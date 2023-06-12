@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,101 +7,69 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Aluno {
-  id             BigInt       @id @default(autoincrement())
-  name           String    @db.VarChar(63)
-  cpf            String    @db.VarChar(127)
-  matricula      String    @db.VarChar(127)
-  email          String    @db.VarChar(127)
-  telefone       String    @db.VarChar(127)
-  curso          String    @db.VarChar(127)
-  password       String    @db.VarChar(127)
-  createdAt      DateTime  @default(now()) @db.Timestamp(0)
-  updatedAt      DateTime  @default(now()) @db.Timestamp(0)
-
-  //relacionamentos
+model User {
+  id                  String             @id @default(uuid())
+  name                String             @db.VarChar(63)
+  cpf                 String             @db.VarChar(127)
+  matricula           String?            @db.VarChar(127)
+  email               String             @db.VarChar(127)
+  telefone            String             @db.VarChar(127)
+  curso               String?            @db.VarChar(127)
+  password            String             @db.VarChar(127)
+  role                String             @db.VarChar(127)
+  createdAt           DateTime           @default(now()) @db.Timestamp(0)
+  updatedAt           DateTime           @default(now()) @db.Timestamp(0)
+  id_instituicao      String?
   termosDeCompromisso TermoCompromisso[] @relation("alunoTermo")
+  instituicao         Instituicao?       @relation("userInstituicao", fields: [id_instituicao], references: [id], map: "tb_instituicao")
 
-  id_instituicao BigInt?
-  instituicao Instituicao? @relation("alunoInstituicao", fields: [id_instituicao], references: [id], map: "tb_instituicao")
-
-  @@map("tb_alunos")
-}
-
-model FuncionarioDex {
-  id        BigInt    @id @default(autoincrement())
-  name      String    @db.VarChar(63)
-  cpf       String    @db.VarChar(127)
-  email     String    @db.VarChar(127)
-  password  String    @db.VarChar(127)
-  createdAt DateTime  @default(now()) @db.Timestamp(0)
-  updatedAt DateTime  @default(now()) @db.Timestamp(0)
-
-  //relacionamentos
-  id_instituicao BigInt? 
-  instituicao Instituicao? @relation("funcionarioDexInstituicao", fields: [id_instituicao], references: [id], map: "tb_instituicao")
-
-  @@map("tb_funcionarios")
+  @@map("tb_users")
 }
 
 model Instituicao {
-  id        BigInt    @id @default(autoincrement())
-  name      String    @db.VarChar(63)
-  campus    String    @db.VarChar(127)
-  cnpj      String    @db.VarChar(127)
-  UF        String    @db.VarChar(127)
-  createdAt DateTime  @default(now()) @db.Timestamp(0)
-  updatedAt DateTime  @default(now()) @db.Timestamp(0)
-
-  //relacionamentos
-  alunos Aluno[] @relation("alunoInstituicao")
-
-  funcionariosDex FuncionarioDex[] @relation("funcionarioDexInstituicao")
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(63)
+  campus    String   @db.VarChar(127)
+  cnpj      String   @db.VarChar(127)
+  UF        String   @db.VarChar(127)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  users     User[]   @relation("userInstituicao")
 
   @@map("tb_instituicao")
 }
 
 model Concedente {
-  id        BigInt    @id @default(autoincrement())
-  name      String    @db.VarChar(63)
-  endereco  String    @db.VarChar(127)
-  cnpj      String    @db.VarChar(127)
-  cep       String    @db.VarChar(127)
-  email     String    @db.VarChar(127)
-  telefone  String    @db.VarChar(127)
-  createdAt DateTime  @default(now()) @db.Timestamp(0)
-  updatedAt DateTime  @default(now()) @db.Timestamp(0)
-
-  //relacionamentos
+  id                  String             @id @default(uuid())
+  name                String             @db.VarChar(63)
+  endereco            String             @db.VarChar(127)
+  cnpj                String             @db.VarChar(127)
+  cep                 String             @db.VarChar(127)
+  email               String             @db.VarChar(127)
+  telefone            String             @db.VarChar(127)
+  createdAt           DateTime           @default(now()) @db.Timestamp(0)
+  updatedAt           DateTime           @default(now()) @db.Timestamp(0)
   termosDeCompromisso TermoCompromisso[] @relation("concedenteTermo")
-
-
 
   @@map("tb_concedentes")
 }
 
 model TermoCompromisso {
-  id                  BigInt    @id @default(autoincrement())
-  numApoliceSeguro    String    @db.VarChar(63)
-  nomeSeguradora      String    @db.VarChar(127)
-  profOrientador      String    @db.VarChar(127)
-  codSiape            String    @db.VarChar(127)
-  dataInicioEstagio   DateTime  @db.Timestamp(0)
-  dataFimEstagio      DateTime  @db.Timestamp(0)
-  horaInicioEstagio   DateTime  @db.Timestamp(0)
-  horaFimEstagio      DateTime  @db.Timestamp(0)
-  createdAt           DateTime  @default(now()) @db.Timestamp(0)
-  updatedAt           DateTime  @default(now()) @db.Timestamp(0)
-
-
-  //relacionamentos
-  id_aluno            BigInt?
-  aluno Aluno? @relation("alunoTermo", fields: [id_aluno], references: [id], map: "tb_alunos")
-
-  id_concedente       BigInt? 
-  concedente Concedente? @relation("concedenteTermo", fields: [id_concedente],references: [id],map: "tb_concedentes")
+  id                String      @id @default(uuid())
+  numApoliceSeguro  String      @db.VarChar(63)
+  nomeSeguradora    String      @db.VarChar(127)
+  profOrientador    String      @db.VarChar(127)
+  codSiape          String      @db.VarChar(127)
+  dataInicioEstagio DateTime    @db.Timestamp(0)
+  dataFimEstagio    DateTime    @db.Timestamp(0)
+  horaInicioEstagio DateTime    @db.Timestamp(0)
+  horaFimEstagio    DateTime    @db.Timestamp(0)
+  createdAt         DateTime    @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime    @default(now()) @db.Timestamp(0)
+  id_aluno          String?
+  id_concedente     String?
+  user              User?       @relation("alunoTermo", fields: [id_aluno], references: [id], map: "tb_alunos")
+  concedente        Concedente? @relation("concedenteTermo", fields: [id_concedente], references: [id], map: "tb_concedentes")
 
   @@map("tb_termo_compromisso")
 }
-
-

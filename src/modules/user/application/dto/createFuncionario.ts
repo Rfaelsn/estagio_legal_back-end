@@ -3,25 +3,22 @@ import {
   IsStrongPassword,
   IsString,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
-export class CreateAlunoDTO {
+import { Role } from '../../domain/entities/user.entity';
+
+export class CreateFuncionarioDTO {
   @IsString()
   name: string;
 
   @IsString()
   cpf: string;
 
-  @IsString()
-  matricula: string;
-
   @IsEmail()
   email: string;
 
   @IsString()
   telefone: string;
-
-  @IsString()
-  curso: string;
 
   @IsStrongPassword({
     minLength: 6,
@@ -30,6 +27,9 @@ export class CreateAlunoDTO {
   })
   password: string;
 
+  @IsEnum(Role)
+  role: string;
+
   @IsOptional()
-  id_instituicao: bigint;
+  id_instituicao: string;
 }

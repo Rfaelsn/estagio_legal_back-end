@@ -4,8 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Aluno } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { User } from '@prisma/client';
+import { PrismaService } from 'src/config/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  createToken(user: Aluno) {
+  createToken(user: User) {
     return {
       acessToken: this.jwtService.sign(
         // infos requeridas no payload
@@ -60,7 +60,7 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = await this.prismaService.aluno.findFirst({
+    const user = await this.prismaService.user.findFirst({
       where: {
         email: email,
         password: password,
@@ -73,7 +73,7 @@ export class AuthService {
     return this.createToken(user);
   }
   async forget(email: string) {
-    const user = await this.prismaService.aluno.findFirst({
+    const user = await this.prismaService.user.findFirst({
       where: {
         email: email,
       },
@@ -86,27 +86,5 @@ export class AuthService {
     //enviar email
 
     return true;
-  }
-  async reset(password: string, token: string) {
-    //validar token
-
-    const id = 0;
-    const user = await this.prismaService.aluno.update({
-      where: {
-        id,
-      },
-      data: {
-        password: password,
-      },
-    });
-
-    return this.createToken(user);
-  }
-
-  async register(data: AuthRegisterDTO) {
-    console.log(data);
-    const user = await this.prismaService.aluno.create({ data });
-
-    return this.createToken(user);
   }
 }

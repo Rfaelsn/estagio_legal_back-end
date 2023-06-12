@@ -5,9 +5,9 @@ import {
   IsOptional,
   IsEnum,
 } from 'class-validator';
-import { Role } from 'src/modules/user/domain/entities/user.entity';
+import { Role } from '../../domain/entities/user.entity';
 
-export class AuthRegisterDTO {
+export class CreateAlunoDTO {
   @IsString()
   name: string;
 
@@ -37,5 +37,11 @@ export class AuthRegisterDTO {
   role: string;
 
   @IsOptional()
-  id_instituicao: bigint;
+  id_instituicao: string;
+
+  @IsOptional()
+  createdAt: Date;
+
+  @IsOptional()
+  updatedAt: Date;
 }
