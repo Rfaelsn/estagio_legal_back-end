@@ -1,10 +1,10 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthLoginDTO } from './dto/auth-login.dto';
-import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { AuthForgetDTO } from './dto/auth-forget.dto';
-import { AuthResetDTO } from './dto/auth-reset.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from './decorators/roles.decorator';
+import { Role } from 'src/modules/user/domain/entities/user.entity';
 import { IsPublic } from './decorators/is-public.decorator';
 // import { AuthGuard } from 'src/guards/auth.guard';
 

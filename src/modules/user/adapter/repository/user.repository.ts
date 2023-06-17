@@ -9,6 +9,11 @@ import { CreateFuncionarioDTO } from '../../application/dto/createFuncionario';
 export class UserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getByEmail(email: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    return user;
+  }
+
   async create(CreateAlunoDTO: CreateAlunoDTO): Promise<User> {
     const data: Prisma.UserCreateInput = { ...CreateAlunoDTO };
     const newUser = await this.prisma.user.create({ data });

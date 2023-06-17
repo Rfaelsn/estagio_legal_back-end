@@ -2,7 +2,15 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserService } from '../../../application/service/user.service';
 import { Role } from '../../../domain/entities/user.entity';
 import { CreateAlunoDTO } from '../../../application/dto/createAluno.dto';
-import { Body, Controller, Delete, Post, Put, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Post,
+  Put,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { CreateFuncionarioDTO } from 'src/modules/user/application/dto/createFuncionario';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 
@@ -14,6 +22,12 @@ export class UserController {
   @Post('createAluno')
   async createAluno(@Body() createAlunoDTO: CreateAlunoDTO) {
     return this.userService.create(createAlunoDTO);
+  }
+
+  @IsPublic()
+  @Get('findByEmail')
+  async findByEmail(@Query('email') email: string) {
+    return this.userService.getUserByEmail(email);
   }
 
   @Get(':id')

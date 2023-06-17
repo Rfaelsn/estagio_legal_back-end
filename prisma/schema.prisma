@@ -10,9 +10,9 @@ datasource db {
 model User {
   id                  String             @id @default(uuid())
   name                String             @db.VarChar(63)
-  cpf                 String             @db.VarChar(127)
-  matricula           String?            @db.VarChar(127)
-  email               String             @db.VarChar(127)
+  cpf                 String             @unique @db.VarChar(127)
+  matricula           String?            @unique @db.VarChar(127)
+  email               String             @unique @db.VarChar(127)
   telefone            String             @db.VarChar(127)
   curso               String?            @db.VarChar(127)
   password            String             @db.VarChar(127)
