@@ -7,6 +7,9 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
+import { UserService } from 'src/modules/user/application/service/user.service';
+import * as bcrypt from 'bcrypt';
+import { UnauthorizedError } from './errors/unauthorized.error';
 
 @Injectable()
 export class AuthService {
@@ -15,8 +18,26 @@ export class AuthService {
 
   constructor(
     private readonly jwtService: JwtService,
+    private readonly userService: UserService,
     private readonly prismaService: PrismaService,
   ) {}
+
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.getUserByEmail(email);
+
+    if (user) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (isPasswordValid) {
+        return {
+          ...user,
+          password: undefined,
+        };
+      }
+    }
+
+    throw new UnauthorizedError('Email e/ou senha incorretos');
+  }
 
   createToken(user: User) {
     return {
