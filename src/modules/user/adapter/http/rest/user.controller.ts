@@ -24,7 +24,6 @@ export class UserController {
     return this.userService.create(createAlunoDTO);
   }
 
-  @IsPublic()
   @Get('findByEmail')
   async findByEmail(@Query('email') email: string) {
     return this.userService.getUserByEmail(email);
