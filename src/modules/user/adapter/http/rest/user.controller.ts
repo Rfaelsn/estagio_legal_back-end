@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { CreateFuncionarioDTO } from 'src/modules/user/application/dto/createFuncionario';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+import { User } from 'src/auth/decorators/user.decorator';
 
 @Controller('user')
 export class UserController {
@@ -27,6 +28,11 @@ export class UserController {
   @Get('findByEmail')
   async findByEmail(@Query('email') email: string) {
     return this.userService.getUserByEmail(email);
+  }
+
+  @Get('me')
+  async showUser(@User() email: string) {
+    return email;
   }
 
   @Get(':id')
