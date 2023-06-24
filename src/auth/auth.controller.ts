@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { AuthLoginDTO } from './dto/auth-login.dto';
 import { AuthForgetDTO } from './dto/auth-forget.dto';
@@ -15,6 +16,7 @@ import { Roles } from './decorators/roles.decorator';
 import { Role } from 'src/modules/user/domain/entities/user.entity';
 import { IsPublic } from './decorators/is-public.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { AuthRequest } from './models/AuthRequest';
 // import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('auth')
@@ -25,8 +27,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Body() { email, password }: AuthLoginDTO) {
-    return this.authService.validateUser(email, password);
+  async login(@Request() req: AuthRequest) {
+    return this.authService.login(req.user);
   }
 
   @Post('forget')

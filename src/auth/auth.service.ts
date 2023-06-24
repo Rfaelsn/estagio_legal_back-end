@@ -4,12 +4,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { User } from 'src/modules/user/domain/entities/user.entity';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from 'src/modules/user/application/service/user.service';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedError } from './errors/unauthorized.error';
+import { AuthRequest } from './models/AuthRequest';
+import { UserPayload } from './models/UserPayload';
+import { UserToken } from './models/UserToken';
 
 @Injectable()
 export class AuthService {
@@ -80,18 +83,18 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string) {
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        email: email,
-        password: password,
-      },
-    });
+  async login(user: User): Promise<UserToken> {
+    const payload: UserPayload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+    };
 
-    if (!user) {
-      throw new UnauthorizedException('E-mail e/ou senha incorretos');
-    }
-    return this.createToken(user);
+    const jwtToken = await this.jwtService.sign(payload);
+
+    return {
+      acess_token: jwtToken,
+    };
   }
   async forget(email: string) {
     const user = await this.prismaService.user.findFirst({
