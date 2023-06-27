@@ -26,6 +26,13 @@ model User {
   @@map("tb_users")
 }
 
+model Token{
+  id        String   @id @default(uuid())
+  hash      String   @db.VarChar(255)
+  user_email  String   @db.VarChar(255)
+  @@map("tb_token")
+}
+
 model Instituicao {
   id        String   @id @default(uuid())
   name      String   @db.VarChar(63)

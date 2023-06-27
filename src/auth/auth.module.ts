@@ -8,6 +8,7 @@ import { UserModule } from 'src/modules/user/user.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlewares/login-validation.middleware';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LoginValidationMiddleware } from './middlewares/login-validation.middle
     }),
     PrismaModule,
     UserModule,
+    TokenModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],

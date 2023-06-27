@@ -12,12 +12,14 @@ import * as bcrypt from 'bcrypt';
 import { UnauthorizedError } from './errors/unauthorized.error';
 import { UserPayload } from './models/UserPayload';
 import { UserToken } from './models/UserToken';
+import { TokenService } from './token/token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -45,6 +47,7 @@ export class AuthService {
     };
 
     const jwtToken = await this.jwtService.sign(payload);
+    this.tokenService.save(jwtToken, user.email);
 
     return {
       acess_token: jwtToken,
