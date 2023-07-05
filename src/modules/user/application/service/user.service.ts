@@ -4,13 +4,13 @@ import { CreateAlunoDTO } from '../dto/createAluno.dto';
 import { User } from '@prisma/client';
 import { CreateUserUsecase } from '../../domain/usecase/create-user.usecase';
 import { FindUserByIdUsecase } from '../../domain/usecase/find-userById.usecase';
-import { FindUserByEmailUsecase } from '../../domain/usecase/find-userByEmail.usecase copy';
+import { FindUserByEmailUsecase } from '../../domain/usecase/find-userByEmail.usecase';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async create(createAlunoDTO: CreateAlunoDTO): Promise<User> {
+  async create(createAlunoDTO: CreateAlunoDTO) {
     const createUserUsecase = new CreateUserUsecase(this.userRepository);
     const aluno = await createUserUsecase.handle(createAlunoDTO);
     return aluno;
