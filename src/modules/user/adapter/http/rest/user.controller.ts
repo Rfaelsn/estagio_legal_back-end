@@ -48,4 +48,8 @@ export class UserController {
   @Post('createFuncionario')
   @Roles(Role.ADMINISTRADOR)
   async createFuncionario(user: CreateFuncionarioDTO) {}
+
+  @Post('uploadPDF')
+  @Roles(Role.ALUNO)
+  async uploadPDF(user: CreateFuncionarioDTO) {}
 }

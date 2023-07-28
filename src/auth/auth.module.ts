@@ -8,7 +8,7 @@ import { UserModule } from 'src/modules/user/user.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlewares/login-validation.middleware';
-import { TokenModule } from './token/token.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { TokenModule } from './token/token.module';
     }),
     PrismaModule,
     UserModule,
-    TokenModule,
+    HttpModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],

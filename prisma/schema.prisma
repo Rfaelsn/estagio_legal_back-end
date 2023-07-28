@@ -21,9 +21,18 @@ model User {
   updatedAt           DateTime           @default(now()) @db.Timestamp(0)
   id_instituicao      String?
   termosDeCompromisso TermoCompromisso[] @relation("alunoTermo")
+  files               File[]             @relation("userFile")
   instituicao         Instituicao?       @relation("userInstituicao", fields: [id_instituicao], references: [id], map: "tb_instituicao")
 
   @@map("tb_users")
+}
+
+model File{
+  id                  String             @id @default(uuid())
+  filePath            String             @db.VarChar(255)
+  userId              String             @db.VarChar(255)
+  user                User               @relation("userFile",fields: [userId], references: [id])
+  @@map("tb_user_files")
 }
 
 model Token{
@@ -75,8 +84,8 @@ model TermoCompromisso {
   updatedAt         DateTime    @default(now()) @db.Timestamp(0)
   id_aluno          String?
   id_concedente     String?
-  user              User?       @relation("alunoTermo", fields: [id_aluno], references: [id], map: "tb_alunos")
-  concedente        Concedente? @relation("concedenteTermo", fields: [id_concedente], references: [id], map: "tb_concedentes")
+  user              User?       @relation("alunoTermo", fields: [id_aluno], references: [id])
+  concedente        Concedente? @relation("concedenteTermo", fields: [id_concedente], references: [id])
 
   @@map("tb_termo_compromisso")
 }
