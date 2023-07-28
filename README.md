@@ -22,27 +22,32 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Descrição
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Back-end da aplicação esstagio legal
+Front-end: https://github.com/diegosantss/estagio_legal_front
 
-## Installation
+## Instalação
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+## Inicializando a aplicação
 
 ```bash
-# development
-$ npm run start
 
-# watch mode
-$ npm run start:dev
+# desenvolvimento
+$ npm run dev
 
-# production mode
+# modo de produção
 $ npm run start:prod
+
+#criação do banco de dados com prismaORM
+$ npx prisma db push
+
+#atualização do prisma client
+$ npx prisma generate
 ```
 
 ## Test
