@@ -21,6 +21,7 @@ model User {
   updatedAt           DateTime           @default(now()) @db.Timestamp(0)
   id_instituicao      String?
   termosDeCompromisso TermoCompromisso[] @relation("alunoTermo")
+  processosDeEstagio  ProcessoEstagio [] @relation("alunoProcessoEstagio")
   files               File[]             @relation("userFile")
   instituicao         Instituicao?       @relation("userInstituicao", fields: [id_instituicao], references: [id], map: "tb_instituicao")
 
@@ -82,10 +83,50 @@ model TermoCompromisso {
   horaFimEstagio    DateTime    @db.Timestamp(0)
   createdAt         DateTime    @default(now()) @db.Timestamp(0)
   updatedAt         DateTime    @default(now()) @db.Timestamp(0)
+  //relacionamento aluno
   id_aluno          String?
-  id_concedente     String?
   user              User?       @relation("alunoTermo", fields: [id_aluno], references: [id])
+
+  //relaionamento concedente
+  id_concedente     String?
   concedente        Concedente? @relation("concedenteTermo", fields: [id_concedente], references: [id])
 
+  //relacionamento processo
+  id_processoEstagio String    @unique
+  processoEstagio   ProcessoEstagio @relation(fields: [id_processoEstagio], references: [id])
+
   @@map("tb_termo_compromisso")
+}
+
+model ProcessoEstagio {
+  id                  String      @id @default(uuid())
+  movimentacao        String      @db.VarChar(63)
+  status              String      @db.VarChar(127)
+  dataInicioProcesso  DateTime   @default(now()) @db.Timestamp(0)
+  dataFimProcesso     DateTime   @db.Timestamp(0)
+
+  //relacionamento termo de compromisso
+  termoCompromisso TermoCompromisso?
+
+  //relacionamento Aluno
+  id_aluno            String
+  user              User       @relation("alunoProcessoEstagio", fields: [id_aluno], references: [id])
+
+  //relacionamento AvaliacaoAluno
+  avaliacaoEstagio AvalicaoEstagio[] @relation("processoEstagioAvaliacao")
+  
+  @@map("tb_processo_estagio")
+}
+
+model AvalicaoEstagio{
+  id                  String      @id @default(uuid())
+  atividadesEstagio   String      @db.VarChar(63)
+  componentesCurricularesUtilizados   String      @db.VarChar(127)
+  aplicacaoDeConhecimentosCurso   String      @db.VarChar(127)
+  dataInicioProcesso  DateTime   @default(now()) @db.Timestamp(0)
+  dataFimProcesso     DateTime   @db.Timestamp(0)
+  id_aluno            String
+  id_processoEstagio  String
+
+  processoEstagio        ProcessoEstagio @relation("processoEstagioAvaliacao", fields: [id_processoEstagio], references: [id])
 }
