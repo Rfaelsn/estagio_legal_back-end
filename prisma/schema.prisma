@@ -81,8 +81,6 @@ model TermoCompromisso {
   dataFimEstagio    DateTime    @db.Timestamp(0)
   horaInicioEstagio DateTime    @db.Timestamp(0)
   horaFimEstagio    DateTime    @db.Timestamp(0)
-  createdAt         DateTime    @default(now()) @db.Timestamp(0)
-  updatedAt         DateTime    @default(now()) @db.Timestamp(0)
   //relacionamento aluno
   id_aluno          String?
   user              User?       @relation("alunoTermo", fields: [id_aluno], references: [id])
@@ -109,8 +107,8 @@ model ProcessoEstagio {
   termoCompromisso TermoCompromisso?
 
   //relacionamento Aluno
-  id_aluno            String
-  user              User       @relation("alunoProcessoEstagio", fields: [id_aluno], references: [id])
+  id_aluno            String?
+  user              User?       @relation("alunoProcessoEstagio", fields: [id_aluno], references: [id])
 
   //relacionamento AvaliacaoAluno
   avaliacaoEstagio AvalicaoEstagio[] @relation("processoEstagioAvaliacao")

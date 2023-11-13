@@ -1,4 +1,5 @@
-import { TermoCompromisso, AvalicaoEstagio } from '@prisma/client';
+import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
+import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -26,13 +27,13 @@ export class IntershipProcess {
 
   dataFimProcesso: Date;
 
-  termoCompromisso?: TermoCompromisso;
+  // termoCompromisso?: TermCommitment;
 
   id_aluno: string;
 
-  user: User;
+  // user: User;
 
-  avaliacaoEstagio: AvalicaoEstagio[];
+  // avaliacaoEstagio: InternshipEvaluation[];
 
   constructor(props: Omit<IntershipProcess, 'id'>, id?: string) {
     Object.assign(this, props);

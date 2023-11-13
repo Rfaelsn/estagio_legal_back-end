@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { CreateIntershipProcessDTO } from '../dto/createIntershipProcess.dto';
-import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcessUsecase';
+import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcess.usecase';
 import { IIntershipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 import { IntershipProcess } from '../../domain/entities/intershipProcess.entity';
 
