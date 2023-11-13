@@ -3,6 +3,7 @@ import { Prisma, ProcessoEstagio, User } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { IIntershipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 import { CreateIntershipProcessDTO } from '../../application/dto/createIntershipProcess.dto';
+import { IntershipProcess } from '../../domain/entities/intershipProcess.entity';
 
 @Injectable()
 export class IntershipProcessRepository implements IIntershipProcessRepository {

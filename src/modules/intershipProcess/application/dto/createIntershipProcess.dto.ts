@@ -1,4 +1,3 @@
-import { AvalicaoEstagio, TermoCompromisso } from '@prisma/client';
 import {
   IsString,
   IsOptional,
@@ -11,6 +10,8 @@ import {
   IntershipProcessMovement,
   IntershipProcessStatus,
 } from '../../domain/entities/intershipProcess.entity';
+import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
+import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
 
 export class CreateIntershipProcessDTO {
   @IsEnum(IntershipProcessMovement)
@@ -25,14 +26,14 @@ export class CreateIntershipProcessDTO {
   @IsDate()
   dataFimProcesso: Date;
 
-  @IsOptional()
-  termoCompromisso?: TermoCompromisso;
+  // @IsOptional()
+  // termoCompromisso?: TermCommitment;
 
   @IsString()
   id_aluno: string;
 
-  @IsNotEmpty()
-  user: User;
+  // @IsNotEmpty()
+  // user: User;
 
-  avaliacaoEstagio: AvalicaoEstagio[];
+  // avaliacaoEstagio: InternshipEvaluation[];
 }
