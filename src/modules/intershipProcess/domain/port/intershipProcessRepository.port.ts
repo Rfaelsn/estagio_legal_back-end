@@ -1,6 +1,5 @@
-import { ProcessoEstagio } from '@prisma/client';
-import { CreateIntershipProcessDTO } from '../../application/dto/createIntershipProcess.dto';
+import { InternshipProcess } from '../entities/intershipProcess.entity';
 
-export interface IIntershipProcessRepository {
-  create(intershipProcess: CreateIntershipProcessDTO): Promise<ProcessoEstagio>;
+export interface IInternshipProcessRepository {
+  create(intershipProcess: InternshipProcess): Promise<InternshipProcess>;
 }

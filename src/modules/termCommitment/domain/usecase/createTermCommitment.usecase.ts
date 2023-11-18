@@ -1,23 +1,22 @@
-// import axios from 'axios';
-// import { HttpException, HttpStatus } from '@nestjs/common';
-// import { CreateIntershipProcessDTO } from '../../application/dto/createintershipProcess.dto';
-// import { IIntershipProcessRepository } from '../port/intershipProcessRepository.port';
-// import { IntershipProcess } from '../entities/intershipProcess.entity';
+import { CreateTermCommitmentDTO } from '../../application/dto/createTermCommitment.dto';
+import { TermCommitment } from '../entities/termCommitment.entity';
+import { ITermCommitmentRepository } from '../port/ITermCommitmentRepository';
 
-// export class CreateTermCommitmentUsecase {
-//   constructor(
-//     private readonly intershipProcessRepository: IIntershipProcessRepository,
-//   ) {}
+export class CreateTermCommitmentUsecase {
+  constructor(
+    private readonly termCommitmentRepository: ITermCommitmentRepository,
+  ) {}
 
-//   async handle(createIntershipProcessDTO: CreateIntershipProcessDTO) {
-//     try {
-//       const intershipProcess = new IntershipProcess(createIntershipProcessDTO);
-//       const createIntershipProcess =
-//         await this.intershipProcessRepository.create(intershipProcess);
+  async handle(createTermCommitmentDTO: CreateTermCommitmentDTO) {
+    try {
+      const termCommitment = new TermCommitment(createTermCommitmentDTO);
+      const createTermCommitment = await this.termCommitmentRepository.create(
+        termCommitment,
+      );
 
-//       return createIntershipProcess;
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   }
-// }
+      return createTermCommitment;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}

@@ -1,9 +1,9 @@
 import { IUserRepository } from '../port/user-repository.port';
 import { CreateAlunoDTO } from '../../application/dto/createAluno.dto';
-import { User } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { User } from '../entities/user.entity';
 
 export class CreateUserUsecase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -14,15 +14,15 @@ export class CreateUserUsecase {
         'http://localhost:3000/aluno/findByMatricula',
         {
           params: {
-            matricula: inputUserAlunoDTO.matricula,
+            registration: inputUserAlunoDTO.registration,
           },
         },
       );
 
       console.log(response.data);
       if (
-        inputUserAlunoDTO.name === response.data.nome &&
-        inputUserAlunoDTO.matricula === response.data.matricula
+        inputUserAlunoDTO.name === response.data.name &&
+        inputUserAlunoDTO.registration === response.data.registration
       ) {
         const data = {
           ...inputUserAlunoDTO,

@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/config/prisma/prisma.module';
-import { IntershipProcessController } from './adapter/http/rest/intershipProcess.controller';
-import { IntershipProcessService } from './application/service/intershipProcess.service';
-import { IntershipProcessRepository } from './adapter/repository/intershipProcess.repository';
+
+import { InternshipProcessService } from './application/service/intershipProcess.service';
+import { InternshipProcessController } from './adapter/http/rest/intershipProcess.controller';
+import { InternshipProcessRepository } from './adapter/repository/intershipProcess.repository';
 
 @Module({
-  controllers: [IntershipProcessController],
-  providers: [IntershipProcessService, IntershipProcessRepository],
+  controllers: [InternshipProcessController],
+  providers: [InternshipProcessService, InternshipProcessRepository],
   imports: [PrismaModule],
-  exports: [IntershipProcessService],
+  exports: [InternshipProcessService],
 })
-export class IntershipProcessModule {}
+export class InternshipProcessModule {}

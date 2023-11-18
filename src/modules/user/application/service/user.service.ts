@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../../adapter/repository/user.repository';
 import { CreateAlunoDTO } from '../dto/createAluno.dto';
-import { User } from '@prisma/client';
 import { CreateUserUsecase } from '../../domain/usecase/create-user.usecase';
 import { FindUserByIdUsecase } from '../../domain/usecase/find-userById.usecase';
 import { FindUserByEmailUsecase } from '../../domain/usecase/find-userByEmail.usecase';
+import { User } from '../../domain/entities/user.entity';
 
 @Injectable()
 export class UserService {

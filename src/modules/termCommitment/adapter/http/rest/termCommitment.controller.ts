@@ -1,17 +1,18 @@
-// import { Body, Controller, Post } from '@nestjs/common';
-// import { IsPublic } from 'src/auth/decorators/is-public.decorator';
-// import { CreateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/createIntershipProcess.dto';
-// import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
+import { Body, Controller, Post } from '@nestjs/common';
+import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+import { CreateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/createIntershipProcess.dto';
+import { CreateTermCommitmentDTO } from 'src/modules/termCommitment/application/dto/createTermCommitment.dto';
+import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 
-// @Controller('processo/estagio')
-// export class termCommitmentController {
-//   constructor(private readonly termCommitmentService: TermCommitmentService) {}
+@Controller('termCommitment')
+export class termCommitmentController {
+  constructor(private readonly termCommitmentService: TermCommitmentService) {}
 
-//   @IsPublic()
-//   @Post('create')
-//   async createIntershipProcess(
-//     @Body() createIntershipProcessDTO: CreateIntershipProcessDTO,
-//   ) {
-//     return this.termCommitmentService.create(createIntershipProcessDTO);
-//   }
-// }
+  @IsPublic()
+  @Post('create')
+  async createIntershipProcess(
+    @Body() createTermCommitmentDTO: CreateTermCommitmentDTO,
+  ) {
+    return this.termCommitmentService.create(createTermCommitmentDTO);
+  }
+}

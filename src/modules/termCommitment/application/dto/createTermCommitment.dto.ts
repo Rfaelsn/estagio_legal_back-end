@@ -1,39 +1,44 @@
-// import {
-//   IsString,
-//   IsOptional,
-//   IsEnum,
-//   IsDate,
-//   IsNotEmpty,
-// } from 'class-validator';
-// import { User } from 'src/modules/user/domain/entities/user.entity';
-// import {
-//   IntershipProcessMovement,
-//   IntershipProcessStatus,
-// } from '../../domain/entities/intershipProcess.entity';
-// import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
-// import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
+import { Prisma, TermCommitment } from '@prisma/client';
+import { IsString, IsDate } from 'class-validator';
+// import { TermCommitment } from '../../domain/entities/termCommitment.entity';
 
-// export class CreateIntershipProcessDTO {
-//   @IsEnum(IntershipProcessMovement)
-//   movimentacao: string;
+export class CreateTermCommitmentDTO {
+  @IsString()
+  numApoliceSeguro: string;
 
-//   @IsEnum(IntershipProcessStatus)
-//   status: string;
+  @IsString()
+  nomeSeguradora: string;
 
-//   @IsDate()
-//   dataInicioProcesso: Date;
+  @IsString()
+  profOrientador: string;
 
-//   @IsDate()
-//   dataFimProcesso: Date;
+  @IsString()
+  codSiape: string;
 
-//   // @IsOptional()
-//   // termoCompromisso?: TermCommitment;
+  @IsDate()
+  dataInicioEstagio: Date;
 
-//   @IsString()
-//   id_aluno: string;
+  @IsDate()
+  dataFimEstagio: Date;
 
-//   // @IsNotEmpty()
-//   // user: User;
+  @IsDate()
+  horaInicioEstagio: Date;
 
-//   // avaliacaoEstagio: InternshipEvaluation[];
-// }
+  @IsDate()
+  horaFimEstagio: Date;
+
+  @IsString()
+  id_aluno: string;
+
+  user: Prisma.UserCreateNestedOneWithoutTermsCommitmentInput;
+
+  @IsString()
+  id_internshipGrantor: string;
+
+  internshipGrantor: Prisma.InternshipGrantorCreateNestedOneWithoutTermsCommitmentInput;
+
+  @IsString()
+  id_processoEstagio: string;
+
+  internshipProcess: Prisma.InternshipProcessCreateNestedOneWithoutTermCommitmentInput;
+}

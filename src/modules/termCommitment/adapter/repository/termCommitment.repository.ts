@@ -1,23 +1,45 @@
-// import { Injectable } from '@nestjs/common';
-// import { Prisma, ProcessoEstagio, User } from '@prisma/client';
-// import { PrismaService } from 'src/config/prisma/prisma.service';
-// import { IIntershipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
-// import { CreateIntershipProcessDTO } from '../../application/dto/createIntershipProcess.dto';
+import { Injectable } from '@nestjs/common';
+import { Prisma, User } from '@prisma/client';
+import { PrismaService } from 'src/config/prisma/prisma.service';
+import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository';
+import { TermCommitmentEntity } from '../../domain/entities/termCommitment.entity';
+import { CreateTermCommitmentDTO } from '../../application/dto/createTermCommitment.dto';
 
-// @Injectable()
-// export class TermCommitmentRepository implements IIntershipProcessRepository {
-//   constructor(private readonly prisma: PrismaService) {}
+@Injectable()
+export class TermCommitmentRepository implements ITermCommitmentRepository {
+  constructor(private readonly prisma: PrismaService) {}
 
-//   async create(
-//     createIntershipProcessDTO: CreateIntershipProcessDTO,
-//   ): Promise<ProcessoEstagio> {
-//     const data: Prisma.ProcessoEstagioCreateInput = {
-//       ...createIntershipProcessDTO,
-//     };
-//     const newIntershipProcess = await this.prisma.processoEstagio.create({
-//       data,
-//     });
+  async create(
+    createTermCommitmentDTO: CreateTermCommitmentDTO,
+  ): Promise<TermCommitmentEntity> {
+    const data: Prisma.TermCommitmentCreateInput = {
+      ...createTermCommitmentDTO,
+      user: {
+        connect: {
+          id: createTermCommitmentDTO.id_aluno,
+        },
+      },
+      internshipGrantor: {
+        connect: {
+          id: createTermCommitmentDTO.id_internshipGrantor,
+        },
+      },
+      internshipProcess: {
+        connect: {
+          id: createTermCommitmentDTO.id_processoEstagio,
+        },
+      },
+    };
 
-//     return newIntershipProcess;
-//   }
-// }
+    const newTermCommitment = await this.prisma.termCommitment.create({
+      data,
+      include: {
+        user: true,
+        internshipGrantor: true,
+        internshipProcess: true,
+      },
+    });
+
+    return newTermCommitment;
+  }
+}

@@ -11,19 +11,19 @@ model User {
   id                  String             @id @default(uuid())
   name                String             @db.VarChar(63)
   cpf                 String             @unique @db.VarChar(127)
-  matricula           String?            @unique @db.VarChar(127)
+  registration        String?            @unique @db.VarChar(127)
   email               String             @unique @db.VarChar(127)
   telefone            String             @db.VarChar(127)
-  curso               String?            @db.VarChar(127)
+  courseStudy         String?            @db.VarChar(127)
   password            String             @db.VarChar(127)
   role                String             @db.VarChar(127)
   createdAt           DateTime           @default(now()) @db.Timestamp(0)
   updatedAt           DateTime           @default(now()) @db.Timestamp(0)
-  id_instituicao      String?
-  termosDeCompromisso TermoCompromisso[] @relation("alunoTermo")
-  processosDeEstagio  ProcessoEstagio [] @relation("alunoProcessoEstagio")
-  files               File[]             @relation("userFile")
-  instituicao         Instituicao?       @relation("userInstituicao", fields: [id_instituicao], references: [id], map: "tb_instituicao")
+  id_institution      String?
+  TermsCommitment     TermCommitment[]     @relation("userTerm")
+  internshipProcess   InternshipProcess [] @relation("alunoProcessoEstagio")
+  files               File[]               @relation("userFile")
+  institution         Institution?         @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
 
   @@map("tb_users")
 }
@@ -43,7 +43,7 @@ model Token{
   @@map("tb_token")
 }
 
-model Instituicao {
+model Institution {
   id        String   @id @default(uuid())
   name      String   @db.VarChar(63)
   campus    String   @db.VarChar(127)
@@ -51,12 +51,12 @@ model Instituicao {
   UF        String   @db.VarChar(127)
   createdAt DateTime @default(now()) @db.Timestamp(0)
   updatedAt DateTime @default(now()) @db.Timestamp(0)
-  users     User[]   @relation("userInstituicao")
+  users     User[]   @relation("userInstitution")
 
-  @@map("tb_instituicao")
+  @@map("tb_institution")
 }
 
-model Concedente {
+model InternshipGrantor {
   id                  String             @id @default(uuid())
   name                String             @db.VarChar(63)
   endereco            String             @db.VarChar(127)
@@ -66,12 +66,12 @@ model Concedente {
   telefone            String             @db.VarChar(127)
   createdAt           DateTime           @default(now()) @db.Timestamp(0)
   updatedAt           DateTime           @default(now()) @db.Timestamp(0)
-  termosDeCompromisso TermoCompromisso[] @relation("concedenteTermo")
+  termsCommitment TermCommitment[] @relation("internshipGrantorTerm")
 
-  @@map("tb_concedentes")
+  @@map("tb_internshipGrantor")
 }
 
-model TermoCompromisso {
+model TermCommitment {
   id                String      @id @default(uuid())
   numApoliceSeguro  String      @db.VarChar(63)
   nomeSeguradora    String      @db.VarChar(127)
@@ -82,49 +82,50 @@ model TermoCompromisso {
   horaInicioEstagio DateTime    @db.Timestamp(0)
   horaFimEstagio    DateTime    @db.Timestamp(0)
   //relacionamento aluno
-  id_aluno          String?
-  user              User?       @relation("alunoTermo", fields: [id_aluno], references: [id])
+  id_aluno          String
+  user              User       @relation("userTerm", fields: [id_aluno], references: [id])
 
   //relaionamento concedente
-  id_concedente     String?
-  concedente        Concedente? @relation("concedenteTermo", fields: [id_concedente], references: [id])
+  id_internshipGrantor     String
+  internshipGrantor        InternshipGrantor @relation("internshipGrantorTerm", fields: [id_internshipGrantor], references: [id])
 
   //relacionamento processo
   id_processoEstagio String    @unique
-  processoEstagio   ProcessoEstagio @relation(fields: [id_processoEstagio], references: [id])
+  internshipProcess   InternshipProcess @relation(fields: [id_processoEstagio], references: [id])
 
-  @@map("tb_termo_compromisso")
+  @@map("tb_termCommitment")
 }
 
-model ProcessoEstagio {
+model InternshipProcess {
   id                  String      @id @default(uuid())
-  movimentacao        String      @db.VarChar(63)
+  movement            String      @db.VarChar(63)
   status              String      @db.VarChar(127)
-  dataInicioProcesso  DateTime   @default(now()) @db.Timestamp(0)
-  dataFimProcesso     DateTime   @db.Timestamp(0)
+  startDateProcess    DateTime   @default(now()) @db.Timestamp(0)
+  endDateProcess      DateTime   @db.Timestamp(0)
 
   //relacionamento termo de compromisso
-  termoCompromisso TermoCompromisso?
+  termCommitment TermCommitment?
 
   //relacionamento Aluno
-  id_aluno            String?
-  user              User?       @relation("alunoProcessoEstagio", fields: [id_aluno], references: [id])
+  id_user            String?
+  user              User?       @relation("alunoProcessoEstagio", fields: [id_user], references: [id])
 
   //relacionamento AvaliacaoAluno
-  avaliacaoEstagio AvalicaoEstagio[] @relation("processoEstagioAvaliacao")
+  internshipEvaluation InternshipEvaluation[] @relation("processoEstagioAvaliacao")
   
-  @@map("tb_processo_estagio")
+  @@map("tb_internshipProcess")
 }
 
-model AvalicaoEstagio{
+model InternshipEvaluation{
   id                  String      @id @default(uuid())
   atividadesEstagio   String      @db.VarChar(63)
   componentesCurricularesUtilizados   String      @db.VarChar(127)
   aplicacaoDeConhecimentosCurso   String      @db.VarChar(127)
-  dataInicioProcesso  DateTime   @default(now()) @db.Timestamp(0)
-  dataFimProcesso     DateTime   @db.Timestamp(0)
-  id_aluno            String
-  id_processoEstagio  String
+  startDateProcess  DateTime   @default(now()) @db.Timestamp(0)
+  endDateProcess    DateTime   @db.Timestamp(0)
+  id_user            String
+  id_internshipProcess  String
 
-  processoEstagio        ProcessoEstagio @relation("processoEstagioAvaliacao", fields: [id_processoEstagio], references: [id])
+  internshipProcess        InternshipProcess @relation("processoEstagioAvaliacao", fields: [id_internshipProcess], references: [id])
+	@@map("tb_internshipEvaluation")
 }

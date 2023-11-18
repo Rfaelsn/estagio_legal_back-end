@@ -1,5 +1,4 @@
-import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
-import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
+import { Prisma } from '@prisma/client';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,32 +9,25 @@ export enum IntershipProcessStatus {
 }
 
 export enum IntershipProcessMovement {
-  INICIO_ESTAGIO = 'INÍCIO DE ESTAGIO',
+  INICIO_ESTAGIO = 'INÍCIO DE ESTÁGIO',
   RENOVACAO = 'RENOVAÇÃO DE ESTÁGIO',
   FIM_ESTAGIO = 'FIM DE ESTÁGIO',
   CREDITACAO = 'CREDITAÇÃO',
 }
 
-export class IntershipProcess {
-  id: string;
-
-  movimentacao: string;
-
+export class InternshipProcess
+  implements Prisma.InternshipProcessUncheckedCreateInput
+{
+  id?: string;
+  movement: string;
   status: string;
+  startDateProcess?: string | Date;
+  endDateProcess: string | Date;
+  id_user?: string;
+  termCommitment?: Prisma.TermCommitmentUncheckedCreateNestedOneWithoutInternshipProcessInput;
+  internshipEvaluation?: Prisma.InternshipEvaluationUncheckedCreateNestedManyWithoutInternshipProcessInput;
 
-  dataInicioProcesso: Date;
-
-  dataFimProcesso: Date;
-
-  // termoCompromisso?: TermCommitment;
-
-  id_aluno: string;
-
-  // user: User;
-
-  // avaliacaoEstagio: InternshipEvaluation[];
-
-  constructor(props: Omit<IntershipProcess, 'id'>, id?: string) {
+  constructor(props: Omit<InternshipProcess, 'id'>, id?: string) {
     Object.assign(this, props);
     if (!id) {
       this.id = uuidv4();

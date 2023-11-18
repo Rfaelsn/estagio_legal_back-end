@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { CreateIntershipProcessDTO } from '../dto/createIntershipProcess.dto';
 import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcess.usecase';
-import { IIntershipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
-import { IntershipProcess } from '../../domain/entities/intershipProcess.entity';
+import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
 
 @Injectable()
-export class IntershipProcessService {
+export class InternshipProcessService {
   constructor(
-    private readonly intershipProcessRepository: IIntershipProcessRepository,
+    private readonly intershipProcessRepository: InternshipProcessRepository,
   ) {}
 
   async create(createIntershipProcessDTO: CreateIntershipProcessDTO) {

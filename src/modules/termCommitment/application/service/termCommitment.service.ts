@@ -1,31 +1,29 @@
-// import { Injectable } from '@nestjs/common';
-// import { User } from '@prisma/client';
-// import { CreateIntershipProcessDTO } from '../dto/createIntershipProcess.dto';
-// import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcessUsecase';
-// import { IIntershipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
-// import { IntershipProcess } from '../../domain/entities/intershipProcess.entity';
+import { Injectable } from '@nestjs/common';
+import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository';
+import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
+import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
 
-// @Injectable()
-// export class TermCommitmentService {
-//   constructor(
-//     private readonly intershipProcessRepository: IIntershipProcessRepository,
-//   ) {}
+@Injectable()
+export class TermCommitmentService {
+  constructor(
+    private readonly termCommitmentRepository: ITermCommitmentRepository,
+  ) {}
 
-//   async create(createIntershipProcessDTO: CreateIntershipProcessDTO) {
-//     const createIntershipProcessUsecase = new CreateIntershipProcessUsecase(
-//       this.intershipProcessRepository,
-//     );
-//     const intershipProcess = await createIntershipProcessUsecase.handle(
-//       createIntershipProcessDTO,
-//     );
-//     return intershipProcess;
-//   }
+  async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {
+    const createIntershipProcessUsecase = new CreateTermCommitmentUsecase(
+      this.termCommitmentRepository,
+    );
+    const intershipProcess = await createIntershipProcessUsecase.handle(
+      createTermCommitmentDTO,
+    );
+    return intershipProcess;
+  }
 
-//   // async getUserById(id: string): Promise<IntershipProcess> {
-//   //   const findUserUsecase = new FindUserByIdUsecase(
-//   //     this.intershipProcessRepository,
-//   //   );
-//   //   const user = await findUserUsecase.handle(id);
-//   //   return user;
-//   // }
-// }
+  // async getUserById(id: string): Promise<IntershipProcess> {
+  //   const findUserUsecase = new FindUserByIdUsecase(
+  //     this.intershipProcessRepository,
+  //   );
+  //   const user = await findUserUsecase.handle(id);
+  //   return user;
+  // }
+}
