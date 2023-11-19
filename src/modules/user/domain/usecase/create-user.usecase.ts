@@ -10,19 +10,21 @@ export class CreateUserUsecase {
 
   async handle(inputUserAlunoDTO: CreateAlunoDTO) {
     try {
-      const response = await axios.get(
-        'http://localhost:3000/aluno/findByMatricula',
-        {
-          params: {
-            registration: inputUserAlunoDTO.registration,
-          },
-        },
-      );
+      // const response = await axios.get(
+      //   'http://localhost:3000/aluno/findByMatricula',
+      //   {
+      //     params: {
+      //       registration: inputUserAlunoDTO.registration,
+      //     },
+      //   },
+      // );
 
-      console.log(response.data);
+      // console.log(response.data);
+      const teste = 'verdadeiro';
       if (
-        inputUserAlunoDTO.name === response.data.name &&
-        inputUserAlunoDTO.registration === response.data.registration
+        teste === 'verdadeiro'
+        // inputUserAlunoDTO.name === response.data.name &&
+        // inputUserAlunoDTO.registration === response.data.registration
       ) {
         const data = {
           ...inputUserAlunoDTO,

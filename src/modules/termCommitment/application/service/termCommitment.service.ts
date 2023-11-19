@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
 import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
+import { TermCommitmentRepository } from '../../adapter/repository/termCommitment.repository';
 
 @Injectable()
 export class TermCommitmentService {
   constructor(
-    private readonly termCommitmentRepository: ITermCommitmentRepository,
+    private readonly termCommitmentRepository: TermCommitmentRepository,
   ) {}
 
   async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {

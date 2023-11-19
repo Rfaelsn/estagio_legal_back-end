@@ -15,6 +15,12 @@ export class InternshipProcessRepository
   ): Promise<InternshipProcess> {
     const data: Prisma.InternshipProcessCreateInput = {
       ...createIntershipProcessDTO,
+      user: {
+        connect: {
+          id: createIntershipProcessDTO.id_user,
+        },
+      },
+      termCommitment: createIntershipProcessDTO.termCommitment,
     };
     const newIntershipProcess = await this.prisma.internshipProcess.create({
       data,

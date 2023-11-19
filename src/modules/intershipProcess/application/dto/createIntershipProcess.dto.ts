@@ -15,9 +15,6 @@ import {
 import { Prisma } from '@prisma/client';
 
 export class CreateIntershipProcessDTO extends InternshipProcess {
-  @IsString()
-  id: string;
-
   @IsEnum(IntershipProcessMovement)
   movement: string;
 
@@ -34,7 +31,7 @@ export class CreateIntershipProcessDTO extends InternshipProcess {
   id_user: string;
 
   @IsOptional()
-  termCommitment?: Prisma.TermCommitmentUncheckedCreateNestedOneWithoutInternshipProcessInput;
+  termCommitment?: Prisma.TermCommitmentCreateNestedOneWithoutInternshipProcessInput;
 
   @IsOptional()
   internshipEvaluation?: Prisma.InternshipEvaluationUncheckedCreateNestedManyWithoutInternshipProcessInput;

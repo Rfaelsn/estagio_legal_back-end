@@ -1,9 +1,9 @@
-import { InternshipGrantor, Prisma, TermCommitment } from '@prisma/client';
+import { InternshipGrantor } from 'src/modules/internshipGrantor/domain/entities/internshipGrantor.entity';
 import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export class TermCommitmentEntity {
+export class TermCommitment {
   id: string;
   numApoliceSeguro: string;
   nomeSeguradora: string;

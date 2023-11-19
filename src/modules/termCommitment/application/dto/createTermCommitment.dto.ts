@@ -1,5 +1,8 @@
 import { Prisma, TermCommitment } from '@prisma/client';
 import { IsString, IsDate } from 'class-validator';
+import { InternshipGrantor } from 'src/modules/internshipGrantor/domain/entities/internshipGrantor.entity';
+import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
+import { User } from 'src/modules/user/domain/entities/user.entity';
 // import { TermCommitment } from '../../domain/entities/termCommitment.entity';
 
 export class CreateTermCommitmentDTO {
@@ -30,15 +33,15 @@ export class CreateTermCommitmentDTO {
   @IsString()
   id_aluno: string;
 
-  user: Prisma.UserCreateNestedOneWithoutTermsCommitmentInput;
+  user?: User;
 
   @IsString()
   id_internshipGrantor: string;
 
-  internshipGrantor: Prisma.InternshipGrantorCreateNestedOneWithoutTermsCommitmentInput;
+  internshipGrantor?: InternshipGrantor;
 
   @IsString()
   id_processoEstagio: string;
 
-  internshipProcess: Prisma.InternshipProcessCreateNestedOneWithoutTermCommitmentInput;
+  internshipProcess?: InternshipProcess;
 }

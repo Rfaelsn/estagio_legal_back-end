@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository';
-import { TermCommitmentEntity } from '../../domain/entities/termCommitment.entity';
+import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository.port';
+import { TermCommitment } from '../../domain/entities/termCommitment.entity';
 import { CreateTermCommitmentDTO } from '../../application/dto/createTermCommitment.dto';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
 
   async create(
     createTermCommitmentDTO: CreateTermCommitmentDTO,
-  ): Promise<TermCommitmentEntity> {
+  ): Promise<TermCommitment> {
     const data: Prisma.TermCommitmentCreateInput = {
       ...createTermCommitmentDTO,
       user: {

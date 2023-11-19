@@ -1,6 +1,6 @@
 import { CreateTermCommitmentDTO } from '../../application/dto/createTermCommitment.dto';
 import { TermCommitment } from '../entities/termCommitment.entity';
-import { ITermCommitmentRepository } from '../port/ITermCommitmentRepository';
+import { ITermCommitmentRepository } from '../port/ITermCommitmentRepository.port';
 
 export class CreateTermCommitmentUsecase {
   constructor(
