@@ -38,10 +38,10 @@ export class CreateTermCommitmentDTO {
   @IsString()
   id_internshipGrantor: string;
 
-  internshipGrantor?: InternshipGrantor;
+  internshipGrantor?: Prisma.InternshipGrantorCreateNestedOneWithoutTermsCommitmentInput;
 
   @IsString()
-  id_processoEstagio: string;
+  id_processoEstagio?: string;
 
-  internshipProcess?: InternshipProcess;
+  internshipProcess?: Prisma.InternshipProcessCreateNestedOneWithoutTermCommitmentInput;
 }

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { InternshipProcess, Prisma, User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 import { CreateIntershipProcessDTO } from '../../application/dto/createIntershipProcess.dto';
+import { InternshipProcess } from '../../domain/entities/intershipProcess.entity';
 
 @Injectable()
 export class InternshipProcessRepository
@@ -15,13 +16,10 @@ export class InternshipProcessRepository
   ): Promise<InternshipProcess> {
     const data: Prisma.InternshipProcessCreateInput = {
       ...createIntershipProcessDTO,
-      user: {
-        connect: {
-          id: createIntershipProcessDTO.id_user,
-        },
-      },
-      termCommitment: createIntershipProcessDTO.termCommitment,
     };
+
+    console.log(data);
+
     const newIntershipProcess = await this.prisma.internshipProcess.create({
       data,
     });

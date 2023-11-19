@@ -90,8 +90,8 @@ model TermCommitment {
   internshipGrantor        InternshipGrantor @relation("internshipGrantorTerm", fields: [id_internshipGrantor], references: [id])
 
   //relacionamento processo
-  id_processoEstagio String    @unique
-  internshipProcess   InternshipProcess @relation(fields: [id_processoEstagio], references: [id])
+  id_processoEstagio String?    @unique
+  internshipProcess   InternshipProcess? @relation(fields: [id_processoEstagio], references: [id])
 
   @@map("tb_termCommitment")
 }
@@ -107,8 +107,8 @@ model InternshipProcess {
   termCommitment TermCommitment?
 
   //relacionamento Aluno
-  id_user            String?
-  user              User?       @relation("alunoProcessoEstagio", fields: [id_user], references: [id])
+  id_user           String    
+  user              User       @relation("alunoProcessoEstagio", fields: [id_user], references: [id])
 
   //relacionamento AvaliacaoAluno
   internshipEvaluation InternshipEvaluation[] @relation("processoEstagioAvaliacao")

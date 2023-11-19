@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { InternshipEvaluation, Prisma, TermCommitment } from '@prisma/client';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,16 +15,15 @@ export enum IntershipProcessMovement {
   CREDITACAO = 'CREDITAÇÃO',
 }
 
-export class InternshipProcess
-  implements Prisma.InternshipProcessUncheckedCreateInput
-{
+export class InternshipProcess {
   id?: string;
   movement: string;
   status: string;
   startDateProcess?: string | Date;
   endDateProcess: string | Date;
   id_user?: string;
-  termCommitment?: Prisma.TermCommitmentUncheckedCreateNestedOneWithoutInternshipProcessInput;
+  user?: Prisma.UserCreateNestedOneWithoutInternshipProcessInput;
+  termCommitment?: Prisma.TermCommitmentCreateNestedOneWithoutInternshipProcessInput;
   internshipEvaluation?: Prisma.InternshipEvaluationUncheckedCreateNestedManyWithoutInternshipProcessInput;
 
   constructor(props: Omit<InternshipProcess, 'id'>, id?: string) {

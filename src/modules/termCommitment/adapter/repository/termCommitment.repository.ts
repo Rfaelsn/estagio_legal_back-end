@@ -24,11 +24,11 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
           id: createTermCommitmentDTO.id_internshipGrantor,
         },
       },
-      internshipProcess: {
-        connect: {
-          id: createTermCommitmentDTO.id_processoEstagio,
-        },
-      },
+      // internshipProcess: {
+      //   connect: {
+      //     id: createTermCommitmentDTO.id_processoEstagio,
+      //   },
+      // },
     };
 
     const newTermCommitment = await this.prisma.termCommitment.create({
@@ -36,7 +36,7 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
       include: {
         user: true,
         internshipGrantor: true,
-        internshipProcess: true,
+        // internshipProcess: true,
       },
     });
 

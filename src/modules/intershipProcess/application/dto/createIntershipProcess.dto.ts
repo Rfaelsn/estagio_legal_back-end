@@ -14,7 +14,7 @@ import {
 } from '../../domain/entities/intershipProcess.entity';
 import { Prisma } from '@prisma/client';
 
-export class CreateIntershipProcessDTO extends InternshipProcess {
+export class CreateIntershipProcessDTO {
   @IsEnum(IntershipProcessMovement)
   movement: string;
 
@@ -27,8 +27,8 @@ export class CreateIntershipProcessDTO extends InternshipProcess {
   @IsDate()
   endDateProcess: string | Date;
 
-  @IsString()
-  id_user: string;
+  @IsOptional()
+  user: Prisma.UserCreateNestedOneWithoutInternshipProcessInput;
 
   @IsOptional()
   termCommitment?: Prisma.TermCommitmentCreateNestedOneWithoutInternshipProcessInput;

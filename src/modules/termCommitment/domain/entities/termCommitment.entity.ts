@@ -17,7 +17,7 @@ export class TermCommitment {
   user?: User;
   id_internshipGrantor: string;
   internshipGrantor?: InternshipGrantor;
-  id_processoEstagio: string;
+  id_processoEstagio?: string;
   internshipProcess?: InternshipProcess;
 
   constructor(props: Omit<TermCommitment, 'id'>, id?: string) {
