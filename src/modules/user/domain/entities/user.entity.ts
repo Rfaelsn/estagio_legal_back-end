@@ -1,4 +1,6 @@
-import { Prisma } from '@prisma/client';
+import { File, Prisma } from '@prisma/client';
+import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
+import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { v4 as uuidv4 } from 'uuid';
 
 export enum Role {
@@ -7,7 +9,7 @@ export enum Role {
   ADMINISTRADOR = 'ADMINISTRADOR',
 }
 
-export class User implements Prisma.UserUncheckedCreateInput {
+export class User {
   id: string;
   name: string;
   cpf: string;
@@ -20,9 +22,9 @@ export class User implements Prisma.UserUncheckedCreateInput {
   createdAt?: string | Date;
   updatedAt?: string | Date;
   id_institution?: string;
-  TermsCommitment?: Prisma.TermCommitmentUncheckedCreateNestedManyWithoutUserInput;
-  internshipProcess?: Prisma.InternshipProcessUncheckedCreateNestedManyWithoutUserInput;
-  files?: Prisma.FileUncheckedCreateNestedManyWithoutUserInput;
+  termsCommitment?: TermCommitment[];
+  internshipProcess?: InternshipProcess[];
+  files?: File[];
 
   constructor(props: Omit<User, 'id'>, id?: string) {
     Object.assign(this, props);

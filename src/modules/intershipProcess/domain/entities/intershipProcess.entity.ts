@@ -1,4 +1,5 @@
-import { InternshipEvaluation, Prisma, TermCommitment } from '@prisma/client';
+import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
+import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -22,9 +23,9 @@ export class InternshipProcess {
   startDateProcess?: string | Date;
   endDateProcess: string | Date;
   id_user?: string;
-  user?: Prisma.UserCreateNestedOneWithoutInternshipProcessInput;
-  termCommitment?: Prisma.TermCommitmentCreateNestedOneWithoutInternshipProcessInput;
-  internshipEvaluation?: Prisma.InternshipEvaluationUncheckedCreateNestedManyWithoutInternshipProcessInput;
+  user?: User;
+  termCommitment?: TermCommitment;
+  internshipEvaluation?: InternshipEvaluation[];
 
   constructor(props: Omit<InternshipProcess, 'id'>, id?: string) {
     Object.assign(this, props);

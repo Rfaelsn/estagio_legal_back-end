@@ -11,11 +11,8 @@ export class CreateIntershipProcessUsecase {
 
   async handle(createIntershipProcessDTO: CreateIntershipProcessDTO) {
     try {
-      const internshipProcess = new InternshipProcess(
-        createIntershipProcessDTO,
-      );
       const createIntershipProcess =
-        await this.intershipProcessRepository.create(internshipProcess);
+        await this.intershipProcessRepository.create(createIntershipProcessDTO);
 
       return createIntershipProcess;
     } catch (error) {

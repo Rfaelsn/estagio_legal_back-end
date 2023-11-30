@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { IUserRepository } from '../../domain/port/user-repository.port';
 import { CreateAlunoDTO } from '../../application/dto/createAluno.dto';
 import { CreateFuncionarioDTO } from '../../application/dto/createFuncionario';
+import { User } from '../../domain/entities/user.entity';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -15,8 +16,15 @@ export class UserRepository implements IUserRepository {
   }
 
   async create(CreateAlunoDTO: CreateAlunoDTO): Promise<User> {
-    const data: Prisma.UserCreateInput = { ...CreateAlunoDTO };
-    const newUser = await this.prisma.user.create({ data });
+    const data: Prisma.UserCreateInput = {
+      ...CreateAlunoDTO,
+      TermsCommitment: {},
+      internshipProcess: {},
+      files: {},
+    };
+    const newUser = await this.prisma.user.create({
+      data,
+    });
 
     return newUser;
   }
@@ -24,7 +32,12 @@ export class UserRepository implements IUserRepository {
   async createFuncionario(
     createFuncionarioDTO: CreateFuncionarioDTO,
   ): Promise<User> {
-    const data: Prisma.UserCreateInput = { ...createFuncionarioDTO };
+    const data: Prisma.UserCreateInput = {
+      ...createFuncionarioDTO,
+      TermsCommitment: {},
+      internshipProcess: {},
+      files: {},
+    };
     const newUser = await this.prisma.user.create({ data });
 
     return newUser;

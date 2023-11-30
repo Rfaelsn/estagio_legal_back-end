@@ -1,18 +1,12 @@
-import {
-  IsString,
-  IsOptional,
-  IsEnum,
-  IsDate,
-  IsNotEmpty,
-  ValidateNested,
-} from 'class-validator';
+import { IsOptional, IsEnum, IsDate } from 'class-validator';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import {
-  InternshipProcess,
   IntershipProcessMovement,
   IntershipProcessStatus,
 } from '../../domain/entities/intershipProcess.entity';
-import { Prisma } from '@prisma/client';
+import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
+import { CreateTermCommitmentDTO } from 'src/modules/termCommitment/application/dto/createTermCommitment.dto';
+import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
 
 export class CreateIntershipProcessDTO {
   @IsEnum(IntershipProcessMovement)
@@ -27,12 +21,13 @@ export class CreateIntershipProcessDTO {
   @IsDate()
   endDateProcess: string | Date;
 
-  @IsOptional()
-  user: Prisma.UserCreateNestedOneWithoutInternshipProcessInput;
+  idUser: string;
+
+  idInternshipGrantor: string;
 
   @IsOptional()
-  termCommitment?: Prisma.TermCommitmentCreateNestedOneWithoutInternshipProcessInput;
+  termCommitment?: CreateTermCommitmentDTO;
 
   @IsOptional()
-  internshipEvaluation?: Prisma.InternshipEvaluationUncheckedCreateNestedManyWithoutInternshipProcessInput;
+  internshipEvaluation?: InternshipEvaluation;
 }
