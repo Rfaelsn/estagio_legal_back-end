@@ -1,9 +1,10 @@
+import { TermCommitment as TermCommitmentPrisma } from '@prisma/client';
 import { InternshipGrantor } from 'src/modules/internshipGrantor/domain/entities/internshipGrantor.entity';
 import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export class TermCommitment {
+export class TermCommitment implements TermCommitmentPrisma {
   id: string;
   numApoliceSeguro: string;
   nomeSeguradora: string;
@@ -13,12 +14,11 @@ export class TermCommitment {
   dataFimEstagio: Date;
   horaInicioEstagio: Date;
   horaFimEstagio: Date;
-  id_aluno: string;
+  id_user: string;
   user?: User;
   id_internshipGrantor: string;
   internshipGrantor?: InternshipGrantor;
-  id_processoEstagio?: string;
-  internshipProcess?: InternshipProcess;
+  internshipProcess?: InternshipProcess[];
 
   constructor(props: Omit<TermCommitment, 'id'>, id?: string) {
     Object.assign(this, props);

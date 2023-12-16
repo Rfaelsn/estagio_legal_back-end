@@ -1,3 +1,4 @@
+import { InternshipProcess as InternshipProcessPrisma } from '@prisma/client';
 import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
 import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { User } from 'src/modules/user/domain/entities/user.entity';
@@ -16,14 +17,15 @@ export enum IntershipProcessMovement {
   CREDITACAO = 'CREDITAÇÃO',
 }
 
-export class InternshipProcess {
-  id?: string;
+export class InternshipProcess implements InternshipProcessPrisma {
+  id: string;
   movement: string;
   status: string;
-  startDateProcess?: string | Date;
-  endDateProcess: string | Date;
-  id_user?: string;
+  startDateProcess: Date;
+  endDateProcess: Date;
+  id_user: string | null;
   user?: User;
+  id_termCommitment: string | null;
   termCommitment?: TermCommitment;
   internshipEvaluation?: InternshipEvaluation[];
 

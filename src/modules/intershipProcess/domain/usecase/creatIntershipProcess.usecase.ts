@@ -1,8 +1,5 @@
-import axios from 'axios';
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateIntershipProcessDTO } from '../../application/dto/createintershipProcess.dto';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
-import { InternshipProcess } from '../entities/intershipProcess.entity';
 
 export class CreateIntershipProcessUsecase {
   constructor(

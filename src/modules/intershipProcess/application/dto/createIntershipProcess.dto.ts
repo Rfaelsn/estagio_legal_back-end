@@ -1,4 +1,10 @@
-import { IsOptional, IsEnum, IsDate } from 'class-validator';
+import {
+  IsOptional,
+  IsEnum,
+  IsDate,
+  IsString,
+  isString,
+} from 'class-validator';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import {
   IntershipProcessMovement,
@@ -15,15 +21,14 @@ export class CreateIntershipProcessDTO {
   @IsEnum(IntershipProcessStatus)
   status: string;
 
-  @IsDate()
-  startDateProcess?: string | Date;
+  @IsString()
+  startDateProcess?: string;
 
-  @IsDate()
-  endDateProcess: string | Date;
+  @IsString()
+  endDateProcess: string;
 
-  idUser: string;
-
-  idInternshipGrantor: string;
+  @IsString()
+  id_user: string;
 
   @IsOptional()
   termCommitment?: CreateTermCommitmentDTO;

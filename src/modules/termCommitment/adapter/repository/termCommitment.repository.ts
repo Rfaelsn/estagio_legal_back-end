@@ -16,7 +16,7 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
       ...createTermCommitmentDTO,
       user: {
         connect: {
-          id: createTermCommitmentDTO.id_aluno,
+          id: createTermCommitmentDTO.id_user,
         },
       },
       internshipGrantor: {

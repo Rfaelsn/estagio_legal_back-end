@@ -19,10 +19,10 @@ model User {
   createdAt           DateTime           @default(now()) @db.Timestamp(0)
   updatedAt           DateTime           @default(now()) @db.Timestamp(0)
   id_institution      String?
+  institution         Institution?         @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
   TermsCommitment     TermCommitment[]     @relation("userTerm")
   internshipProcess   InternshipProcess [] @relation("alunoProcessoEstagio")
   files               File[]               @relation("userFile")
-  institution         Institution?         @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
 
   @@map("tb_users")
 }
@@ -81,16 +81,15 @@ model TermCommitment {
   horaInicioEstagio DateTime    @db.Timestamp(0)
   horaFimEstagio    DateTime    @db.Timestamp(0)
   //relacionamento aluno
-  id_aluno          String
-  user              User       @relation("userTerm", fields: [id_aluno], references: [id])
+  id_user          String     
+  user              User       @relation("userTerm", fields: [id_user], references: [id])
 
   //relaionamento concedente
-  id_internshipGrantor     String
+  id_internshipGrantor     String  
   internshipGrantor        InternshipGrantor @relation("internshipGrantorTerm", fields: [id_internshipGrantor], references: [id])
 
   //relacionamento processo
-  id_processoEstagio String?    @unique
-  internshipProcess   InternshipProcess? @relation(fields: [id_processoEstagio], references: [id])
+  internshipProcess   InternshipProcess[]
 
   @@map("tb_termCommitment")
 }
@@ -103,10 +102,11 @@ model InternshipProcess {
   endDateProcess      DateTime   @db.Timestamp(0)
 
   //relacionamento termo de compromisso
-  termCommitment TermCommitment?
+  id_termCommitment   String?      @unique
+  termCommitment TermCommitment?  @relation(fields: [id_termCommitment], references: [id])
 
   //relacionamento Aluno
-  id_user           String    
+  id_user           String     
   user              User       @relation("alunoProcessoEstagio", fields: [id_user], references: [id])
 
   //relacionamento AvaliacaoAluno
@@ -124,7 +124,6 @@ model InternshipEvaluation{
   endDateProcess    DateTime   @db.Timestamp(0)
   id_user            String
   id_internshipProcess  String
-
   internshipProcess        InternshipProcess @relation("processoEstagioAvaliacao", fields: [id_internshipProcess], references: [id])
 	@@map("tb_internshipEvaluation")
 }

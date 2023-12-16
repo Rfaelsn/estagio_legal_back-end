@@ -10,9 +10,6 @@ import { Role, User } from '../../domain/entities/user.entity';
 
 export class CreateAlunoDTO {
   @IsString()
-  id: string;
-
-  @IsString()
   name: string;
 
   @IsString()
