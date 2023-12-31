@@ -31,6 +31,7 @@ export class InternshipProcessService {
     const filterInternshipProcessUsecase = new FilterInternshipProcessUsecase(
       this.intershipProcessRepository,
     );
+
     const internshipProcess = await filterInternshipProcessUsecase.handle(
       intershipProcessFilterDTO,
     );

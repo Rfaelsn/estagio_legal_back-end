@@ -18,12 +18,4 @@ export class TermCommitmentService {
     );
     return intershipProcess;
   }
-
-  // async getUserById(id: string): Promise<IntershipProcess> {
-  //   const findUserUsecase = new FindUserByIdUsecase(
-  //     this.intershipProcessRepository,
-  //   );
-  //   const user = await findUserUsecase.handle(id);
-  //   return user;
-  // }
 }

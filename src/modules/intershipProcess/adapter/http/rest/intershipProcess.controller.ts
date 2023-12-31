@@ -31,7 +31,6 @@ export class InternshipProcessController {
   }
 
   @IsPublic()
-  @UseInterceptors(InternshipProcessFilterValidationInterceptor)
   @Get('filter')
   async intershipProcessFilter(
     @Query() intershipProcessFilterDTO: InternshipProcessFilterDTO,

@@ -23,29 +23,51 @@ import { Transform } from 'class-transformer';
 export class InternshipProcessFilterDTO {
   @IsEnum(IntershipProcessMovement)
   @IsOptional()
-  movement;
+  movement: string;
 
   @IsEnum(IntershipProcessStatus)
   @IsOptional()
-  status;
+  status: string;
 
-  @IsString()
+  @IsDate()
   @IsOptional()
-  startDateProcess;
+  @Transform(({ value }) => {
+    return new Date(value);
+  })
+  startDateProcessRangeStart: Date;
 
-  @IsString()
+  @IsDate()
   @IsOptional()
-  endDateProcess;
+  @Transform(({ value }) => {
+    return new Date(value);
+  })
+  startDateProcessRangeEnd: Date;
 
+  @IsDate()
+  @IsOptional()
+  @Transform(({ value }) => {
+    return new Date(value);
+  })
+  endDateProcessRangeStart: Date;
+
+  @IsDate()
+  @IsOptional()
+  @Transform(({ value }) => {
+    return new Date(value);
+  })
+  endDateProcessRangeEnd: Date;
+
+  @IsOptional()
   @Transform(({ value }) => {
     return typeof value === 'string' ? parseInt(value, 10) : value;
   })
-  page?: number;
+  page: number;
 
+  @IsOptional()
   @Transform(({ value }) => {
     return typeof value === 'string' ? parseInt(value, 10) : value;
   })
-  pageSize?: number;
+  pageSize: number;
 
   @IsOptional()
   @IsObject()

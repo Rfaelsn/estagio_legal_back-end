@@ -7,6 +7,7 @@ import { InternshipProcess } from '../../domain/entities/intershipProcess.entity
 
 import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
+import { skipUntil } from 'rxjs';
 
 @Injectable()
 export class InternshipProcessRepository
@@ -66,16 +67,32 @@ export class InternshipProcessRepository
   async filter(
     intershipProcessFilterDTO: InternshipProcessFilterDTO,
   ): Promise<InternshipProcess[]> {
-    const { user, termCommitment, page, pageSize, ...rest } =
-      intershipProcessFilterDTO;
+    const {
+      user,
+      termCommitment,
+      page,
+      pageSize,
+      startDateProcessRangeStart,
+      startDateProcessRangeEnd,
+      endDateProcessRangeStart,
+      endDateProcessRangeEnd,
+      ...rest
+    } = intershipProcessFilterDTO;
 
-    // Lógica de paginação
-    const take: number = pageSize || 10; // Número padrão de itens por página
+    const take: number = pageSize || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
     const internshipProcess = await this.prisma.internshipProcess.findMany({
       where: {
         ...rest,
+        startDateProcess: {
+          gte: startDateProcessRangeStart,
+          lte: startDateProcessRangeEnd,
+        },
+        endDateProcess: {
+          gte: endDateProcessRangeStart,
+          lte: endDateProcessRangeEnd,
+        },
         user: { ...user },
         termCommitment: { ...termCommitment },
       },

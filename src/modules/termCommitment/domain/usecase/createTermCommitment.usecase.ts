@@ -9,9 +9,7 @@ export class CreateTermCommitmentUsecase {
 
   async handle(createTermCommitmentDTO: CreateTermCommitmentDTO) {
     try {
-      // const termCommitment = new TermCommitment(createTermCommitmentDTO);
       const createTermCommitment = await this.termCommitmentRepository.create(
-        // termCommitment,
         createTermCommitmentDTO,
       );
 

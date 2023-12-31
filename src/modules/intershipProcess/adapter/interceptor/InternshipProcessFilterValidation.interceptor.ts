@@ -92,7 +92,7 @@ export class InternshipProcessFilterValidationInterceptor
         }
       }
 
-      request.query.user = termCommitmentFilter;
+      request.query.termCommitment = termCommitmentFilter;
     }
 
     return next.handle().pipe(
