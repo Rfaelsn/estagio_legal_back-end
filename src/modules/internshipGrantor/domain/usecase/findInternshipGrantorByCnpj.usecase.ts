@@ -1,18 +1,15 @@
 import { CreateInternshipGrantorDTO } from '../../application/dto/createInternshipGrantor.dto';
-import { InternshipGrantor } from '../entities/internshipGrantor.entity';
 import { IInternshipGrantorRepository } from '../port/IInternshipGrantorRepository.port';
 
-export class CreateInternshipGrantorUsecase {
+export class FindInternshipGrantorByCnpjUsecase {
   constructor(
     private readonly internshipGrantorRepository: IInternshipGrantorRepository,
   ) {}
 
-  async handle(createInternshipGrantorDTO: CreateInternshipGrantorDTO) {
+  async handle(cnpj: string) {
     try {
       const createInternshipGrantor =
-        await this.internshipGrantorRepository.create(
-          createInternshipGrantorDTO,
-        );
+        await this.internshipGrantorRepository.findByCnpj(cnpj);
 
       return createInternshipGrantor;
     } catch (error) {

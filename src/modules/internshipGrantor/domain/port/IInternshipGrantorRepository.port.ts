@@ -5,4 +5,6 @@ export interface IInternshipGrantorRepository {
   create(
     internshipGrantor: CreateInternshipGrantorDTO,
   ): Promise<InternshipGrantor>;
+
+  findByCnpj(cnpj: string): Promise<InternshipGrantor>;
 }

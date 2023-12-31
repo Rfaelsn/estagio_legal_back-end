@@ -56,13 +56,20 @@ model Institution {
 }
 
 model InternshipGrantor {
-  id                  String             @id @default(uuid())
-  name                String             @db.VarChar(63)
-  endereco            String             @db.VarChar(127)
-  cnpj                String             @db.VarChar(127)
-  cep                 String             @db.VarChar(127)
-  email               String             @db.VarChar(127)
-  telefone            String             @db.VarChar(127)
+  id                       String             @id @default(uuid())
+  name                     String             @db.VarChar(63)
+  cnpj                     String             @db.VarChar(127) @unique
+  cep                      String             @db.VarChar(127)
+  bairro                   String             @db.VarChar(127)
+  cidade                   String             @db.VarChar(127)
+  uf                       String             @db.VarChar(127)
+  endereco                 String             @db.VarChar(127)
+  email                    String             @db.VarChar(127)
+  representanteLegal       String             @db.VarChar(127)
+  funcaoRepresentanteLegal String             @db.VarChar(127)
+  supervisor               String             @db.VarChar(127)
+  cargoSupervisor          String             @db.VarChar(127)
+  
   createdAt           DateTime           @default(now()) @db.Timestamp(0)
   updatedAt           DateTime           @default(now()) @db.Timestamp(0)
   termsCommitment TermCommitment[] @relation("internshipGrantorTerm")

@@ -4,6 +4,7 @@ import { IInternshipGrantorRepository } from '../../domain/port/IInternshipGrant
 import { CreateInternshipGrantorDTO } from '../dto/createInternshipGrantor.dto';
 import { CreateInternshipGrantorUsecase } from '../../domain/usecase/createInternshipGrantor.usecase';
 import { InternshipGrantorRepository } from '../../adapter/repository/internshipGrantor.repository';
+import { FindInternshipGrantorByCnpjUsecase } from '../../domain/usecase/findInternshipGrantorByCnpj.usecase';
 
 @Injectable()
 export class InternshipGrantorService {
@@ -21,11 +22,12 @@ export class InternshipGrantorService {
     return intershipProcess;
   }
 
-  // async getUserById(id: string): Promise<IntershipProcess> {
-  //   const findUserUsecase = new FindUserByIdUsecase(
-  //     this.intershipProcessRepository,
-  //   );
-  //   const user = await findUserUsecase.handle(id);
-  //   return user;
-  // }
+  async findByCnpj(cnpj: string) {
+    const findIntershipGrantorByCpnjUsecase =
+      new FindInternshipGrantorByCnpjUsecase(this.internshipGrantorRepository);
+    const internshipGrantor = await findIntershipGrantorByCpnjUsecase.handle(
+      cnpj,
+    );
+    return internshipGrantor;
+  }
 }

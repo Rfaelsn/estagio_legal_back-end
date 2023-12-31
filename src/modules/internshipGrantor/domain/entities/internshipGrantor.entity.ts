@@ -1,16 +1,23 @@
-import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
+import { InternshipGrantor as InternshipGrantorPrisma } from '@prisma/client';
 import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
-import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export class InternshipGrantor {
+export class InternshipGrantor implements InternshipGrantorPrisma {
   id: string;
   name: string;
   endereco: string;
   cnpj: string;
   cep: string;
   email: string;
-  telefone: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+  representanteLegal: string;
+  funcaoRepresentanteLegal: string;
+  supervisor: string;
+  cargoSupervisor: string;
+  createdAt: Date;
+  updatedAt: Date;
   termsCommitment?: TermCommitment[];
 
   constructor(props: Omit<InternshipGrantor, 'id'>, id?: string) {

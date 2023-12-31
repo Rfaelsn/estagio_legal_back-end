@@ -24,4 +24,14 @@ export class InternshipGrantorRepository
 
     return newTermCommitment;
   }
+
+  async findByCnpj(cnpj: string): Promise<InternshipGrantor> {
+    const newTermCommitment = await this.prisma.internshipGrantor.findFirst({
+      where: {
+        cnpj,
+      },
+    });
+
+    return newTermCommitment;
+  }
 }

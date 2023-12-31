@@ -5,17 +5,35 @@ export class CreateInternshipGrantorDTO {
   name: string;
 
   @IsString()
-  endereco: string;
-
-  @IsString()
   cnpj: string;
 
   @IsString()
   cep: string;
 
+  @IsString()
+  bairro: string;
+
+  @IsString()
+  cidade: string;
+
+  @IsString()
+  uf: string;
+
+  @IsString()
+  endereco: string;
+
   @IsEmail()
   email: string;
 
   @IsString()
-  telefone: string;
+  representanteLegal: string;
+
+  @IsString()
+  funcaoRepresentanteLegal: string;
+
+  @IsString()
+  supervisor: string;
+
+  @IsString()
+  cargoSupervisor: string;
 }
