@@ -22,7 +22,7 @@ export class UserService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User> {
     const findUserUsecase = new FindUserByEmailUsecase(this.userRepository);
     const user = await findUserUsecase.handle(email);
     return user;

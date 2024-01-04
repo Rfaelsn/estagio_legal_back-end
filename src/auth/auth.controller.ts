@@ -7,13 +7,13 @@ import {
   Req,
   UseGuards,
   Request,
+  Res,
 } from '@nestjs/common';
 import { AuthForgetDTO } from './dto/auth-forget.dto';
 import { AuthService } from './auth.service';
 import { IsPublic } from './decorators/is-public.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthRequest } from './models/AuthRequest';
-// import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -24,5 +24,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() user) {
     return this.authService.login(user);
+  }
+
+  @IsPublic()
+  @Post('refresh/token')
+  async refreshToken(@Body() body) {
+    return this.authService.verifyRefreshToken(body);
   }
 }

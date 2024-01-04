@@ -27,7 +27,7 @@ export class UserController {
 
   @Get('findByEmail')
   async findByEmail(@Query('email') email: string) {
-    return this.userService.getUserByEmail(email);
+    return this.userService.findByEmail(email);
   }
 
   @Get('me')
