@@ -1,18 +1,19 @@
 // users.seed.ts
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 export async function seedUsers(prisma: PrismaClient) {
   await prisma.user.createMany({
     data: [
       {
-        name: 'SHEL THEA HORACE',
+        name: 'Rafael',
         cpf: '12354476876',
         registration: '20190796543',
-        email: 'shelhorace@gmail.com',
+        email: 'rafael@gmail.com',
         telefone: '3278163183618736',
         courseStudy: 'TECNOLOGIA EM ANÁLISE E DESENVOLVIMENTO DE SISTEMAS',
-        password: '12345',
-        role: 'ADMINISTRADOR',
+        password: await bcrypt.hash('#Rafael01', await bcrypt.genSalt()),
+        role: 'ALUNO',
       },
       {
         name: 'Diego',
@@ -21,7 +22,7 @@ export async function seedUsers(prisma: PrismaClient) {
         email: 'diego@gmail.com',
         telefone: '3278163183618736',
         courseStudy: 'TECNOLOGIA EM ANÁLISE E DESENVOLVIMENTO DE SISTEMAS',
-        password: '12345',
+        password: await bcrypt.hash('#Rafael01', await bcrypt.genSalt()),
         role: 'ADMINISTRADOR',
       },
     ],
