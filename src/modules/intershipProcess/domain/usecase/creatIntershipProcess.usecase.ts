@@ -1,4 +1,4 @@
-import { CreateIntershipProcessDTO } from '../../application/dto/createintershipProcess.dto';
+import { CreateIntershipProcessDTO } from '../../application/dto/createIntershipProcess.dto';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
 
 export class CreateIntershipProcessUsecase {
