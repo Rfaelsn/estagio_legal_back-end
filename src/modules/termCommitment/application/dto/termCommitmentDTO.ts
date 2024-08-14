@@ -6,9 +6,9 @@ import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/
 import { User } from 'src/modules/user/domain/entities/user.entity';
 // import { TermCommitment } from '../../domain/entities/termCommitment.entity';
 
-export class CreateTermCommitmentDTO {
+export class TermCommitmentDTO {
   @IsString()
-  id?: string;
+  Id: string;
 
   @IsString()
   numApoliceSeguro: string;
@@ -41,6 +41,10 @@ export class CreateTermCommitmentDTO {
   @IsString()
   id_user: string;
 
+  user?: User;
+
   @IsString()
   id_internshipGrantor: string;
+
+  internshipGrantor?: InternshipGrantor;
 }

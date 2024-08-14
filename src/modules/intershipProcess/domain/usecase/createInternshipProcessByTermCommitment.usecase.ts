@@ -1,7 +1,7 @@
 import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
 
-export class CreateIntershipProcessUsecase {
+export class CreateIntershipProcessByTermCommitmentUsecase {
   constructor(
     private readonly intershipProcessRepository: IInternshipProcessRepository,
   ) {}

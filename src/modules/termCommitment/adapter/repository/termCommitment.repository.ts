@@ -4,6 +4,7 @@ import { PrismaService } from 'src/config/prisma/prisma.service';
 import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository.port';
 import { TermCommitment } from '../../domain/entities/termCommitment.entity';
 import { CreateTermCommitmentDTO } from '../../application/dto/createTermCommitment.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class TermCommitmentRepository implements ITermCommitmentRepository {
@@ -12,8 +13,11 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
   async create(
     createTermCommitmentDTO: CreateTermCommitmentDTO,
   ): Promise<TermCommitment> {
+    const { id_user, id_internshipGrantor, ...restTermCommitment } =
+      createTermCommitmentDTO;
+    const filteredTermCommitment = restTermCommitment;
     const data: Prisma.TermCommitmentCreateInput = {
-      ...createTermCommitmentDTO,
+      ...filteredTermCommitment,
       user: {
         connect: {
           id: createTermCommitmentDTO.id_user,
@@ -24,21 +28,23 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
           id: createTermCommitmentDTO.id_internshipGrantor,
         },
       },
-      // internshipProcess: {
-      //   connect: {
-      //     id: createTermCommitmentDTO.id_processoEstagio,
-      //   },
-      // },
     };
 
     const newTermCommitment = await this.prisma.termCommitment.create({
-      data,
+      data: createTermCommitmentDTO,
       include: {
         user: true,
-        internshipGrantor: true,
-        // internshipProcess: true,
       },
     });
+
+    // const newTermCommitment = await this.prisma.termCommitment.create({
+    //   data,
+    //   include: {
+    //     user: true,
+    //     //internshipGrantor: true,
+    //     //internshipProcess: true,
+    //   },
+    // });
 
     return newTermCommitment;
   }

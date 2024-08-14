@@ -10,12 +10,12 @@ export class TermCommitmentService {
   ) {}
 
   async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {
-    const createIntershipProcessUsecase = new CreateTermCommitmentUsecase(
+    const createTermCommitmentUsecase = new CreateTermCommitmentUsecase(
       this.termCommitmentRepository,
     );
-    const intershipProcess = await createIntershipProcessUsecase.handle(
+    const termCommitment = await createTermCommitmentUsecase.handle(
       createTermCommitmentDTO,
     );
-    return intershipProcess;
+    return termCommitment;
   }
 }

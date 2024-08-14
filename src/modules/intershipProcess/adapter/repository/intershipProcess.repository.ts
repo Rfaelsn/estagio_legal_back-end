@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
-import { CreateIntershipProcessDTO } from '../../application/dto/createIntershipProcess.dto';
+import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
 import { InternshipProcess } from '../../domain/entities/intershipProcess.entity';
 
 import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { skipUntil } from 'rxjs';
+import { plainToInstance } from 'class-transformer';
+import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 
 @Injectable()
 export class InternshipProcessRepository
@@ -18,45 +19,15 @@ export class InternshipProcessRepository
   async create(
     createIntershipProcessDTO: CreateIntershipProcessDTO,
   ): Promise<InternshipProcess> {
-    const { id_internshipGrantor, ...termFiltrado } =
-      createIntershipProcessDTO.termCommitment;
-
-    const termCommitment: Prisma.TermCommitmentCreateInput = {
-      ...termFiltrado,
-      user: {
-        connect: {
-          id: createIntershipProcessDTO.id_user,
-        },
-      },
-      internshipGrantor: {
-        connect: {
-          id: createIntershipProcessDTO.termCommitment.id_internshipGrantor,
-        },
-      },
-    };
-
-    const { id_user, ...rest } = createIntershipProcessDTO;
-
-    const data: Prisma.InternshipProcessCreateInput = {
-      ...rest,
-      user: {
-        connect: {
-          id: createIntershipProcessDTO.id_user,
-        },
-      },
-      termCommitment: {
-        create: {
-          ...termCommitment,
-        },
-      },
-      internshipEvaluation: {},
-    };
-
     const newIntershipProcess = await this.prisma.internshipProcess.create({
-      data,
+      data: {
+        movement: createIntershipProcessDTO.movement,
+        status: createIntershipProcessDTO.status,
+        startDateProcess: new Date(),
+        id_user: createIntershipProcessDTO.id_user,
+        id_termCommitment: createIntershipProcessDTO.id_termCommitment,
+      },
       include: {
-        internshipEvaluation: true,
-        user: true,
         termCommitment: true,
       },
     });

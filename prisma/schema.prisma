@@ -87,6 +87,7 @@ model TermCommitment {
   dataFimEstagio    DateTime    @db.Timestamp(0)
   horaInicioEstagio DateTime    @db.Timestamp(0)
   horaFimEstagio    DateTime    @db.Timestamp(0)
+  filePath            String?     @db.VarChar(255)
   //relacionamento aluno
   id_user          String     
   user              User       @relation("userTerm", fields: [id_user], references: [id])
@@ -106,7 +107,8 @@ model InternshipProcess {
   movement            String      @db.VarChar(63)
   status              String      @db.VarChar(127)
   startDateProcess    DateTime   @default(now()) @db.Timestamp(0)
-  endDateProcess      DateTime   @db.Timestamp(0)
+  endDateProcess      DateTime?   @db.Timestamp(0)
+
 
   //relacionamento termo de compromisso
   id_termCommitment   String?      @unique

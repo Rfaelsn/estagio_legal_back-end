@@ -4,7 +4,7 @@ import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export class TermCommitment implements TermCommitmentPrisma {
+export class TermCommitment {
   id: string;
   numApoliceSeguro: string;
   nomeSeguradora: string;
@@ -14,6 +14,7 @@ export class TermCommitment implements TermCommitmentPrisma {
   dataFimEstagio: Date;
   horaInicioEstagio: Date;
   horaFimEstagio: Date;
+  filePath?: string;
   id_user: string;
   user?: User;
   id_internshipGrantor: string;

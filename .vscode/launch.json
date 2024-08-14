@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "NestJS Debug",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:debug"],
+      "port": 9229,
+      "console": "integratedTerminal",
+      "protocol": "inspector",
+      "restart": true,
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+    }
+  ]
+}

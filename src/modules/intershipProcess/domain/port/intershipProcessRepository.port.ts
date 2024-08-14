@@ -1,4 +1,4 @@
-import { CreateIntershipProcessDTO } from '../../application/dto/createIntershipProcess.dto';
+import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
 import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
 import { InternshipProcess } from '../entities/intershipProcess.entity';

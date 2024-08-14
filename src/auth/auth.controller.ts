@@ -23,6 +23,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() user) {
+    console.log('oi');
     return this.authService.login(user);
   }
 
