@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export enum IntershipProcessStatus {
   CONCLUIDO = 'CONCLUÍDO',
+  EM_ANALISE = 'EM ANALISE',
   EM_ANDAMENTO = 'EM ANDAMENTO',
   RECUSADO = 'RECUSADO',
 }

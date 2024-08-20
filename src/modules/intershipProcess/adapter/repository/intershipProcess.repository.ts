@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
 import { InternshipProcess } from '../../domain/entities/intershipProcess.entity';
+import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 
-import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { plainToInstance } from 'class-transformer';
-import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
+import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
+import { UpdateIntershipProcessDTO } from '../../application/dto/updateInternshiProcess.dto';
 
 @Injectable()
 export class InternshipProcessRepository
@@ -33,6 +32,28 @@ export class InternshipProcessRepository
     });
 
     return newIntershipProcess;
+  }
+
+  async updateInternshipProcess(
+    updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  ) {
+    let prismaData: Prisma.InternshipProcessUpdateInput;
+    if (updateInternshipProcessStatusDTO.status === 'CONCLUÍDO') {
+      prismaData = {
+        status: updateInternshipProcessStatusDTO.status,
+        endDateProcess: new Date(),
+      };
+    } else {
+      prismaData = {
+        status: updateInternshipProcessStatusDTO.status,
+      };
+    }
+    await this.prisma.internshipProcess.update({
+      where: { id: updateInternshipProcessStatusDTO.id },
+      data: prismaData,
+    });
+
+    return true;
   }
 
   async filter(

@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { CreateIntershipProcessDTO } from '../dto/input/intershipProcess.dto';
-import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcess.usecase';
+import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
 import { InternshipProcess } from '../../domain/entities/intershipProcess.entity';
-import { InternshipProcessFilterDTO } from '../dto/internshipProcessFilter.dto';
-import { FilterInternshipProcessUsecase } from '../../domain/usecase/filterInternshipProcess.usecase';
-import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQuery.dto';
-import { FindInternshipProcessByQueryUsecase } from '../../domain/usecase/findInternshipProcessByQuery.usecase';
-import { FindInternshipProcessByIdUsecase } from '../../domain/usecase/findByIdInternshipProcess.usecase';
 import { CreateIntershipProcessByTermCommitmentUsecase } from '../../domain/usecase/createInternshipProcessByTermCommitment.usecase';
-import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
-import { create } from 'domain';
-import { plainToInstance } from 'class-transformer';
-import { TermCommitmentDTO } from 'src/modules/termCommitment/application/dto/termCommitmentDTO';
+import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcess.usecase';
+import { FilterInternshipProcessUsecase } from '../../domain/usecase/filterInternshipProcess.usecase';
+import { FindInternshipProcessByIdUsecase } from '../../domain/usecase/findByIdInternshipProcess.usecase';
+import { FindInternshipProcessByQueryUsecase } from '../../domain/usecase/findInternshipProcessByQuery.usecase';
+import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQuery.dto';
+import { CreateIntershipProcessDTO } from '../dto/input/intershipProcess.dto';
+import { InternshipProcessFilterDTO } from '../dto/internshipProcessFilter.dto';
+import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
 
 @Injectable()
 export class InternshipProcessService {
@@ -90,5 +88,13 @@ export class InternshipProcessService {
     );
     const internshipProcess = await filterInternshipProcessUsecase.handle(id);
     return internshipProcess;
+  }
+
+  async updateInternshipProcess(
+    updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  ) {
+    return await this.intershipProcessRepository.updateInternshipProcess(
+      updateInternshipProcessStatusDTO,
+    );
   }
 }

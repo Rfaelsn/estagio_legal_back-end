@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   Param,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { CreateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/input/intershipProcess.dto';
@@ -22,6 +23,7 @@ import { RoleGuard } from 'src/auth/guards/role.guard';
 import { plainToInstance } from 'class-transformer';
 import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
+import { UpdateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/updateInternshiProcess.dto';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
@@ -36,6 +38,16 @@ export class InternshipProcessController {
     @Body() createIntershipProcessDTO: CreateIntershipProcessDTO,
   ) {
     return this.intershipProcessService.create(createIntershipProcessDTO);
+  }
+
+  @IsPublic()
+  @Patch('update/status')
+  async updateInternshipProcess(
+    @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  ) {
+    return await this.intershipProcessService.updateInternshipProcess(
+      updateInternshipProcessStatusDTO,
+    );
   }
 
   @IsPublic()

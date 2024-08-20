@@ -2,6 +2,7 @@ import { CreateIntershipProcessDTO } from '../../application/dto/input/intership
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
 import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
 import { InternshipProcess } from '../entities/intershipProcess.entity';
+import { UpdateIntershipProcessDTO } from '../../application/dto/updateInternshiProcess.dto';
 
 export interface IInternshipProcessRepository {
   create(
@@ -17,4 +18,8 @@ export interface IInternshipProcessRepository {
   ): Promise<InternshipProcess[]>;
 
   findById(id: string): Promise<InternshipProcess>;
+
+  updateInternshipProcess(
+    updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  );
 }
