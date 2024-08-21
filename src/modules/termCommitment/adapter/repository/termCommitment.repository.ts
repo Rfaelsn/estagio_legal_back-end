@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository.port';
-import { TermCommitment } from '../../domain/entities/termCommitment.entity';
 import { CreateTermCommitmentDTO } from '../../application/dto/createTermCommitment.dto';
-import { plainToInstance } from 'class-transformer';
+import { LinkTermCommitmentFilePathDTO } from '../../application/dto/LinkTermCommitmentFilePath.dto';
+import { TermCommitment } from '../../domain/entities/termCommitment.entity';
+import { ITermCommitmentRepository } from '../../domain/port/ITermCommitmentRepository.port';
 
 @Injectable()
 export class TermCommitmentRepository implements ITermCommitmentRepository {
@@ -47,5 +47,14 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
     // });
 
     return newTermCommitment;
+  }
+
+  async linkDocumentToTermCommitment(
+    linkTermCommitmentFilePathDTO: LinkTermCommitmentFilePathDTO,
+  ) {
+    await this.prisma.termCommitment.update({
+      where: { id: linkTermCommitmentFilePathDTO.id },
+      data: { filePath: linkTermCommitmentFilePathDTO.termCommitmentFilePath },
+    });
   }
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
-import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
 import { TermCommitmentRepository } from '../../adapter/repository/termCommitment.repository';
+import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
+import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
+import { LinkTermCommitmentFilePathDTO } from '../dto/LinkTermCommitmentFilePath.dto';
 
 @Injectable()
 export class TermCommitmentService {
@@ -17,5 +18,13 @@ export class TermCommitmentService {
       createTermCommitmentDTO,
     );
     return termCommitment;
+  }
+
+  async linkDocumentToTermCommitment(
+    linkTermCommitmentFilePathDTO: LinkTermCommitmentFilePathDTO,
+  ) {
+    return this.termCommitmentRepository.linkDocumentToTermCommitment(
+      linkTermCommitmentFilePathDTO,
+    );
   }
 }
