@@ -7,12 +7,13 @@ import {
   IsDate,
 } from 'class-validator';
 import { Role, User } from '../../domain/entities/user.entity';
+import { IsCPF } from 'src/shared/decorators/isCpf.decorator';
 
 export class CreateAlunoDTO {
   @IsString()
   name: string;
 
-  @IsString()
+  @IsCPF()
   cpf: string;
 
   @IsString()

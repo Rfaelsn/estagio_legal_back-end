@@ -6,14 +6,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { UserModule } from './modules/user/user.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { InternshipProcessModule } from './modules/intershipProcess/intershipProcess.module';
-import { InternshipGrantorModule } from './modules/internshipGrantor/internshipGrantor.module';
+// import { InternshipGrantorModule } from './modules/internshipGrantor/internshipGrantor.module';
 import { TermCommitmentModule } from './modules/termCommitment/termCommitment.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     InternshipProcessModule,
-    InternshipGrantorModule,
+    // InternshipGrantorModule,
     TermCommitmentModule,
     PrismaModule,
     AuthModule,

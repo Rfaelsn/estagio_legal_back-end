@@ -32,13 +32,13 @@ export class InternshipProcessController {
     private readonly intershipProcessService: InternshipProcessService,
   ) {}
 
-  @IsPublic()
-  @Post('create')
-  async createIntershipProcess(
-    @Body() createIntershipProcessDTO: CreateIntershipProcessDTO,
-  ) {
-    return this.intershipProcessService.create(createIntershipProcessDTO);
-  }
+  // @IsPublic()
+  // @Post('create')
+  // async createIntershipProcess(
+  //   @Body() createIntershipProcessDTO: CreateIntershipProcessDTO,
+  // ) {
+  //   return this.intershipProcessService.create(createIntershipProcessDTO);
+  // }
 
   @IsPublic()
   @Patch('update/status')
@@ -50,32 +50,32 @@ export class InternshipProcessController {
     );
   }
 
-  @IsPublic()
-  @Post('create/internshipProcess')
-  async createIntershipProcessByTermCommitment(
-    @Body()
-    createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
-  ) {
-    const internshipProcess = plainToInstance(
-      InternshipProcess,
-      createIntershipProcessByTermCommitmentDTO,
-    );
+  // @IsPublic()
+  // @Post('create/internshipProcess')
+  // async createIntershipProcessByTermCommitment(
+  //   @Body()
+  //   createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
+  // ) {
+  //   const internshipProcess = plainToInstance(
+  //     InternshipProcess,
+  //     createIntershipProcessByTermCommitmentDTO,
+  //   );
 
-    return this.intershipProcessService.createTermCommitment(
-      createIntershipProcessByTermCommitmentDTO,
-    );
-  }
+  //   return this.intershipProcessService.createTermCommitment(
+  //     createIntershipProcessByTermCommitmentDTO,
+  //   );
+  // }
 
-  @IsPublic()
-  @Post('create/external/termCommitment')
-  async createIntershipProcessByExtrenalTermCommitment(
-    @Body()
-    createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
-  ) {
-    return this.intershipProcessService.create(
-      createIntershipProcessByTermCommitmentDTO,
-    );
-  }
+  // @IsPublic()
+  // @Post('create/external/termCommitment')
+  // async createIntershipProcessByExtrenalTermCommitment(
+  //   @Body()
+  //   createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
+  // ) {
+  //   return this.intershipProcessService.create(
+  //     createIntershipProcessByTermCommitmentDTO,
+  //   );
+  // }
 
   @Roles(Role.ADMINISTRADOR)
   @Get('filter')

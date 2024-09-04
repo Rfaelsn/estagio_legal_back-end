@@ -27,8 +27,5 @@ export class CreateIntershipProcessDTO {
   id_user: string;
 
   @IsOptional()
-  termCommitment?: CreateTermCommitmentDTO;
-
-  @IsOptional()
   id_termCommitment?: string;
 }

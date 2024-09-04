@@ -16,47 +16,41 @@ import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
 export class InternshipProcessService {
   constructor(
     private readonly intershipProcessRepository: InternshipProcessRepository,
-    private readonly termCommitmentService: TermCommitmentService,
   ) {}
 
-  async create(createIntershipProcessDTO: CreateIntershipProcessDTO) {
+  async create(idTermCommitment: string, idUser: string) {
     const createIntershipProcessUsecase = new CreateIntershipProcessUsecase(
       this.intershipProcessRepository,
     );
 
-    const termCommitmentEntity = await this.termCommitmentService.create(
-      createIntershipProcessDTO.termCommitment,
-    );
-
-    createIntershipProcessDTO.id_termCommitment = termCommitmentEntity.id;
-
     const intershipProcess = await createIntershipProcessUsecase.handle(
-      createIntershipProcessDTO,
+      idTermCommitment,
+      idUser,
     );
     return intershipProcess;
   }
 
-  async createTermCommitment(
-    createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
-  ) {
-    const TermCommitment = this.termCommitmentService.create(
-      createIntershipProcessByTermCommitmentDTO.termCommitment,
-    );
+  // async createTermCommitment(
+  //   createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
+  // ) {
+  //   const TermCommitment = this.termCommitmentService.create(
+  //     createIntershipProcessByTermCommitmentDTO.termCommitment,
+  //   );
 
-    // createIntershipProcessByTermCommitmentDTO.termCommitment = TermCommitment;
+  //   // createIntershipProcessByTermCommitmentDTO.termCommitment = TermCommitment;
 
-    const createIntershipProcessByTermCommitmentUsecase =
-      new CreateIntershipProcessByTermCommitmentUsecase(
-        this.intershipProcessRepository,
-      );
+  //   const createIntershipProcessByTermCommitmentUsecase =
+  //     new CreateIntershipProcessByTermCommitmentUsecase(
+  //       this.intershipProcessRepository,
+  //     );
 
-    const intershipProcess =
-      await createIntershipProcessByTermCommitmentUsecase.handle(
-        createIntershipProcessByTermCommitmentDTO,
-      );
+  //   const intershipProcess =
+  //     await createIntershipProcessByTermCommitmentUsecase.handle(
+  //       createIntershipProcessByTermCommitmentDTO,
+  //     );
 
-    return intershipProcess;
-  }
+  //   return intershipProcess;
+  // }
 
   async filter(
     intershipProcessFilterDTO: InternshipProcessFilterDTO,

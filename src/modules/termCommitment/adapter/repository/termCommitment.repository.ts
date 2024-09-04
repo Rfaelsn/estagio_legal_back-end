@@ -13,8 +13,7 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
   async create(
     createTermCommitmentDTO: CreateTermCommitmentDTO,
   ): Promise<TermCommitment> {
-    const { id_user, id_internshipGrantor, ...restTermCommitment } =
-      createTermCommitmentDTO;
+    const { id_user, ...restTermCommitment } = createTermCommitmentDTO;
     const filteredTermCommitment = restTermCommitment;
     const data: Prisma.TermCommitmentCreateInput = {
       ...filteredTermCommitment,
@@ -23,11 +22,11 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
           id: createTermCommitmentDTO.id_user,
         },
       },
-      internshipGrantor: {
-        connect: {
-          id: createTermCommitmentDTO.id_internshipGrantor,
-        },
-      },
+      // internshipGrantor: {
+      //   connect: {
+      //     id: createTermCommitmentDTO.id_internshipGrantor,
+      //   },
+      // },
     };
 
     const newTermCommitment = await this.prisma.termCommitment.create({

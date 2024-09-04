@@ -1,26 +1,18 @@
-import { Prisma, TermCommitment } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsString, IsDate } from 'class-validator';
-import { InternshipGrantor } from 'src/modules/internshipGrantor/domain/entities/internshipGrantor.entity';
-import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
-import { User } from 'src/modules/user/domain/entities/user.entity';
-// import { TermCommitment } from '../../domain/entities/termCommitment.entity';
+import { IsString, IsDate, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateTermCommitmentDTO {
   @IsString()
+  @IsOptional()
   id?: string;
 
   @IsString()
-  numApoliceSeguro: string;
+  @IsOptional()
+  numApoliceSeguro?: string;
 
   @IsString()
-  nomeSeguradora: string;
-
-  @IsString()
-  profOrientador: string;
-
-  @IsString()
-  codSiape: string;
+  @IsOptional()
+  nomeSeguradora?: string;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
@@ -38,9 +30,48 @@ export class CreateTermCommitmentDTO {
   @Transform(({ value }) => new Date(value))
   horaFimEstagio: Date;
 
+  @IsBoolean()
+  isObrigatorio: boolean;
+
+  @IsString()
+  razaoSocialConcedente: string;
+
+  @IsString()
+  cnpjConcedente: string;
+
+  @IsString()
+  cepConcedente: string;
+
+  @IsString()
+  bairroConcedente: string;
+
+  @IsString()
+  cidadeConcedente: string;
+
+  @IsString()
+  ufConcedente: string;
+
+  @IsString()
+  enderecoConcedente: string;
+
+  @IsString()
+  emailConcedente: string;
+
+  @IsString()
+  representanteLegalConcedente: string;
+
+  @IsString()
+  funcaoRepresentanteLegalConcedente: string;
+
+  @IsString()
+  supervisor: string;
+
+  @IsString()
+  cargoSupervisor: string;
+
   @IsString()
   id_user: string;
 
-  @IsString()
-  id_internshipGrantor: string;
+  // @IsString()
+  // id_internshipGrantor: string;
 }

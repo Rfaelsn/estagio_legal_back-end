@@ -1,39 +1,39 @@
-import { IsString, IsEmail } from 'class-validator';
+// import { IsString, IsEmail } from 'class-validator';
 
-export class CreateInternshipGrantorDTO {
-  @IsString()
-  name: string;
+// export class CreateInternshipGrantorDTO {
+//   @IsString()
+//   name: string;
 
-  @IsString()
-  cnpj: string;
+//   @IsString()
+//   cnpj: string;
 
-  @IsString()
-  cep: string;
+//   @IsString()
+//   cep: string;
 
-  @IsString()
-  bairro: string;
+//   @IsString()
+//   bairro: string;
 
-  @IsString()
-  cidade: string;
+//   @IsString()
+//   cidade: string;
 
-  @IsString()
-  uf: string;
+//   @IsString()
+//   uf: string;
 
-  @IsString()
-  endereco: string;
+//   @IsString()
+//   endereco: string;
 
-  @IsEmail()
-  email: string;
+//   @IsEmail()
+//   email: string;
 
-  @IsString()
-  representanteLegal: string;
+//   @IsString()
+//   representanteLegal: string;
 
-  @IsString()
-  funcaoRepresentanteLegal: string;
+//   @IsString()
+//   funcaoRepresentanteLegal: string;
 
-  @IsString()
-  supervisor: string;
+//   @IsString()
+//   supervisor: string;
 
-  @IsString()
-  cargoSupervisor: string;
-}
+//   @IsString()
+//   cargoSupervisor: string;
+// }

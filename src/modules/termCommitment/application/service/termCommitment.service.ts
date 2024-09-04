@@ -3,11 +3,13 @@ import { TermCommitmentRepository } from '../../adapter/repository/termCommitmen
 import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '../dto/LinkTermCommitmentFilePath.dto';
+import { InternshipProcessService } from 'src/modules/intershipProcess/application/service/intershipProcess.service';
 
 @Injectable()
 export class TermCommitmentService {
   constructor(
     private readonly termCommitmentRepository: TermCommitmentRepository,
+    private readonly internshipProcessService: InternshipProcessService,
   ) {}
 
   async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {
@@ -16,6 +18,11 @@ export class TermCommitmentService {
     );
     const termCommitment = await createTermCommitmentUsecase.handle(
       createTermCommitmentDTO,
+    );
+
+    this.internshipProcessService.create(
+      termCommitment.id,
+      termCommitment.id_user,
     );
     return termCommitment;
   }

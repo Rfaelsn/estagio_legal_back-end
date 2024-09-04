@@ -1,10 +1,10 @@
-import { CreateInternshipGrantorDTO } from '../../application/dto/createInternshipGrantor.dto';
-import { InternshipGrantor } from '../entities/internshipGrantor.entity';
+// import { CreateInternshipGrantorDTO } from '../../application/dto/createInternshipGrantor.dto';
+// import { InternshipGrantor } from '../entities/internshipGrantor.entity';
 
-export interface IInternshipGrantorRepository {
-  create(
-    internshipGrantor: CreateInternshipGrantorDTO,
-  ): Promise<InternshipGrantor>;
+// export interface IInternshipGrantorRepository {
+//   create(
+//     internshipGrantor: CreateInternshipGrantorDTO,
+//   ): Promise<InternshipGrantor>;
 
-  findByCnpj(cnpj: string): Promise<InternshipGrantor>;
-}
+//   findByCnpj(cnpj: string): Promise<InternshipGrantor>;
+// }
