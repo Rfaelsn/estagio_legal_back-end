@@ -13,7 +13,7 @@ export class termCommitmentController {
   async createIntershipProcess(
     @Body() createTermCommitmentDTO: CreateTermCommitmentDTO,
   ) {
-    console.log(createTermCommitmentDTO);
+    console.log(createTermCommitmentDTO.horaInicioEstagio);
     return this.termCommitmentService.create(createTermCommitmentDTO);
   }
 

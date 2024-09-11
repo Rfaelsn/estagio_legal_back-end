@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TermCommitmentRepository } from '../../adapter/repository/termCommitment.repository';
 import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
@@ -9,6 +9,7 @@ import { InternshipProcessService } from 'src/modules/intershipProcess/applicati
 export class TermCommitmentService {
   constructor(
     private readonly termCommitmentRepository: TermCommitmentRepository,
+    @Inject(forwardRef(() => InternshipProcessService))
     private readonly internshipProcessService: InternshipProcessService,
   ) {}
 
@@ -24,6 +25,17 @@ export class TermCommitmentService {
       termCommitment.id,
       termCommitment.id_user,
     );
+    return termCommitment;
+  }
+
+  async directCreate(createTermCommitmentDTO: CreateTermCommitmentDTO) {
+    const createTermCommitmentUsecase = new CreateTermCommitmentUsecase(
+      this.termCommitmentRepository,
+    );
+    const termCommitment = await createTermCommitmentUsecase.handle(
+      createTermCommitmentDTO,
+    );
+
     return termCommitment;
   }
 

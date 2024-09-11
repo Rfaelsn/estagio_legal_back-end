@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
 import { InternshipProcess } from '../../domain/entities/intershipProcess.entity';
@@ -11,11 +11,14 @@ import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQ
 import { CreateIntershipProcessDTO } from '../dto/input/intershipProcess.dto';
 import { InternshipProcessFilterDTO } from '../dto/internshipProcessFilter.dto';
 import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
+import { DirectCreateIntershipProcessDTO } from '../dto/input/directCreateInternshipProcess.dto';
 
 @Injectable()
 export class InternshipProcessService {
   constructor(
     private readonly intershipProcessRepository: InternshipProcessRepository,
+    @Inject(forwardRef(() => TermCommitmentService))
+    private readonly termCommitmentService: TermCommitmentService,
   ) {}
 
   async create(idTermCommitment: string, idUser: string) {
@@ -28,6 +31,16 @@ export class InternshipProcessService {
       idUser,
     );
     return intershipProcess;
+  }
+
+  async directCreate(
+    directCreateIntershipProcessDTO: DirectCreateIntershipProcessDTO,
+  ) {
+    const termCommitmentEntity = await this.termCommitmentService.directCreate(
+      directCreateIntershipProcessDTO.termCommitment,
+    );
+
+    directCreateIntershipProcessDTO.id_termCommitment = termCommitmentEntity.id;
   }
 
   // async createTermCommitment(

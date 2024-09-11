@@ -24,6 +24,7 @@ import { plainToInstance } from 'class-transformer';
 import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
 import { UpdateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/updateInternshiProcess.dto';
+import { DirectCreateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/input/directCreateInternshipProcess.dto';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
@@ -32,13 +33,15 @@ export class InternshipProcessController {
     private readonly intershipProcessService: InternshipProcessService,
   ) {}
 
-  // @IsPublic()
-  // @Post('create')
-  // async createIntershipProcess(
-  //   @Body() createIntershipProcessDTO: CreateIntershipProcessDTO,
-  // ) {
-  //   return this.intershipProcessService.create(createIntershipProcessDTO);
-  // }
+  @IsPublic()
+  @Post('create')
+  async createIntershipProcess(
+    @Body() directCreateIntershipProcessDTO: DirectCreateIntershipProcessDTO,
+  ) {
+    return this.intershipProcessService.directCreate(
+      directCreateIntershipProcessDTO,
+    );
+  }
 
   @IsPublic()
   @Patch('update/status')

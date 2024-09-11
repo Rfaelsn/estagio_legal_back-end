@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PrismaModule } from 'src/config/prisma/prisma.module';
 import { TermCommitmentService } from './application/service/termCommitment.service';
 import { termCommitmentController } from './adapter/http/rest/termCommitment.controller';
@@ -8,7 +8,7 @@ import { InternshipProcessModule } from '../intershipProcess/intershipProcess.mo
 @Module({
   controllers: [termCommitmentController],
   providers: [TermCommitmentService, TermCommitmentRepository],
-  imports: [PrismaModule, InternshipProcessModule],
+  imports: [PrismaModule, forwardRef(() => InternshipProcessModule)],
   exports: [TermCommitmentService],
 })
 export class TermCommitmentModule {}

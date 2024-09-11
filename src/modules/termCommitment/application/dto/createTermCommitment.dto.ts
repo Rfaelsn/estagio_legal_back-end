@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsString, IsDate, IsOptional, IsBoolean } from 'class-validator';
+import { IsTime } from 'src/shared/decorators/isTime.decorator';
 
 export class CreateTermCommitmentDTO {
   @IsString()
@@ -22,12 +23,10 @@ export class CreateTermCommitmentDTO {
   @Transform(({ value }) => new Date(value))
   dataFimEstagio: Date;
 
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
+  @IsTime()
   horaInicioEstagio: Date;
 
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
+  @IsTime()
   horaFimEstagio: Date;
 
   @IsBoolean()
