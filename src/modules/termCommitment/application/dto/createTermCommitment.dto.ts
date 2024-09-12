@@ -1,5 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsDate, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsDate,
+  IsOptional,
+  IsBoolean,
+  IsEmail,
+} from 'class-validator';
+import { IsCNPJ } from 'src/shared/decorators/isCnpj.decorator';
 import { IsTime } from 'src/shared/decorators/isTime.decorator';
 
 export class CreateTermCommitmentDTO {
@@ -35,7 +42,7 @@ export class CreateTermCommitmentDTO {
   @IsString()
   razaoSocialConcedente: string;
 
-  @IsString()
+  @IsCNPJ()
   cnpjConcedente: string;
 
   @IsString()
@@ -53,7 +60,7 @@ export class CreateTermCommitmentDTO {
   @IsString()
   enderecoConcedente: string;
 
-  @IsString()
+  @IsEmail()
   emailConcedente: string;
 
   @IsString()
