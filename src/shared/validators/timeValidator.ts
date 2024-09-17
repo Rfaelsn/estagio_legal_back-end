@@ -7,6 +7,10 @@ import {
 @ValidatorConstraint({ name: 'isTime', async: false })
 export class IsTimeConstraint implements ValidatorConstraintInterface {
   validate(time: string, args: ValidationArguments) {
+    if (!time) {
+      return false;
+    }
+
     const timeRegex = /^(?:([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?)$/;
     const match = time.match(timeRegex);
 

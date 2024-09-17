@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsBoolean,
   IsEmail,
+  IsNotEmpty,
 } from 'class-validator';
 import { IsCNPJ } from 'src/shared/decorators/isCnpj.decorator';
 import { IsTime } from 'src/shared/decorators/isTime.decorator';
@@ -24,58 +25,76 @@ export class CreateTermCommitmentDTO {
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
+  @IsNotEmpty()
   dataInicioEstagio: Date;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
+  @IsNotEmpty()
   dataFimEstagio: Date;
 
+  @IsNotEmpty()
   @IsTime()
   horaInicioEstagio: Date;
 
+  @IsNotEmpty()
   @IsTime()
   horaFimEstagio: Date;
 
   @IsBoolean()
+  @IsNotEmpty()
   isObrigatorio: boolean;
 
   @IsString()
+  @IsNotEmpty()
   razaoSocialConcedente: string;
 
   @IsCNPJ()
+  @IsNotEmpty()
   cnpjConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   cepConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   bairroConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   cidadeConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   ufConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   enderecoConcedente: string;
 
   @IsEmail()
+  @IsNotEmpty()
   emailConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   representanteLegalConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   funcaoRepresentanteLegalConcedente: string;
 
   @IsString()
+  @IsNotEmpty()
   supervisor: string;
 
   @IsString()
+  @IsNotEmpty()
   cargoSupervisor: string;
 
   @IsString()
+  @IsNotEmpty()
   id_user: string;
 
   // @IsString()

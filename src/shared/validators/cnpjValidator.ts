@@ -7,6 +7,10 @@ import {
 @ValidatorConstraint({ name: 'isCNPJ', async: false })
 export class IsCNPJConstraint implements ValidatorConstraintInterface {
   validate(cnpj: string, args: ValidationArguments) {
+    if (!cnpj) {
+      return false;
+    }
+
     cnpj = cnpj.replace(/[^\d]+/g, '');
 
     if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) {
