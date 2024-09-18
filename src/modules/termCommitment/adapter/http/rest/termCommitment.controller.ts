@@ -1,7 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { CreateTermCommitmentDTO } from 'src/modules/termCommitment/application/dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from 'src/modules/termCommitment/application/dto/LinkTermCommitmentFilePath.dto';
+import { CreatedTermCommitmentOutputDTO } from 'src/modules/termCommitment/application/dto/output/termCommitmentOutPut.dto';
 import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 
 @Controller('termCommitment')
@@ -13,8 +15,17 @@ export class termCommitmentController {
   async createIntershipProcess(
     @Body() createTermCommitmentDTO: CreateTermCommitmentDTO,
   ) {
-    console.log(createTermCommitmentDTO.horaInicioEstagio);
-    return this.termCommitmentService.create(createTermCommitmentDTO);
+    const termCommitmentEntity = await this.termCommitmentService.create(
+      createTermCommitmentDTO,
+    );
+
+    const termCommitmentOutput = plainToInstance(
+      CreatedTermCommitmentOutputDTO,
+      termCommitmentEntity,
+      { excludeExtraneousValues: true },
+    );
+
+    return termCommitmentOutput;
   }
 
   @IsPublic()

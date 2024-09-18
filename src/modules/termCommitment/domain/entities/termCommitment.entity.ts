@@ -14,7 +14,10 @@ export class TermCommitment {
   dataFimEstagio: Date;
   horaInicioEstagio: Date;
   horaFimEstagio: Date;
+  jornadaSemanal: Date;
   isObrigatorio: boolean;
+  bolsaAuxilio: number;
+  auxilioTransporte: number;
   filePath?: string;
   id_user: string;
   user?: User;

@@ -1,50 +1,110 @@
-// import { Prisma, TermCommitment } from '@prisma/client';
-// import { Transform } from 'class-transformer';
-// import { IsString, IsDate } from 'class-validator';
-// // import { InternshipGrantor } from 'src/modules/internshipGrantor/domain/entities/internshipGrantor.entity';
-// import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
-// import { User } from 'src/modules/user/domain/entities/user.entity';
-// // import { TermCommitment } from '../../domain/entities/termCommitment.entity';
+import { Expose, Transform, Type } from 'class-transformer';
+import { IsString, IsDate, IsBoolean, IsNumber } from 'class-validator';
+import { UserAlunoOutputDTO } from 'src/modules/user/application/dto/output/userAlunoOutput.dto';
 
-// export class TermCommitmentDTO {
-//   @IsString()
-//   Id: string;
+export class CreatedTermCommitmentOutputDTO {
+  @IsString()
+  @Expose()
+  numApoliceSeguro: string;
 
-//   @IsString()
-//   numApoliceSeguro: string;
+  @IsString()
+  @Expose()
+  nomeSeguradora: string;
 
-//   @IsString()
-//   nomeSeguradora: string;
+  @IsString()
+  @Expose()
+  profOrientador: string;
 
-//   @IsString()
-//   profOrientador: string;
+  @IsString()
+  @Expose()
+  codSiape: string;
 
-//   @IsString()
-//   codSiape: string;
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => new Date(value))
+  dataInicioEstagio: Date;
 
-//   @IsDate()
-//   @Transform(({ value }) => new Date(value))
-//   dataInicioEstagio: Date;
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => new Date(value))
+  dataFimEstagio: Date;
 
-//   @IsDate()
-//   @Transform(({ value }) => new Date(value))
-//   dataFimEstagio: Date;
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => new Date(value))
+  horaInicioEstagio: Date;
 
-//   @IsDate()
-//   @Transform(({ value }) => new Date(value))
-//   horaInicioEstagio: Date;
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => new Date(value))
+  horaFimEstagio: Date;
 
-//   @IsDate()
-//   @Transform(({ value }) => new Date(value))
-//   horaFimEstagio: Date;
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => new Date(value))
+  jornadaSemanal: Date;
 
-//   @IsString()
-//   id_user: string;
+  @IsBoolean()
+  @Expose()
+  isObrigatorio: boolean;
 
-//   user?: User;
+  @IsNumber()
+  @Expose()
+  bolsaAuxilio: number;
 
-//   // @IsString()
-//   // id_internshipGrantor: string;
+  @IsNumber()
+  @Expose()
+  auxilioTransporte: number;
 
-//   // internshipGrantor?: InternshipGrantor;
-// }
+  @IsString()
+  @Expose()
+  razaoSocialConcedente: string;
+
+  @IsString()
+  @Expose()
+  cnpjConcedente: string;
+
+  @IsString()
+  @Expose()
+  cepConcedente: string;
+
+  @IsString()
+  @Expose()
+  bairroConcedente: string;
+
+  @IsString()
+  @Expose()
+  cidadeConcedente: string;
+
+  @IsString()
+  @Expose()
+  ufConcedente: string;
+
+  @IsString()
+  @Expose()
+  enderecoConcedente: string;
+
+  @IsString()
+  @Expose()
+  emailConcedente: string;
+
+  @IsString()
+  @Expose()
+  representanteLegalConcedente: string;
+
+  @IsString()
+  @Expose()
+  funcaoRepresentanteLegalConcedente: string;
+
+  @IsString()
+  @Expose()
+  supervisor: string;
+
+  @IsString()
+  @Expose()
+  cargoSupervisor: string;
+
+  @Expose()
+  @Type(() => UserAlunoOutputDTO)
+  user: UserAlunoOutputDTO;
+}

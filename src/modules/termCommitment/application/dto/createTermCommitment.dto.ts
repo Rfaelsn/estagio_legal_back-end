@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsEmail,
   IsNotEmpty,
+  IsNumber,
 } from 'class-validator';
 import { IsCNPJ } from 'src/shared/decorators/isCnpj.decorator';
 import { IsTime } from 'src/shared/decorators/isTime.decorator';
@@ -41,9 +42,19 @@ export class CreateTermCommitmentDTO {
   @IsTime()
   horaFimEstagio: Date;
 
+  @IsNotEmpty()
+  @IsTime()
+  jornadaSemanal: Date;
+
   @IsBoolean()
   @IsNotEmpty()
   isObrigatorio: boolean;
+
+  @IsNumber()
+  bolsaAuxilio: number;
+
+  @IsNumber()
+  auxilioTransporte: number;
 
   @IsString()
   @IsNotEmpty()
