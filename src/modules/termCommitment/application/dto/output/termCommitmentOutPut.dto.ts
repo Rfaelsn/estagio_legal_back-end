@@ -1,6 +1,7 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { IsString, IsDate, IsBoolean, IsNumber } from 'class-validator';
 import { UserAlunoOutputDTO } from 'src/modules/user/application/dto/output/userAlunoOutput.dto';
+import { IsTime } from 'src/shared/decorators/isTime.decorator';
 
 export class CreatedTermCommitmentOutputDTO {
   @IsString()
@@ -29,20 +30,17 @@ export class CreatedTermCommitmentOutputDTO {
   @Transform(({ value }) => new Date(value))
   dataFimEstagio: Date;
 
-  @IsDate()
   @Expose()
-  @Transform(({ value }) => new Date(value))
-  horaInicioEstagio: Date;
+  @IsTime('toTime')
+  horaInicioEstagio: string;
 
-  @IsDate()
   @Expose()
-  @Transform(({ value }) => new Date(value))
-  horaFimEstagio: Date;
+  @IsTime('toTime')
+  horaFimEstagio: string;
 
-  @IsDate()
   @Expose()
-  @Transform(({ value }) => new Date(value))
-  jornadaSemanal: Date;
+  @IsTime('toTime')
+  jornadaSemanal: string;
 
   @IsBoolean()
   @Expose()

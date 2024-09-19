@@ -35,15 +35,15 @@ export class CreateTermCommitmentDTO {
   dataFimEstagio: Date;
 
   @IsNotEmpty()
-  @IsTime()
+  @IsTime('toDate')
   horaInicioEstagio: Date;
 
   @IsNotEmpty()
-  @IsTime()
+  @IsTime('toDate')
   horaFimEstagio: Date;
 
   @IsNotEmpty()
-  @IsTime()
+  @IsTime('toDate')
   jornadaSemanal: Date;
 
   @IsBoolean()

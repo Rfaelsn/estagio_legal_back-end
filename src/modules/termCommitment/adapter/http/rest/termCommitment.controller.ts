@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { validateSync } from 'class-validator';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { CreateTermCommitmentDTO } from 'src/modules/termCommitment/application/dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from 'src/modules/termCommitment/application/dto/LinkTermCommitmentFilePath.dto';
@@ -24,6 +25,8 @@ export class termCommitmentController {
       termCommitmentEntity,
       { excludeExtraneousValues: true },
     );
+
+    const erros = await validateSync(termCommitmentOutput);
 
     return termCommitmentOutput;
   }
