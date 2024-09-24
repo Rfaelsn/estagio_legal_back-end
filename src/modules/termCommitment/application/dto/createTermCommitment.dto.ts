@@ -7,6 +7,10 @@ import {
   IsEmail,
   IsNotEmpty,
   IsNumber,
+  MaxLength,
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
 } from 'class-validator';
 import { IsCNPJ } from 'src/shared/decorators/isCnpj.decorator';
 import { IsTime } from 'src/shared/decorators/isTime.decorator';
@@ -55,6 +59,16 @@ export class CreateTermCommitmentDTO {
 
   @IsNumber()
   auxilioTransporte: number;
+
+  @IsArray()
+  @ArrayMinSize(5, { message: 'Você deve enviar exatamente 5 atividades' })
+  @ArrayMaxSize(5, { message: 'Você deve enviar exatamente 5 atividades' })
+  @IsString({ each: true, message: 'Cada atividade deve ser uma string' })
+  @MaxLength(200, {
+    each: true,
+    message: 'Cada atividade deve ter no máximo 200 caracteres',
+  })
+  planoAtividadesEstagio: string[];
 
   @IsString()
   @IsNotEmpty()

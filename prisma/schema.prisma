@@ -89,9 +89,10 @@ model TermCommitment {
   horaFimEstagio    DateTime    @db.Time(0)
   jornadaSemanal    DateTime    @db.Time(0)
   isObrigatorio     Boolean
-  //dados concedente
   bolsaAuxilio      Float
   auxilioTransporte Float
+  planoAtividadesEstagio String @db.Text()
+  //dados concedente
   razaoSocialConcedente String @db.VarChar(127)
   cnpjConcedente String @db.VarChar(14)
   cepConcedente  String @db.VarChar(63)

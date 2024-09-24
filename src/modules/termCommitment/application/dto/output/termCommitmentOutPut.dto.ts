@@ -54,6 +54,10 @@ export class CreatedTermCommitmentOutputDTO {
   @Expose()
   auxilioTransporte: number;
 
+  @Transform(({ value }) => JSON.parse(value), { toClassOnly: true })
+  @Expose()
+  planoAtividadesEstagio: string[];
+
   @IsString()
   @Expose()
   razaoSocialConcedente: string;

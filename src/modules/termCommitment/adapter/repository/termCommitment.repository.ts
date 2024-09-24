@@ -17,6 +17,9 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
     const filteredTermCommitment = restTermCommitment;
     const data: Prisma.TermCommitmentCreateInput = {
       ...filteredTermCommitment,
+      planoAtividadesEstagio: JSON.stringify(
+        filteredTermCommitment.planoAtividadesEstagio,
+      ),
       user: {
         connect: {
           id: createTermCommitmentDTO.id_user,
@@ -30,7 +33,7 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
     };
 
     const newTermCommitment = await this.prisma.termCommitment.create({
-      data: createTermCommitmentDTO,
+      data,
       include: {
         user: true,
       },
