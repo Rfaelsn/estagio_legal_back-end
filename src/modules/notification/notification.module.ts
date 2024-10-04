@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { NotificationGateway } from './notification.gateway';
+import { NotificationGateway } from './adapter/gateways/notification.gateway';
+import { NotificationService } from './application/service/notification.service';
 
 @Module({
-  providers: [NotificationGateway],
-  exports: [NotificationGateway],
+  providers: [NotificationGateway, NotificationService],
+  exports: [NotificationService, NotificationGateway],
 })
-export class WebSocketModule {}
+export class NotificationModule {}

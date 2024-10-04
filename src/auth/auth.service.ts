@@ -25,10 +25,12 @@ export class AuthService {
 
     const accessToken = this.generateAccessToken(validatedUser);
     const refreshToken = this.generateRefreshToken(validatedUser);
+    const uuidUser = validatedUser.id;
 
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
+      uuidUser: uuidUser,
     };
   }
 

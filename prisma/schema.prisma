@@ -35,6 +35,8 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   user              User       @relation("userNotification", fields: [id_user], references: [id])
+
+  @@map("tb_notifications")
 }
 
 model File{

@@ -8,7 +8,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { InternshipProcessModule } from './modules/intershipProcess/intershipProcess.module';
 // import { InternshipGrantorModule } from './modules/internshipGrantor/internshipGrantor.module';
 import { TermCommitmentModule } from './modules/termCommitment/termCommitment.module';
-import { WebSocketModule } from './modules/notification/notification.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { WebSocketModule } from './modules/notification/notification.module';
     PrismaModule,
     AuthModule,
     UserModule,
-    WebSocketModule,
+    NotificationModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })

@@ -12,6 +12,7 @@ import { CreateIntershipProcessDTO } from '../dto/input/intershipProcess.dto';
 import { InternshipProcessFilterDTO } from '../dto/internshipProcessFilter.dto';
 import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
 import { DirectCreateIntershipProcessDTO } from '../dto/input/directCreateInternshipProcess.dto';
+import { NotificationService } from 'src/modules/notification/application/service/notification.service';
 
 @Injectable()
 export class InternshipProcessService {
@@ -19,6 +20,7 @@ export class InternshipProcessService {
     private readonly intershipProcessRepository: InternshipProcessRepository,
     @Inject(forwardRef(() => TermCommitmentService))
     private readonly termCommitmentService: TermCommitmentService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async create(idTermCommitment: string, idUser: string) {
@@ -30,6 +32,12 @@ export class InternshipProcessService {
       idTermCommitment,
       idUser,
     );
+
+    this.notificationService.sendNotification(
+      idUser,
+      'novo processo de estágio cadastrado',
+    );
+
     return intershipProcess;
   }
 
