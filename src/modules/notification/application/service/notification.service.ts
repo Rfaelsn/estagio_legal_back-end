@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { CreateNotificationUsecase } from '../../domain/usecase/createNotification.usecase';
+import { INotificationRepository } from '../../domain/port/notificationRepository.interface';
+import { NotificationsRepository } from '../../adapter/repository/notification.repository';
+import { CreateNotificationDTO } from '../dto/createNotification.dto';
+import { use } from 'passport';
 
 @Injectable()
 export class NotificationService {
+  constructor(
+    private readonly notificationRepository: NotificationsRepository,
+  ) {}
+
   @WebSocketServer()
   server: Server;
 
@@ -45,6 +54,13 @@ export class NotificationService {
   }
 
   private async saveNotificationToDatabase(userId: string, message: string) {
-    console.log(`Notificação salva no banco de dados para o usuário ${userId}`);
+    const createNotificationUsecase = new CreateNotificationUsecase(
+      this.notificationRepository,
+    );
+
+    await createNotificationUsecase.handle({
+      idUser: userId,
+      message: message,
+    });
   }
 }
