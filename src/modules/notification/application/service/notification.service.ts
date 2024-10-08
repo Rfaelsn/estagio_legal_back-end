@@ -46,10 +46,6 @@ export class NotificationService {
     if (socketId) {
       this.server.to(socketId).emit('notification', { message });
       console.log(`Notificação enviada para o usuário ${userId} via WebSocket`);
-    } else {
-      console.log(
-        `Usuário ${userId} está offline. Notificação salva apenas no banco de dados.`,
-      );
     }
   }
 
