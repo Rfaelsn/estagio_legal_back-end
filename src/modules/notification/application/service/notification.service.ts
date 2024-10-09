@@ -6,6 +6,8 @@ import { INotificationRepository } from '../../domain/port/notificationRepositor
 import { NotificationsRepository } from '../../adapter/repository/notification.repository';
 import { CreateNotificationDTO } from '../dto/createNotification.dto';
 import { use } from 'passport';
+import { FindLatestNotificationsByUserIdDTO } from '../dto/findLatestNotificationsByUserId.dto';
+import { FindLatestNotificationsByUserIdUsecase } from '../../domain/usecase/findLatestNotificationsByUserId.usecase';
 
 @Injectable()
 export class NotificationService {
@@ -41,10 +43,10 @@ export class NotificationService {
   async sendNotification(userId: string, message: string) {
     const socketId = this.userSocketMap.get(userId);
 
-    await this.saveNotificationToDatabase(userId, message);
+    const notification = await this.saveNotificationToDatabase(userId, message);
 
     if (socketId) {
-      this.server.to(socketId).emit('notification', { message });
+      this.server.to(socketId).emit('notification', notification);
       console.log(`Notificação enviada para o usuário ${userId} via WebSocket`);
     }
   }
@@ -54,9 +56,24 @@ export class NotificationService {
       this.notificationRepository,
     );
 
-    await createNotificationUsecase.handle({
+    const notification = await createNotificationUsecase.handle({
       idUser: userId,
       message: message,
     });
+
+    return notification;
+  }
+
+  async findLatestNotificationsByUserId(
+    findLatestNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
+  ) {
+    const findLatestNotificationsByUserIdUsecase =
+      new FindLatestNotificationsByUserIdUsecase(this.notificationRepository);
+
+    const notifications = findLatestNotificationsByUserIdUsecase.handle(
+      findLatestNotificationsByUserIdDTO,
+    );
+
+    return notifications;
   }
 }

@@ -1,10 +1,10 @@
 import { CreateNotificationDTO } from '../../application/dto/createNotification.dto';
-import { FindNotificationsByUserIdDTO } from '../../application/dto/findNotificationsByUserId.dto';
+import { FindLatestNotificationsByUserIdDTO } from '../../application/dto/findLatestNotificationsByUserId.dto';
 
 export interface INotificationRepository {
   create(intershipProcess: CreateNotificationDTO): Promise<any>;
 
   findNotificationsByUserId(
-    findNotificationsByUserIdDTO: FindNotificationsByUserIdDTO,
+    findNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
   ): Promise<any[]>;
 }
