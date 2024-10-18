@@ -7,4 +7,6 @@ export interface INotificationRepository {
   findNotificationsByUserId(
     findNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
   ): Promise<any[]>;
+
+  setReadNotification(notificationId: string): Promise<void>;
 }

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { CreateNotificationDTO } from 'src/modules/notification/application/dto/createNotification.dto';
 import { FindLatestNotificationsByUserIdDTO } from 'src/modules/notification/application/dto/findLatestNotificationsByUserId.dto';
@@ -9,7 +18,8 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @IsPublic()
-  @Get('find/latest')
+  @HttpCode(200)
+  @Post('find/latest')
   async findLatestNotificationsByUserId(
     @Body()
     findLatestNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
@@ -18,6 +28,16 @@ export class NotificationController {
       return this.notificationService.findLatestNotificationsByUserId(
         findLatestNotificationsByUserIdDTO,
       );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @IsPublic()
+  @Patch('set/read/:notificationID')
+  async setReadNotification(@Param('notificationID') notificationId: string) {
+    try {
+      await this.notificationService.setReadNotification(notificationId);
     } catch (error) {
       console.log(error);
     }

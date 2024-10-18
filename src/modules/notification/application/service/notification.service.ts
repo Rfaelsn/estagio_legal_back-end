@@ -8,6 +8,7 @@ import { CreateNotificationDTO } from '../dto/createNotification.dto';
 import { use } from 'passport';
 import { FindLatestNotificationsByUserIdDTO } from '../dto/findLatestNotificationsByUserId.dto';
 import { FindLatestNotificationsByUserIdUsecase } from '../../domain/usecase/findLatestNotificationsByUserId.usecase';
+import { SetReadNotificationUsecase } from '../../domain/usecase/setReadNotification.usecase';
 
 @Injectable()
 export class NotificationService {
@@ -75,5 +76,13 @@ export class NotificationService {
     );
 
     return notifications;
+  }
+
+  async setReadNotification(notificationId: string): Promise<void> {
+    const setReadNotificationUsecase = new SetReadNotificationUsecase(
+      this.notificationRepository,
+    );
+
+    setReadNotificationUsecase.handle(notificationId);
   }
 }

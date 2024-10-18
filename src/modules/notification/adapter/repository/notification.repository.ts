@@ -40,4 +40,15 @@ export class NotificationsRepository implements INotificationRepository {
 
     return notifications;
   }
+
+  async setReadNotification(notificationId: string): Promise<void> {
+    await this.prisma.notification.update({
+      where: {
+        id: notificationId,
+      },
+      data: {
+        read: true,
+      },
+    });
+  }
 }
