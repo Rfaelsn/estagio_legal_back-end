@@ -22,7 +22,6 @@ model User {
   institution         Institution?         @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
   TermsCommitment     TermCommitment[]     @relation("userTerm")
   internshipProcess   InternshipProcess [] @relation("alunoProcessoEstagio")
-  files               File[]               @relation("userFile")
   Notifications     Notification[]     @relation("userNotification")
 
   @@map("tb_users")
@@ -42,17 +41,11 @@ model Notification {
 model File{
   id                  String             @id @default(uuid())
   filePath            String             @db.VarChar(255)
-  userId              String             @db.VarChar(255)
-  user                User               @relation("userFile",fields: [userId], references: [id])
-  @@map("tb_user_files")
+  internshipProcessId              String             @db.VarChar(255)
+  internshipProcess   InternshipProcess  @relation("fileToInternshipProcess",fields: [internshipProcessId], references: [id])
+  @@map("tb_internship_process_files")
 }
 
-model Token{
-  id        String   @id @default(uuid())
-  hash      String   @db.VarChar(255)
-  user_email  String   @db.VarChar(255)
-  @@map("tb_token")
-}
 
 model Institution {
   id        String   @id @default(uuid())
@@ -138,6 +131,8 @@ model InternshipProcess {
   status              String      @db.VarChar(127)
   startDateProcess    DateTime   @default(now()) @db.Timestamp(0)
   endDateProcess      DateTime?   @db.Timestamp(0)
+
+  files               File[]               @relation("fileToInternshipProcess")
 
 
   //relacionamento termo de compromisso

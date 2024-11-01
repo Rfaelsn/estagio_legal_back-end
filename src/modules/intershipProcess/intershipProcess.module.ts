@@ -6,12 +6,14 @@ import { InternshipProcessController } from './adapter/http/rest/intershipProces
 import { InternshipProcessRepository } from './adapter/repository/intershipProcess.repository';
 import { TermCommitmentModule } from '../termCommitment/termCommitment.module';
 import { NotificationModule } from '../notification/notification.module';
+import { FileModule } from '../file/file.module';
 
 @Module({
   controllers: [InternshipProcessController],
   providers: [InternshipProcessService, InternshipProcessRepository],
   imports: [
     PrismaModule,
+    FileModule,
     forwardRef(() => TermCommitmentModule),
     NotificationModule,
   ],

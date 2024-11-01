@@ -20,7 +20,6 @@ export class UserRepository implements IUserRepository {
       ...CreateAlunoDTO,
       TermsCommitment: {},
       internshipProcess: {},
-      files: {},
     };
     const newUser = await this.prisma.user.create({
       data,
@@ -36,7 +35,6 @@ export class UserRepository implements IUserRepository {
       ...createFuncionarioDTO,
       TermsCommitment: {},
       internshipProcess: {},
-      files: {},
     };
     const newUser = await this.prisma.user.create({ data });
 
