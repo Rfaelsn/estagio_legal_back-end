@@ -146,12 +146,12 @@ model InternshipProcess {
   //relacionamento AvaliacaoAluno
   internshipEvaluation InternshipEvaluation[] @relation("processoEstagioAvaliacao")
 
-  statusHistory       InternshipProcessStatusHistory[] @relation("historicoStatusProcesso")
+  statusHistory       InternshipProcessHistory[] @relation("historicoStatusProcesso")
   
   @@map("tb_internshipProcess")
 }
 
-model InternshipProcessStatusHistory {
+model InternshipProcessHistory {
   id                  String      @id @default(uuid())
   startDate           DateTime   @default(now()) @db.Timestamp(0)
   endDate             DateTime?   @db.Timestamp(0)

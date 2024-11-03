@@ -1,7 +1,10 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
-import { InternshipProcess } from '../../domain/entities/intershipProcess.entity';
+import {
+  InternshipProcess,
+  IntershipProcessStatus,
+} from '../../domain/entities/intershipProcess.entity';
 import { CreateIntershipProcessByTermCommitmentUsecase } from '../../domain/usecase/createInternshipProcessByTermCommitment.usecase';
 import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcess.usecase';
 import { FilterInternshipProcessUsecase } from '../../domain/usecase/filterInternshipProcess.usecase';
@@ -13,6 +16,7 @@ import { InternshipProcessFilterDTO } from '../dto/internshipProcessFilter.dto';
 import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
 import { DirectCreateIntershipProcessDTO } from '../dto/input/directCreateInternshipProcess.dto';
 import { NotificationService } from 'src/modules/notification/application/service/notification.service';
+import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
 
 @Injectable()
 export class InternshipProcessService {
@@ -21,6 +25,7 @@ export class InternshipProcessService {
     @Inject(forwardRef(() => TermCommitmentService))
     private readonly termCommitmentService: TermCommitmentService,
     private readonly notificationService: NotificationService,
+    private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
   ) {}
 
   async create(idTermCommitment: string, idUser: string) {
@@ -32,6 +37,13 @@ export class InternshipProcessService {
       idTermCommitment,
       idUser,
     );
+
+    this.internshipProcessHistoryService.registerHistory({
+      startDate: new Date(),
+      status: IntershipProcessStatus.EM_ANALISE,
+      observacoes: 'registrado pelo aluno',
+      idInternshipProcess: intershipProcess.id,
+    });
 
     this.notificationService.sendNotification(
       idUser,

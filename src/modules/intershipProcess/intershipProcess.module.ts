@@ -7,6 +7,7 @@ import { InternshipProcessRepository } from './adapter/repository/intershipProce
 import { TermCommitmentModule } from '../termCommitment/termCommitment.module';
 import { NotificationModule } from '../notification/notification.module';
 import { FileModule } from '../file/file.module';
+import { InternshipProcessHistoryModule } from '../internship-process-history/internship-process-history.module';
 
 @Module({
   controllers: [InternshipProcessController],
@@ -16,6 +17,7 @@ import { FileModule } from '../file/file.module';
     FileModule,
     forwardRef(() => TermCommitmentModule),
     NotificationModule,
+    InternshipProcessHistoryModule,
   ],
   exports: [InternshipProcessService],
 })
