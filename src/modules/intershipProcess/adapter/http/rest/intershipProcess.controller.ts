@@ -25,6 +25,7 @@ import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termC
 import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
 import { UpdateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/updateInternshiProcess.dto';
 import { DirectCreateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/input/directCreateInternshipProcess.dto';
+import { registerAssignTermCommitmentDto } from 'src/modules/intershipProcess/application/dto/register-assign-term-commitment.dto';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
@@ -46,6 +47,34 @@ export class InternshipProcessController {
   @IsPublic()
   @Patch('update/status')
   async updateInternshipProcess(
+    @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  ) {
+    return await this.intershipProcessService.updateInternshipProcess(
+      updateInternshipProcessStatusDTO,
+    );
+  }
+
+  @IsPublic()
+  @Patch('register/assign-term')
+  async registerAssignTermCommitmentByAluno(
+    @Body() registerAssignTermDto: registerAssignTermCommitmentDto,
+  ) {
+    return await this.intershipProcessService.registerAssignTermCommitment(
+      registerAssignTermDto,
+    );
+  }
+
+  @Patch('register/response/submit/docs')
+  async registerRenovationByAluno(
+    @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  ) {
+    return await this.intershipProcessService.updateInternshipProcess(
+      updateInternshipProcessStatusDTO,
+    );
+  }
+
+  @Patch('register/assign-end-internship')
+  async registerEndInternshipByAluno(
     @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
   ) {
     return await this.intershipProcessService.updateInternshipProcess(

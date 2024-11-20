@@ -16,4 +16,17 @@ export class FileController {
       console.error(error);
     }
   }
+
+  @Post('register-file/aluno')
+  async registerFileAluno(
+    @Body() registerFilePathDto: RegisterFilePathDto,
+  ): Promise<void> {
+    try {
+      await this.fileService.registerFilePathProcess(registerFilePathDto);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  //colocar as rotas para cadastrar os files recedendo o id do processo e o filepath da api de arquivos
 }

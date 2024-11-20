@@ -41,6 +41,7 @@ model Notification {
 model File{
   id                  String             @id @default(uuid())
   filePath            String             @db.VarChar(255)
+  fileType            String             @db.VarChar(255)
   internshipProcessId              String             @db.VarChar(255)
   internshipProcess   InternshipProcess  @relation("fileToInternshipProcess",fields: [internshipProcessId], references: [id])
   @@map("tb_internship_process_files")
@@ -156,7 +157,9 @@ model InternshipProcessHistory {
   startDate           DateTime   @default(now()) @db.Timestamp(0)
   endDate             DateTime?   @db.Timestamp(0)
   status              String      @db.VarChar(127)
-  observacoes         String      @db.Text()
+  movement            String      @db.VarChar(127)
+  description         String?      @db.Text()
+  observacoes         String?     @db.Text()
   id_internshipProcess String
   internshipProcess    InternshipProcess  @relation("historicoStatusProcesso", fields: [id_internshipProcess], references: [id])
 

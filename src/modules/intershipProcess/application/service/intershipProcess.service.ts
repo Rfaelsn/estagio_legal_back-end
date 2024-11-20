@@ -3,6 +3,7 @@ import { TermCommitmentService } from 'src/modules/termCommitment/application/se
 import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
 import {
   InternshipProcess,
+  IntershipProcessMovement,
   IntershipProcessStatus,
 } from '../../domain/entities/intershipProcess.entity';
 import { CreateIntershipProcessByTermCommitmentUsecase } from '../../domain/usecase/createInternshipProcessByTermCommitment.usecase';
@@ -17,6 +18,9 @@ import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
 import { DirectCreateIntershipProcessDTO } from '../dto/input/directCreateInternshipProcess.dto';
 import { NotificationService } from 'src/modules/notification/application/service/notification.service';
 import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
+import { FileService } from 'src/modules/file/application/services/file.service';
+import { registerAssignTermCommitmentDto } from '../dto/register-assign-term-commitment.dto';
+import { FileType } from 'src/modules/file/domain/entities/file.entity';
 
 @Injectable()
 export class InternshipProcessService {
@@ -24,6 +28,7 @@ export class InternshipProcessService {
     private readonly intershipProcessRepository: InternshipProcessRepository,
     @Inject(forwardRef(() => TermCommitmentService))
     private readonly termCommitmentService: TermCommitmentService,
+    private readonly fileService: FileService,
     private readonly notificationService: NotificationService,
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
   ) {}
@@ -38,9 +43,9 @@ export class InternshipProcessService {
       idUser,
     );
 
-    this.internshipProcessHistoryService.registerHistory({
-      startDate: new Date(),
+    await this.internshipProcessHistoryService.registerHistoryByFuncionario({
       status: IntershipProcessStatus.EM_ANALISE,
+      movement: intershipProcess.movement,
       observacoes: 'registrado pelo aluno',
       idInternshipProcess: intershipProcess.id,
     });
@@ -53,6 +58,42 @@ export class InternshipProcessService {
     return intershipProcess;
   }
 
+  async registerAssignTermCommitment(
+    registerAssignTermDto: registerAssignTermCommitmentDto,
+  ) {
+    //aqui vou cadastrar o historico e chamar a file para fazer o register
+    const registerFile = {
+      filePath: registerAssignTermDto.filePath,
+      fileType: registerAssignTermDto.fileType,
+      internshipProcessId: registerAssignTermDto.idInternshipProcess,
+    };
+
+    await this.fileService.registerFilePathProcess(registerFile);
+
+    const internshipProcess = await this.findById(
+      registerAssignTermDto.idInternshipProcess,
+    );
+
+    const history = {
+      idInternshipProcess: registerAssignTermDto.idInternshipProcess,
+      status: internshipProcess.status,
+      movement: internshipProcess.movement,
+      description: 'registrando termo assinado',
+    };
+
+    this.internshipProcessHistoryService.registerHistoryByAluno(history);
+    //notificar a dex da nova att do historico
+    //apos isso notificar todos os usuarios da DEX
+  }
+
+  async updateInternshipProcess(
+    updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  ) {
+    return await this.intershipProcessRepository.updateInternshipProcess(
+      updateInternshipProcessStatusDTO,
+    );
+  }
+
   async directCreate(
     directCreateIntershipProcessDTO: DirectCreateIntershipProcessDTO,
   ) {
@@ -62,7 +103,6 @@ export class InternshipProcessService {
 
     directCreateIntershipProcessDTO.id_termCommitment = termCommitmentEntity.id;
   }
-
   // async createTermCommitment(
   //   createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
   // ) {
@@ -115,13 +155,5 @@ export class InternshipProcessService {
     );
     const internshipProcess = await filterInternshipProcessUsecase.handle(id);
     return internshipProcess;
-  }
-
-  async updateInternshipProcess(
-    updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
-  ) {
-    return await this.intershipProcessRepository.updateInternshipProcess(
-      updateInternshipProcessStatusDTO,
-    );
   }
 }

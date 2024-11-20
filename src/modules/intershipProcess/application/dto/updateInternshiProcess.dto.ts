@@ -10,4 +10,7 @@ export class UpdateIntershipProcessDTO {
 
   @IsEnum(IntershipProcessStatus)
   status: string;
+
+  @IsEnum(IntershipProcessMovement)
+  movement: string;
 }

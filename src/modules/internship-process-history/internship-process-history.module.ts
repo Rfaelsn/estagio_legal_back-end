@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { InternshipProcessHistoryService } from './application/services/internship-process-history.service';
-import { InternshipProcessHistoryRepository } from './adapters/repositories/internship-process-history.repository';
+
 import { PrismaModule } from 'src/config/prisma/prisma.module';
+import { InternshipProcessHistoryRepository } from './adapters/repositories/internship-process-history.repository';
 
 @Module({
   imports: [PrismaModule],

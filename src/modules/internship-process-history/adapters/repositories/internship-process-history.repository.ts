@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { CreateInternshipProcessHistoryDto } from '../../application/dtos/create-internship-process-history.dto';
+import { CreateInternshipProcessHistoryByFuncionarioDto } from '../../application/dtos/create-internship-process-history-by-funcionario.dto';
 import { connect } from 'http2';
 import { InternshipProcessHistoryRepositoryInterface } from '../../domain/ports/internship-process-history.repository.port';
+import { CreateInternshipProcessHistoryByAlunoDto } from '../../application/dtos/create-internship-process-history-by-aluno.dto';
 
 @Injectable()
 export class InternshipProcessHistoryRepository
@@ -10,10 +11,28 @@ export class InternshipProcessHistoryRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
-  async registerHistory(
-    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
+  async registerHistoryByFuncionario(
+    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryByFuncionarioDto,
   ): Promise<void> {
     const { idInternshipProcess, ...rest } = createInternshipProcessHistoryDto;
+
+    await this.prisma.internshipProcessHistory.create({
+      data: {
+        ...rest,
+        internshipProcess: {
+          connect: {
+            id: idInternshipProcess,
+          },
+        },
+      },
+    });
+  }
+
+  async registerHistoryByAluno(
+    createInternshipProcessHistoryByAlunoDto: CreateInternshipProcessHistoryByAlunoDto,
+  ): Promise<void> {
+    const { idInternshipProcess, ...rest } =
+      createInternshipProcessHistoryByAlunoDto;
 
     await this.prisma.internshipProcessHistory.create({
       data: {

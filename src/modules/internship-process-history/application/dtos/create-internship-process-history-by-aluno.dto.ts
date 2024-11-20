@@ -1,17 +1,14 @@
 import { IsDate, IsString } from 'class-validator';
 
-export class CreateInternshipProcessHistoryDto {
-  @IsDate()
-  startDate: Date;
-
+export class CreateInternshipProcessHistoryByAlunoDto {
   @IsDate()
   endDate?: Date;
 
   @IsString()
-  status: string;
+  movement: string;
 
   @IsString()
-  observacoes: string;
+  status: string;
 
   @IsString()
   idInternshipProcess: string;
