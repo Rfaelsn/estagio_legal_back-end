@@ -61,7 +61,6 @@ export class InternshipProcessService {
   async registerAssignTermCommitment(
     registerAssignTermDto: registerAssignTermCommitmentDto,
   ) {
-    //aqui vou cadastrar o historico e chamar a file para fazer o register
     const registerFile = {
       filePath: registerAssignTermDto.filePath,
       fileType: registerAssignTermDto.fileType,
