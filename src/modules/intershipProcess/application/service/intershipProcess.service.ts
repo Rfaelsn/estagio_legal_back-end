@@ -81,8 +81,6 @@ export class InternshipProcessService {
     };
 
     this.internshipProcessHistoryService.registerHistoryByAluno(history);
-    //notificar a dex da nova att do historico
-    //apos isso notificar todos os usuarios da DEX
   }
 
   async updateInternshipProcess(

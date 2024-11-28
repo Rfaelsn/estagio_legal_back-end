@@ -5,8 +5,10 @@ import {
   IntershipProcessStatus,
 } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
 
-export async function seedInternshipProcess(prisma: PrismaClient) {
-  const alunos = await prisma.user.findMany();
+export async function seedInternshipProcess(
+  prismaTransaction: Prisma.TransactionClient,
+) {
+  const alunos = await prismaTransaction.user.findMany();
   const process1: Prisma.TermCommitmentCreateInput = {
     dataInicioEstagio: new Date(),
     dataFimEstagio: new Date(),
@@ -35,7 +37,7 @@ export async function seedInternshipProcess(prisma: PrismaClient) {
     },
     planoAtividadesEstagio: `['atividade 1','atividade 2','atividade 3','atividade 4','atividade 5',]`,
   };
-  const termCommitment1 = await prisma.termCommitment.create({
+  const termCommitment1 = await prismaTransaction.termCommitment.create({
     data: process1,
   });
 
@@ -47,7 +49,7 @@ export async function seedInternshipProcess(prisma: PrismaClient) {
     id_termCommitment: termCommitment1.id,
   };
 
-  await prisma.internshipProcess.create({
+  await prismaTransaction.internshipProcess.create({
     data: internshipProcess1,
   });
 
@@ -79,7 +81,7 @@ export async function seedInternshipProcess(prisma: PrismaClient) {
     },
     planoAtividadesEstagio: `['atividade 1','atividade 2','atividade 3','atividade 4','atividade 5',]`,
   };
-  const termCommitment2 = await prisma.termCommitment.create({
+  const termCommitment2 = await prismaTransaction.termCommitment.create({
     data: process2,
   });
 
@@ -91,7 +93,7 @@ export async function seedInternshipProcess(prisma: PrismaClient) {
     id_termCommitment: termCommitment2.id,
   };
 
-  await prisma.internshipProcess.create({
+  await prismaTransaction.internshipProcess.create({
     data: internshipProcess2,
   });
 
@@ -123,7 +125,7 @@ export async function seedInternshipProcess(prisma: PrismaClient) {
     },
     planoAtividadesEstagio: `['atividade 1','atividade 2','atividade 3','atividade 4','atividade 5',]`,
   };
-  const termCommitment3 = await prisma.termCommitment.create({
+  const termCommitment3 = await prismaTransaction.termCommitment.create({
     data: process3,
   });
 
@@ -135,7 +137,7 @@ export async function seedInternshipProcess(prisma: PrismaClient) {
     id_termCommitment: termCommitment3.id,
   };
 
-  await prisma.internshipProcess.create({
+  await prismaTransaction.internshipProcess.create({
     data: internshipProcess3,
   });
 

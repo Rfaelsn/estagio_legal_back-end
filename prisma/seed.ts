@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { seedUsers } from './seeds/User.seed';
-// import { seedInternshipGrantors } from './seeds/InternshipGrantor.seed';
 import { seedInternshipProcess } from './seeds/internshipProcess.seed';
 const prisma = new PrismaClient();
 async function main() {
-  await seedUsers(prisma);
-  // await seedInternshipGrantors(prisma);
-  await seedInternshipProcess(prisma);
+  prisma.$transaction(async (prismaTransaction) => {
+    await seedUsers(prismaTransaction);
+    await seedInternshipProcess(prismaTransaction);
+  });
 }
 main()
   .then(async () => {

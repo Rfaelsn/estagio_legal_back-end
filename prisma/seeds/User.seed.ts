@@ -1,9 +1,9 @@
 // users.seed.ts
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-export async function seedUsers(prisma: PrismaClient) {
-  await prisma.user.createMany({
+export async function seedUsers(prismaTransaction: Prisma.TransactionClient) {
+  await prismaTransaction.user.createMany({
     data: [
       {
         name: 'Rafael',
