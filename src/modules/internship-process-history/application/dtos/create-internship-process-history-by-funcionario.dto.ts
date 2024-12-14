@@ -1,4 +1,4 @@
-import { IsDate, IsEnum, IsString } from 'class-validator';
+import { IsDate, IsString } from 'class-validator';
 
 export class CreateInternshipProcessHistoryByFuncionarioDto {
   @IsDate()

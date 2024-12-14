@@ -1,8 +1,8 @@
 import { FindInternshipProcessByQueryDTO } from 'src/modules/intershipProcess/application/dto/findInternshipProcessByQuery.dto';
-import { CreateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/input/intershipProcess.dto';
-import { InternshipProcessFilterDTO } from 'src/modules/intershipProcess/application/dto/internshipProcessFilter.dto';
+import { CreateInternshipProcessDTO } from 'src/modules/intershipProcess/application/dto/input/intershipProcess.dto';
+import { InternshipProcessFilterByEmployeeDTO } from 'src/modules/intershipProcess/application/dto/internshipProcessFilterByEmployee.dto';
 import { InternshipProcessService } from 'src/modules/intershipProcess/application/service/intershipProcess.service';
-import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
+import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
 import { IInternshipProcessRepository } from 'src/modules/intershipProcess/domain/port/intershipProcessRepository.port';
 import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 import { InternshipProcessController } from './intershipProcess.controller';
@@ -15,12 +15,12 @@ class TermCommitmentServiceMock extends TermCommitmentService {}
 class PrismaServiceMock extends PrismaService {}
 class InternshipProcessRepositoryMock extends InternshipProcessRepository {
   create(
-    intershipProcess: CreateIntershipProcessDTO,
+    intershipProcess: CreateInternshipProcessDTO,
   ): Promise<InternshipProcess> {
     throw new Error('Method not implemented.');
   }
   filter(
-    intershipProcessFilterDTO: InternshipProcessFilterDTO,
+    intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
   ): Promise<InternshipProcess[]> {
     throw new Error('Method not implemented.');
   }
@@ -58,7 +58,7 @@ const createSut = () => {
 describe('internhipProcessController', () => {
   it('should return http status code 201', () => {
     const sut = createSut();
-    const createInternshipProcessDTO: CreateIntershipProcessDTO = {
+    const createInternshipProcessDTO: CreateInternshipProcessDTO = {
       movement: 'INÍCIO DE ESTÁGIO',
       status: 'CONCLUÍDO',
       id_user: 'ea0550e7-d377-4b98-a044-c5c6935360d2',

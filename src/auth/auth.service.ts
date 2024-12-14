@@ -3,14 +3,14 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User } from 'src/modules/user/domain/entities/user.entity';
 import { UserPayload } from './models/UserPayload';
 import { UserToken } from './models/UserToken';
 import * as bcrypt from 'bcrypt';
 import { HttpService } from '@nestjs/axios';
-import { UserService } from 'src/modules/user/application/service/user.service';
 import { UnauthorizedError } from './errors/unauthorized.error';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@/modules/user/domain/entities/user.entity';
+import { UserService } from '@/modules/user/application/service/user.service';
 
 @Injectable()
 export class AuthService {
@@ -25,12 +25,10 @@ export class AuthService {
 
     const accessToken = this.generateAccessToken(validatedUser);
     const refreshToken = this.generateRefreshToken(validatedUser);
-    const uuidUser = validatedUser.id;
 
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
-      uuidUser: uuidUser,
     };
   }
 
@@ -82,7 +80,7 @@ export class AuthService {
     const refreshToken = body.refresh_token;
 
     if (!refreshToken) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     try {
@@ -92,14 +90,14 @@ export class AuthService {
 
       // Se você chegou até aqui, o token é válido
       const email = decodedToken['email'];
-      const usuario = await this.userService.findByEmail(email);
+      const user = await this.userService.findByEmail(email);
 
-      if (!usuario) {
-        throw new NotFoundException('Usuário não encontrado');
+      if (!user) {
+        throw new NotFoundException('User not found');
       }
 
-      const accessToken = this.generateAccessToken(usuario);
-      const newRefreshToken = this.generateRefreshToken(usuario);
+      const accessToken = this.generateAccessToken(user);
+      const newRefreshToken = this.generateRefreshToken(user);
 
       return {
         access_token: accessToken,
@@ -107,10 +105,10 @@ export class AuthService {
       };
     } catch (err) {
       if (err.name === 'JsonWebTokenError') {
-        throw new UnauthorizedException('Assinatura Inválida');
+        throw new UnauthorizedException('Invalid Assign');
       }
       if (err.name === 'TokenExpiredError') {
-        throw new UnauthorizedException('Token Expirado');
+        throw new UnauthorizedException('Token Expired');
       }
       throw new UnauthorizedException(err.name);
     }

@@ -1,16 +1,16 @@
 import { IsEnum, IsString } from 'class-validator';
 import {
-  IntershipProcessMovement,
-  IntershipProcessStatus,
-} from '../../domain/entities/intershipProcess.entity';
+  InternshipProcessMovement,
+  InternshipProcessStatus,
+} from '../../domain/entities/internshipProcess.entity';
 
 export class UpdateIntershipProcessDTO {
   @IsString()
   id: string;
 
-  @IsEnum(IntershipProcessStatus)
+  @IsEnum(InternshipProcessStatus)
   status: string;
 
-  @IsEnum(IntershipProcessMovement)
+  @IsEnum(InternshipProcessMovement)
   movement: string;
 }

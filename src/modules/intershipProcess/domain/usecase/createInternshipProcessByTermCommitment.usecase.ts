@@ -1,4 +1,4 @@
-import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
+import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
 
 export class CreateIntershipProcessByTermCommitmentUsecase {
@@ -6,7 +6,7 @@ export class CreateIntershipProcessByTermCommitmentUsecase {
     private readonly intershipProcessRepository: IInternshipProcessRepository,
   ) {}
 
-  async handle(createIntershipProcessDTO: CreateIntershipProcessDTO) {
+  async handle(createIntershipProcessDTO: CreateInternshipProcessDTO) {
     try {
       const createIntershipProcess =
         await this.intershipProcessRepository.create(createIntershipProcessDTO);

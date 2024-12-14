@@ -10,12 +10,10 @@ import {
   Put,
   Get,
   Query,
-  Req,
   Request,
 } from '@nestjs/common';
 import { CreateFuncionarioDTO } from 'src/modules/user/application/dto/createFuncionario';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
-import { validateSync } from 'class-validator';
 
 @Controller('user')
 export class UserController {

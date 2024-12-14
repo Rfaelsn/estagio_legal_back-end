@@ -1,19 +1,6 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  UseGuards,
-  Request,
-  Res,
-} from '@nestjs/common';
-import { AuthForgetDTO } from './dto/auth-forget.dto';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { IsPublic } from './decorators/is-public.decorator';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { AuthRequest } from './models/AuthRequest';
 
 @Controller('auth')
 export class AuthController {
@@ -23,14 +10,21 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() user) {
-    console.log('oi');
-    return this.authService.login(user);
+    try {
+      return this.authService.login(user);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @IsPublic()
   @HttpCode(HttpStatus.OK)
-  @Post('refresh/token')
+  @Post('refresh-token')
   async refreshToken(@Body() body) {
-    return this.authService.verifyRefreshToken(body);
+    try {
+      return this.authService.verifyRefreshToken(body);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

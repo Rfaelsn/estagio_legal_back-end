@@ -1,9 +1,5 @@
 // users.seed.ts
-import { Prisma, PrismaClient } from '@prisma/client';
-import {
-  IntershipProcessMovement,
-  IntershipProcessStatus,
-} from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
+import { Prisma } from '@prisma/client';
 
 export async function seedInternshipProcess(
   prismaTransaction: Prisma.TransactionClient,
@@ -14,7 +10,7 @@ export async function seedInternshipProcess(
     dataFimEstagio: new Date(),
     horaInicioEstagio: new Date(),
     horaFimEstagio: new Date(),
-    jornadaSemanal: new Date(),
+    jornadaSemanal: 20,
     isObrigatorio: true,
     bolsaAuxilio: 200.5,
     auxilioTransporte: 200.5,
@@ -58,7 +54,7 @@ export async function seedInternshipProcess(
     dataFimEstagio: new Date(),
     horaInicioEstagio: new Date(),
     horaFimEstagio: new Date(),
-    jornadaSemanal: new Date(),
+    jornadaSemanal: 20,
     isObrigatorio: true,
     bolsaAuxilio: 200.5,
     auxilioTransporte: 200.5,
@@ -102,7 +98,7 @@ export async function seedInternshipProcess(
     dataFimEstagio: new Date(),
     horaInicioEstagio: new Date(),
     horaFimEstagio: new Date(),
-    jornadaSemanal: new Date(),
+    jornadaSemanal: 20,
     isObrigatorio: true,
     bolsaAuxilio: 200.5,
     auxilioTransporte: 200.5,

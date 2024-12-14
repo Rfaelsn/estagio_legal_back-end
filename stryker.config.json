@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
+  "packageManager": "npm",
+  "reporters": ["html", "clear-text", "progress", "dashboard"],
+  "jsonReporter": {
+    "fileName": "reports/mutation/mutation.json"
+  },
+  "testRunner": "jest",
+  "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/jest-runner for information about the jest plugin.",
+  "coverageAnalysis": "perTest",
+  "checkers": ["typescript"],
+  "tsconfigFile": "tsconfig.json",
+  "jest": {
+    "projectType": "custom",
+    "configFile": "./jest.config.ts"
+  },
+  "timeoutMS": 3000,
+  "ignorePatterns": ["docs", ".docker"],
+  "incremental": true,
+  "concurrency": 2,
+  "thresholds": {
+    "high": 100,
+    "low": 90,
+    "break": 90
+  },
+  "disableTypeChecks": "{test,src,lib}/**/*.{js,ts,jsx,tsx,html,vue,cts,mts}",
+  "mutate": [
+    "src/**/*.{js,ts}",
+    "!src/**/*.{module,dto}.{js,ts}",
+    "!src/config/config.ts",
+    "!src/main.ts"
+  ],
+  "incrementalFile": "reports/mutation/stryker-incremental.json",
+  "cleanTempDir": true
+}

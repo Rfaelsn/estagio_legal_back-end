@@ -1,15 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, Param, Patch, Post } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
-import { CreateNotificationDTO } from 'src/modules/notification/application/dto/createNotification.dto';
 import { FindLatestNotificationsByUserIdDTO } from 'src/modules/notification/application/dto/findLatestNotificationsByUserId.dto';
 import { NotificationService } from 'src/modules/notification/application/service/notification.service';
 

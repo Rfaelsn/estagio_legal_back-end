@@ -1,5 +1,4 @@
-import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
-import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
+import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
 
 export class FilterInternshipProcessUsecase {
@@ -7,7 +6,9 @@ export class FilterInternshipProcessUsecase {
     private readonly intershipProcessRepository: IInternshipProcessRepository,
   ) {}
 
-  async handle(intershipProcessFilterDTO: InternshipProcessFilterDTO) {
+  async handle(
+    intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+  ) {
     try {
       const filteredIntershipProcess =
         await this.intershipProcessRepository.filter(intershipProcessFilterDTO);

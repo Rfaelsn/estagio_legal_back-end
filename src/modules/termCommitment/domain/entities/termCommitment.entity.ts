@@ -1,6 +1,5 @@
-import { TermCommitment as TermCommitmentPrisma } from '@prisma/client';
 // import { InternshipGrantor } from 'src/modules/internshipGrantor/domain/entities/internshipGrantor.entity';
-import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/intershipProcess.entity';
+import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -14,7 +13,7 @@ export class TermCommitment {
   dataFimEstagio: Date;
   horaInicioEstagio: Date;
   horaFimEstagio: Date;
-  jornadaSemanal: Date;
+  jornadaSemanal: number;
   isObrigatorio: boolean;
   bolsaAuxilio: number;
   auxilioTransporte: number;

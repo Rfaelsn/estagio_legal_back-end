@@ -4,14 +4,14 @@ import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termC
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-export enum IntershipProcessStatus {
+export enum InternshipProcessStatus {
   CONCLUIDO = 'CONCLUÍDO',
   EM_ANALISE = 'EM ANALISE',
   EM_ANDAMENTO = 'EM ANDAMENTO',
   RECUSADO = 'RECUSADO',
 }
 
-export enum IntershipProcessMovement {
+export enum InternshipProcessMovement {
   INICIO_ESTAGIO = 'INÍCIO DE ESTÁGIO',
   RENOVACAO = 'RENOVAÇÃO DE ESTÁGIO',
   FIM_ESTAGIO = 'FIM DE ESTÁGIO',

@@ -1,4 +1,3 @@
-import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
 
 export class FindInternshipProcessByIdUsecase {
@@ -8,9 +7,8 @@ export class FindInternshipProcessByIdUsecase {
 
   async handle(id: string) {
     try {
-      const intershipProcess = await this.intershipProcessRepository.findById(
-        id,
-      );
+      const intershipProcess =
+        await this.intershipProcessRepository.findById(id);
 
       return intershipProcess;
     } catch (error) {

@@ -1,31 +1,17 @@
+import { IsOptional, IsEnum, IsDate, IsString } from 'class-validator';
 import {
-  IsOptional,
-  IsEnum,
-  IsDate,
-  ValidateNested,
-  IsObject,
-  IsString,
-  IsNumber,
-  Min,
-} from 'class-validator';
-import { User } from 'src/modules/user/domain/entities/user.entity';
-import {
-  IntershipProcessMovement,
-  IntershipProcessStatus,
-} from '../../domain/entities/intershipProcess.entity';
-import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
-import { CreateTermCommitmentDTO } from 'src/modules/termCommitment/application/dto/createTermCommitment.dto';
-import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
-import { UserFilterDTO } from 'src/modules/user/application/dto/userFilter.dto';
+  InternshipProcessMovement,
+  InternshipProcessStatus,
+} from '../../domain/entities/internshipProcess.entity';
 import { TermCommitmentFilterDTO } from 'src/modules/termCommitment/application/dto/termCommitmentFilter.dto';
 import { Transform } from 'class-transformer';
 
-export class InternshipProcessFilterDTO {
-  @IsEnum(IntershipProcessMovement)
+export class InternshipProcessFilterByStudentDTO {
+  @IsEnum(InternshipProcessMovement)
   @IsOptional()
   movement: string;
 
-  @IsEnum(IntershipProcessStatus)
+  @IsEnum(InternshipProcessStatus)
   @IsOptional()
   status: string;
 
@@ -69,9 +55,9 @@ export class InternshipProcessFilterDTO {
   })
   pageSize: number;
 
+  @IsString()
   @IsOptional()
-  @IsObject()
-  user: UserFilterDTO;
+  idUser?: string;
 
   @IsOptional()
   termCommitment: TermCommitmentFilterDTO;

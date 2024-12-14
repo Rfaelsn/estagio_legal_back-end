@@ -47,8 +47,8 @@ export class CreateTermCommitmentDTO {
   horaFimEstagio: Date;
 
   @IsNotEmpty()
-  @IsTime('toDate')
-  jornadaSemanal: Date;
+  @IsNumber()
+  jornadaSemanal: number;
 
   @IsBoolean()
   @IsNotEmpty()

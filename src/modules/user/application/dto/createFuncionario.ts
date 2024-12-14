@@ -1,10 +1,3 @@
-import {
-  IsEmail,
-  IsStrongPassword,
-  IsString,
-  IsOptional,
-  IsEnum,
-} from 'class-validator';
-import { Role, User } from '../../domain/entities/user.entity';
+import { User } from '../../domain/entities/user.entity';
 
 export class CreateFuncionarioDTO extends User {}

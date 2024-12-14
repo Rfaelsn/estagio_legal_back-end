@@ -3,29 +3,26 @@ import { TermCommitmentService } from 'src/modules/termCommitment/application/se
 import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
 import {
   InternshipProcess,
-  IntershipProcessMovement,
-  IntershipProcessStatus,
-} from '../../domain/entities/intershipProcess.entity';
-import { CreateIntershipProcessByTermCommitmentUsecase } from '../../domain/usecase/createInternshipProcessByTermCommitment.usecase';
-import { CreateIntershipProcessUsecase } from '../../domain/usecase/creatIntershipProcess.usecase';
+  InternshipProcessStatus,
+} from '../../domain/entities/internshipProcess.entity';
+import { CreateInternshipProcessUseCase } from '../../domain/usecase/creatIntershipProcess.usecase';
 import { FilterInternshipProcessUsecase } from '../../domain/usecase/filterInternshipProcess.usecase';
 import { FindInternshipProcessByIdUsecase } from '../../domain/usecase/findByIdInternshipProcess.usecase';
 import { FindInternshipProcessByQueryUsecase } from '../../domain/usecase/findInternshipProcessByQuery.usecase';
 import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQuery.dto';
-import { CreateIntershipProcessDTO } from '../dto/input/intershipProcess.dto';
-import { InternshipProcessFilterDTO } from '../dto/internshipProcessFilter.dto';
+import { InternshipProcessFilterByEmployeeDTO } from '../dto/internshipProcessFilterByEmployee.dto';
 import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
 import { DirectCreateIntershipProcessDTO } from '../dto/input/directCreateInternshipProcess.dto';
 import { NotificationService } from 'src/modules/notification/application/service/notification.service';
 import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
 import { FileService } from 'src/modules/file/application/services/file.service';
 import { registerAssignTermCommitmentDto } from '../dto/register-assign-term-commitment.dto';
-import { FileType } from 'src/modules/file/domain/entities/file.entity';
+import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
 export class InternshipProcessService {
   constructor(
-    private readonly intershipProcessRepository: InternshipProcessRepository,
+    private readonly internshipProcessRepository: InternshipProcessRepository,
     @Inject(forwardRef(() => TermCommitmentService))
     private readonly termCommitmentService: TermCommitmentService,
     private readonly fileService: FileService,
@@ -34,8 +31,8 @@ export class InternshipProcessService {
   ) {}
 
   async create(idTermCommitment: string, idUser: string) {
-    const createIntershipProcessUsecase = new CreateIntershipProcessUsecase(
-      this.intershipProcessRepository,
+    const createIntershipProcessUsecase = new CreateInternshipProcessUseCase(
+      this.internshipProcessRepository,
     );
 
     const intershipProcess = await createIntershipProcessUsecase.handle(
@@ -44,7 +41,7 @@ export class InternshipProcessService {
     );
 
     await this.internshipProcessHistoryService.registerHistoryByFuncionario({
-      status: IntershipProcessStatus.EM_ANALISE,
+      status: InternshipProcessStatus.EM_ANDAMENTO,
       movement: intershipProcess.movement,
       observacoes: 'registrado pelo aluno',
       idInternshipProcess: intershipProcess.id,
@@ -86,7 +83,7 @@ export class InternshipProcessService {
   async updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
   ) {
-    return await this.intershipProcessRepository.updateInternshipProcess(
+    return await this.internshipProcessRepository.updateInternshipProcess(
       updateInternshipProcessStatusDTO,
     );
   }
@@ -122,11 +119,11 @@ export class InternshipProcessService {
   //   return intershipProcess;
   // }
 
-  async filter(
-    intershipProcessFilterDTO: InternshipProcessFilterDTO,
+  async filterByEmployee(
+    intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
   ): Promise<InternshipProcess[]> {
     const filterInternshipProcessUsecase = new FilterInternshipProcessUsecase(
-      this.intershipProcessRepository,
+      this.internshipProcessRepository,
     );
 
     const internshipProcess = await filterInternshipProcessUsecase.handle(
@@ -135,11 +132,21 @@ export class InternshipProcessService {
     return internshipProcess;
   }
 
+  async filterByStudent(
+    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
+  ): Promise<InternshipProcess[]> {
+    const internshipProcess =
+      await this.internshipProcessRepository.filterByStudent(
+        internshipProcessFilterByStudentDto,
+      );
+    return internshipProcess;
+  }
+
   async findByQuery(
     findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
   ): Promise<InternshipProcess[]> {
     const filterInternshipProcessUsecase =
-      new FindInternshipProcessByQueryUsecase(this.intershipProcessRepository);
+      new FindInternshipProcessByQueryUsecase(this.internshipProcessRepository);
     const internshipProcess = await filterInternshipProcessUsecase.handle(
       findInternshipProcessByQueryDTO,
     );
@@ -148,7 +155,7 @@ export class InternshipProcessService {
 
   async findById(id: string): Promise<InternshipProcess> {
     const filterInternshipProcessUsecase = new FindInternshipProcessByIdUsecase(
-      this.intershipProcessRepository,
+      this.internshipProcessRepository,
     );
     const internshipProcess = await filterInternshipProcessUsecase.handle(id);
     return internshipProcess;

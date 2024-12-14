@@ -1,4 +1,3 @@
-import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
 import { UpdateIntershipProcessDTO } from '../../application/dto/updateInternshiProcess.dto';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
 

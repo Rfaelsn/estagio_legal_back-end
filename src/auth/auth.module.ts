@@ -1,14 +1,14 @@
 import { JwtModule } from '@nestjs/jwt';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { PrismaModule } from 'src/config/prisma/prisma.module';
+import { PrismaModule } from '@/config/prisma/prisma.module';
 import { AuthService } from './auth.service';
 
-import { UserModule } from 'src/modules/user/user.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlewares/login-validation.middleware';
 import { HttpModule } from '@nestjs/axios';
+import { UserModule } from '@/modules/user/user.module';
 
 @Module({
   imports: [

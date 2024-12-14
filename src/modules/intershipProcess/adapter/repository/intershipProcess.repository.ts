@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
-import { InternshipProcess } from '../../domain/entities/intershipProcess.entity';
+import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
+import { InternshipProcess } from '../../domain/entities/internshipProcess.entity';
 import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { InternshipProcessFilterDTO } from '../../application/dto/internshipProcessFilter.dto';
+import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
 import { UpdateIntershipProcessDTO } from '../../application/dto/updateInternshiProcess.dto';
+import { InternshipProcessFilterByStudentDTO } from '../../application/dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
 export class InternshipProcessRepository
@@ -16,7 +17,7 @@ export class InternshipProcessRepository
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
-    createIntershipProcessDTO: CreateIntershipProcessDTO,
+    createIntershipProcessDTO: CreateInternshipProcessDTO,
   ): Promise<InternshipProcess> {
     const newIntershipProcess = await this.prisma.internshipProcess.create({
       data: {
@@ -57,7 +58,7 @@ export class InternshipProcessRepository
   }
 
   async filter(
-    intershipProcessFilterDTO: InternshipProcessFilterDTO,
+    intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
   ): Promise<InternshipProcess[]> {
     const {
       user,
@@ -86,6 +87,49 @@ export class InternshipProcessRepository
           lte: endDateProcessRangeEnd,
         },
         user: { ...user },
+        termCommitment: { ...termCommitment },
+      },
+      include: {
+        user: true,
+        termCommitment: true,
+      },
+      take,
+      skip,
+    });
+
+    return internshipProcess;
+  }
+
+  async filterByStudent(
+    intershipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
+  ): Promise<InternshipProcess[]> {
+    const {
+      idUser,
+      termCommitment,
+      page,
+      pageSize,
+      startDateProcessRangeStart,
+      startDateProcessRangeEnd,
+      endDateProcessRangeStart,
+      endDateProcessRangeEnd,
+      ...rest
+    } = intershipProcessFilterByStudentDto;
+
+    const take: number = pageSize || 10;
+    const skip: number = page ? (page - 1) * take : 0;
+
+    const internshipProcess = await this.prisma.internshipProcess.findMany({
+      where: {
+        ...rest,
+        startDateProcess: {
+          gte: startDateProcessRangeStart,
+          lte: startDateProcessRangeEnd,
+        },
+        endDateProcess: {
+          gte: endDateProcessRangeStart,
+          lte: endDateProcessRangeEnd,
+        },
+        user: { id: idUser },
         termCommitment: { ...termCommitment },
       },
       include: {

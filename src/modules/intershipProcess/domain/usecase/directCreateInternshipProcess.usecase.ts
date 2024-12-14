@@ -1,8 +1,8 @@
-import { CreateIntershipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
+import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
 import {
-  IntershipProcessMovement,
-  IntershipProcessStatus,
-} from '../entities/intershipProcess.entity';
+  InternshipProcessMovement,
+  InternshipProcessStatus,
+} from '../entities/internshipProcess.entity';
 import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
 
 export class CreateIntershipProcessUsecase {
@@ -12,9 +12,9 @@ export class CreateIntershipProcessUsecase {
 
   async handle(idTermCommitment: string, idUser: string) {
     try {
-      const createIntershipProcessDTO: CreateIntershipProcessDTO = {
-        movement: IntershipProcessMovement.INICIO_ESTAGIO,
-        status: IntershipProcessStatus.EM_ANALISE,
+      const createIntershipProcessDTO: CreateInternshipProcessDTO = {
+        movement: InternshipProcessMovement.INICIO_ESTAGIO,
+        status: InternshipProcessStatus.EM_ANALISE,
         id_user: idUser,
         id_termCommitment: idTermCommitment,
       };
