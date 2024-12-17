@@ -1,6 +1,7 @@
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { RegisterFilePathDto } from '../../application/dtos/registerFilePath.dto';
 import { Injectable } from '@nestjs/common';
+import { FileEntity } from '../../domain/entities/file.entity';
 
 @Injectable()
 export class FileRepository {
@@ -8,13 +9,9 @@ export class FileRepository {
 
   async registerFilePath(
     registerFilePathDto: RegisterFilePathDto,
-  ): Promise<void> {
-    const { internshipProcessId, ...rest } = registerFilePathDto;
-    await this.prisma.file.create({
-      data: {
-        ...rest,
-        internshipProcessId: internshipProcessId,
-      },
+  ): Promise<FileEntity> {
+    return await this.prisma.file.create({
+      data: registerFilePathDto,
     });
   }
 }

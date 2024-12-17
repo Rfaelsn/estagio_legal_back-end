@@ -42,8 +42,7 @@ model File{
   id                  String             @id @default(uuid())
   filePath            String             @db.VarChar(255)
   fileType            String             @db.VarChar(255)
-  internshipProcessId              String             @db.VarChar(255)
-  internshipProcess   InternshipProcess  @relation("fileToInternshipProcess",fields: [internshipProcessId], references: [id])
+  internshipProcessHistory   InternshipProcessHistory? @relation
   @@map("tb_internship_process_files")
 }
 
@@ -61,28 +60,6 @@ model Institution {
   @@map("tb_institution")
 }
 
-// model InternshipGrantor {
-//   id                       String             @id @default(uuid())
-//   name                     String             @db.VarChar(63)
-//   cnpj                     String             @db.VarChar(127) @unique
-//   cep                      String             @db.VarChar(127)
-//   bairro                   String             @db.VarChar(127)
-//   cidade                   String             @db.VarChar(127)
-//   uf                       String             @db.VarChar(127)
-//   endereco                 String             @db.VarChar(127)
-//   email                    String             @db.VarChar(127)
-//   representanteLegal       String             @db.VarChar(127)
-//   funcaoRepresentanteLegal String             @db.VarChar(127)
-//   supervisor               String             @db.VarChar(127)
-//   cargoSupervisor          String             @db.VarChar(127)
-
-//   createdAt           DateTime           @default(now()) @db.Timestamp(0)
-//   updatedAt           DateTime           @default(now()) @db.Timestamp(0)
-//   termsCommitment TermCommitment[] @relation("internshipGrantorTerm")
-
-//   @@map("tb_internshipGrantor")
-// }
-
 model TermCommitment {
   id                String      @id @default(uuid())
   numApoliceSeguro  String?      @db.VarChar(63)
@@ -98,7 +75,6 @@ model TermCommitment {
   bolsaAuxilio      Float
   auxilioTransporte Float
   planoAtividadesEstagio String @db.Text()
-  //dados concedente
   razaoSocialConcedente String @db.VarChar(127)
   cnpjConcedente String @db.VarChar(14)
   cepConcedente  String @db.VarChar(63)
@@ -112,15 +88,8 @@ model TermCommitment {
   supervisor String @db.VarChar(127)
   cargoSupervisor String @db.VarChar(127)
   filePath            String?     @db.VarChar(255)
-  //relacionamento aluno
   id_user          String
   user              User       @relation("userTerm", fields: [id_user], references: [id])
-
-  //relacionamento concedente
-  // id_internshipGrantor     String
-  // internshipGrantor        InternshipGrantor @relation("internshipGrantorTerm", fields: [id_internshipGrantor], references: [id])
-
-  //relacionamento processo
   internshipProcess   InternshipProcess[]
 
   @@map("tb_termCommitment")
@@ -133,18 +102,12 @@ model InternshipProcess {
   startDateProcess    DateTime   @default(now()) @db.Timestamp(0)
   endDateProcess      DateTime?   @db.Timestamp(0)
 
-  files               File[]               @relation("fileToInternshipProcess")
-
-
-  //relacionamento termo de compromisso
   id_termCommitment   String?      @unique
   termCommitment TermCommitment?  @relation(fields: [id_termCommitment], references: [id])
 
-  //relacionamento Aluno
   id_user           String
   user              User       @relation("alunoProcessoEstagio", fields: [id_user], references: [id])
 
-  //relacionamento AvaliacaoAluno
   internshipEvaluation InternshipEvaluation[] @relation("processoEstagioAvaliacao")
 
   statusHistory       InternshipProcessHistory[] @relation("historicoStatusProcesso")
@@ -160,8 +123,10 @@ model InternshipProcessHistory {
   movement            String      @db.VarChar(127)
   description         String?      @db.Text()
   observacoes         String?     @db.Text()
-  id_internshipProcess String
-  internshipProcess    InternshipProcess  @relation("historicoStatusProcesso", fields: [id_internshipProcess], references: [id])
+  fileId                String?                 @unique
+  file                  File?                   @relation(fields: [fileId], references: [id])
+  idInternshipProcess String
+  internshipProcess    InternshipProcess  @relation("historicoStatusProcesso", fields: [idInternshipProcess], references: [id])
 
   @@map("tb_internshipProcessStatusHistory")
 }

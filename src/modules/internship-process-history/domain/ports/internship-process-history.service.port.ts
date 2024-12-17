@@ -1,7 +1,7 @@
-import { CreateInternshipProcessHistoryByFuncionarioDto } from '../../application/dtos/create-internship-process-history-by-funcionario.dto';
+import { CreateInternshipProcessHistoryDto } from '../../application/dtos/create-internship-process-history.dto';
 
 export interface InternshipProcessHistoryServiceInterface {
-  registerHistoryByFuncionario(
-    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryByFuncionarioDto,
+  registerHistory(
+    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
   ): Promise<void>;
 }

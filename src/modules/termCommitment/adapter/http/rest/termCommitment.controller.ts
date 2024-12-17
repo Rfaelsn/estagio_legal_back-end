@@ -1,3 +1,7 @@
+import { Roles } from '@/auth/decorators/roles.decorator';
+import { RegisterAssignDto } from '@/modules/termCommitment/application/dto/register-assign.dto';
+import { ValidateAssignTermDto } from '@/modules/termCommitment/application/dto/validate-assign-term.dto';
+import { Role } from '@/modules/user/domain/entities/user.entity';
 import { Body, Controller, Post } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
@@ -29,6 +33,22 @@ export class termCommitmentController {
     const erros = await validateSync(termCommitmentOutput);
 
     return termCommitmentOutput;
+  }
+
+  @Roles(Role.ALUNO)
+  @Post('register/assign')
+  async registerAssign(@Body() registerAssignDto: RegisterAssignDto) {
+    await this.termCommitmentService.registerAssignTermByAluno(
+      registerAssignDto,
+    );
+  }
+
+  @Roles(Role.ADMINISTRADOR, Role.FUNCIONARIO)
+  @Post('validate/assign')
+  async validateAssignTerm(
+    @Body() validateAssignTermDto: ValidateAssignTermDto,
+  ) {
+    await this.termCommitmentService.validateAssignTerm(validateAssignTermDto);
   }
 
   @IsPublic()

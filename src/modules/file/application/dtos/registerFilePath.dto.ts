@@ -7,7 +7,4 @@ export class RegisterFilePathDto {
 
   @IsEnum(FileType)
   fileType;
-
-  @IsString()
-  internshipProcessId: string;
 }

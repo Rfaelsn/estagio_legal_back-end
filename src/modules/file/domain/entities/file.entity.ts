@@ -3,8 +3,7 @@ import { File } from '@prisma/client';
 export class FileEntity implements File {
   id: string;
   filePath: string;
-  fileType: FileType;
-  internshipProcessId: string;
+  fileType: string;
 }
 
 export enum FileType {

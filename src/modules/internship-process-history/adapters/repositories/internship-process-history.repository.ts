@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { CreateInternshipProcessHistoryByFuncionarioDto } from '../../application/dtos/create-internship-process-history-by-funcionario.dto';
+import { CreateInternshipProcessHistoryDto } from '../../application/dtos/create-internship-process-history.dto';
 import { InternshipProcessHistoryRepositoryInterface } from '../../domain/ports/internship-process-history.repository.port';
-import { CreateInternshipProcessHistoryByAlunoDto } from '../../application/dtos/create-internship-process-history-by-aluno.dto';
+import { UpdateInternshipProcessHistoryDto } from '../../application/dtos/update-internship-process-history.dto';
 
 @Injectable()
 export class InternshipProcessHistoryRepository
@@ -10,10 +10,11 @@ export class InternshipProcessHistoryRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
-  async registerHistoryByFuncionario(
-    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryByFuncionarioDto,
+  async registerHistory(
+    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
   ): Promise<void> {
-    const { idInternshipProcess, ...rest } = createInternshipProcessHistoryDto;
+    const { idInternshipProcess, fileId, ...rest } =
+      createInternshipProcessHistoryDto;
 
     await this.prisma.internshipProcessHistory.create({
       data: {
@@ -23,25 +24,26 @@ export class InternshipProcessHistoryRepository
             id: idInternshipProcess,
           },
         },
+        ...(fileId && {
+          file: {
+            connect: {
+              id: fileId,
+            },
+          },
+        }),
       },
     });
   }
 
-  async registerHistoryByAluno(
-    createInternshipProcessHistoryByAlunoDto: CreateInternshipProcessHistoryByAlunoDto,
+  async updateHistory(
+    updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
   ): Promise<void> {
-    const { idInternshipProcess, ...rest } =
-      createInternshipProcessHistoryByAlunoDto;
-
-    await this.prisma.internshipProcessHistory.create({
-      data: {
-        ...rest,
-        internshipProcess: {
-          connect: {
-            id: idInternshipProcess,
-          },
-        },
+    await this.prisma.internshipProcessHistory.updateMany({
+      where: {
+        idInternshipProcess:
+          updateInternshipProcessHistoryDto.idInternshipProcess,
       },
+      data: updateInternshipProcessHistoryDto,
     });
   }
 }

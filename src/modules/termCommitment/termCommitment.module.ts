@@ -4,11 +4,18 @@ import { TermCommitmentService } from './application/service/termCommitment.serv
 import { termCommitmentController } from './adapter/http/rest/termCommitment.controller';
 import { TermCommitmentRepository } from './adapter/repository/termCommitment.repository';
 import { InternshipProcessModule } from '../intershipProcess/intershipProcess.module';
+import { InternshipProcessHistoryModule } from '../internship-process-history/internship-process-history.module';
+import { FileModule } from '../file/file.module';
 
 @Module({
   controllers: [termCommitmentController],
   providers: [TermCommitmentService, TermCommitmentRepository],
-  imports: [PrismaModule, forwardRef(() => InternshipProcessModule)],
+  imports: [
+    PrismaModule,
+    forwardRef(() => InternshipProcessModule),
+    InternshipProcessHistoryModule,
+    FileModule,
+  ],
   exports: [TermCommitmentService],
 })
 export class TermCommitmentModule {}

@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Post,
   Get,
   Query,
   Param,
@@ -15,8 +14,6 @@ import { InternshipProcessService } from 'src/modules/intershipProcess/applicati
 import { FindInternshipProcessByQueryDTO } from 'src/modules/intershipProcess/application/dto/findInternshipProcessByQuery.dto';
 
 import { UpdateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/updateInternshiProcess.dto';
-import { DirectCreateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/input/directCreateInternshipProcess.dto';
-import { registerAssignTermCommitmentDto } from 'src/modules/intershipProcess/application/dto/register-assign-term-commitment.dto';
 import { RoleGuard } from '@/auth/guards/role.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { Role } from '@/modules/user/domain/entities/user.entity';
@@ -30,32 +27,12 @@ export class InternshipProcessController {
   ) {}
 
   @IsPublic()
-  @Post('create')
-  async createIntershipProcess(
-    @Body() directCreateIntershipProcessDTO: DirectCreateIntershipProcessDTO,
-  ) {
-    return this.internshipProcessService.directCreate(
-      directCreateIntershipProcessDTO,
-    );
-  }
-
-  @IsPublic()
   @Patch('update/status')
   async updateInternshipProcess(
     @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
   ) {
     return await this.internshipProcessService.updateInternshipProcess(
       updateInternshipProcessStatusDTO,
-    );
-  }
-
-  @IsPublic()
-  @Patch('register/assign-term')
-  async registerAssignTermCommitmentByAluno(
-    @Body() registerAssignTermDto: registerAssignTermCommitmentDto,
-  ) {
-    return await this.internshipProcessService.registerAssignTermCommitment(
-      registerAssignTermDto,
     );
   }
 

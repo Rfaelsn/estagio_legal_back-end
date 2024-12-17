@@ -10,5 +10,6 @@ export class InternshipProcessHistoryEntity
   movement: string;
   description: string;
   observacoes: string | null;
-  id_internshipProcess: string;
+  fileId: string;
+  idInternshipProcess: string;
 }

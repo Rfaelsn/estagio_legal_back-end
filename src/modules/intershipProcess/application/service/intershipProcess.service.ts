@@ -12,11 +12,9 @@ import { FindInternshipProcessByQueryUsecase } from '../../domain/usecase/findIn
 import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQuery.dto';
 import { InternshipProcessFilterByEmployeeDTO } from '../dto/internshipProcessFilterByEmployee.dto';
 import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
-import { DirectCreateIntershipProcessDTO } from '../dto/input/directCreateInternshipProcess.dto';
 import { NotificationService } from 'src/modules/notification/application/service/notification.service';
 import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
 import { FileService } from 'src/modules/file/application/services/file.service';
-import { registerAssignTermCommitmentDto } from '../dto/register-assign-term-commitment.dto';
 import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
@@ -40,7 +38,7 @@ export class InternshipProcessService {
       idUser,
     );
 
-    await this.internshipProcessHistoryService.registerHistoryByFuncionario({
+    await this.internshipProcessHistoryService.registerHistory({
       status: InternshipProcessStatus.EM_ANDAMENTO,
       movement: intershipProcess.movement,
       observacoes: 'registrado pelo aluno',
@@ -55,31 +53,6 @@ export class InternshipProcessService {
     return intershipProcess;
   }
 
-  async registerAssignTermCommitment(
-    registerAssignTermDto: registerAssignTermCommitmentDto,
-  ) {
-    const registerFile = {
-      filePath: registerAssignTermDto.filePath,
-      fileType: registerAssignTermDto.fileType,
-      internshipProcessId: registerAssignTermDto.idInternshipProcess,
-    };
-
-    await this.fileService.registerFilePathProcess(registerFile);
-
-    const internshipProcess = await this.findById(
-      registerAssignTermDto.idInternshipProcess,
-    );
-
-    const history = {
-      idInternshipProcess: registerAssignTermDto.idInternshipProcess,
-      status: internshipProcess.status,
-      movement: internshipProcess.movement,
-      description: 'registrando termo assinado',
-    };
-
-    this.internshipProcessHistoryService.registerHistoryByAluno(history);
-  }
-
   async updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
   ) {
@@ -87,37 +60,6 @@ export class InternshipProcessService {
       updateInternshipProcessStatusDTO,
     );
   }
-
-  async directCreate(
-    directCreateIntershipProcessDTO: DirectCreateIntershipProcessDTO,
-  ) {
-    const termCommitmentEntity = await this.termCommitmentService.directCreate(
-      directCreateIntershipProcessDTO.termCommitment,
-    );
-
-    directCreateIntershipProcessDTO.id_termCommitment = termCommitmentEntity.id;
-  }
-  // async createTermCommitment(
-  //   createIntershipProcessByTermCommitmentDTO: CreateIntershipProcessDTO,
-  // ) {
-  //   const TermCommitment = this.termCommitmentService.create(
-  //     createIntershipProcessByTermCommitmentDTO.termCommitment,
-  //   );
-
-  //   // createIntershipProcessByTermCommitmentDTO.termCommitment = TermCommitment;
-
-  //   const createIntershipProcessByTermCommitmentUsecase =
-  //     new CreateIntershipProcessByTermCommitmentUsecase(
-  //       this.intershipProcessRepository,
-  //     );
-
-  //   const intershipProcess =
-  //     await createIntershipProcessByTermCommitmentUsecase.handle(
-  //       createIntershipProcessByTermCommitmentDTO,
-  //     );
-
-  //   return intershipProcess;
-  // }
 
   async filterByEmployee(
     intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,

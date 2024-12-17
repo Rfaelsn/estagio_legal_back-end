@@ -1,5 +1,5 @@
 // users.seed.ts
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 export async function seedUsers(prismaTransaction: Prisma.TransactionClient) {

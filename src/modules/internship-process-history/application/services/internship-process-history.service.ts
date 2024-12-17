@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
-import { CreateInternshipProcessHistoryByFuncionarioDto } from '../dtos/create-internship-process-history-by-funcionario.dto';
+import { CreateInternshipProcessHistoryDto } from '../dtos/create-internship-process-history.dto';
 import { InternshipProcessHistoryServiceInterface } from '../../domain/ports/internship-process-history.service.port';
 import { InternshipProcessHistoryRepository } from '../../adapters/repositories/internship-process-history.repository';
-import { CreateInternshipProcessHistoryByAlunoDto } from '../dtos/create-internship-process-history-by-aluno.dto';
+import { UpdateInternshipProcessHistoryDto } from '../dtos/update-internship-process-history.dto';
 
 @Injectable()
 export class InternshipProcessHistoryService
@@ -13,11 +13,11 @@ export class InternshipProcessHistoryService
     private readonly internshipProcessHistoryRepository: InternshipProcessHistoryRepository,
   ) {}
 
-  async registerHistoryByFuncionario(
-    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryByFuncionarioDto,
+  async registerHistory(
+    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
   ): Promise<void> {
     try {
-      await this.internshipProcessHistoryRepository.registerHistoryByFuncionario(
+      await this.internshipProcessHistoryRepository.registerHistory(
         createInternshipProcessHistoryDto,
       );
     } catch (error) {
@@ -25,12 +25,12 @@ export class InternshipProcessHistoryService
     }
   }
 
-  async registerHistoryByAluno(
-    createInternshipProcessHistoryDto: CreateInternshipProcessHistoryByAlunoDto,
+  async updateHistory(
+    updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
   ): Promise<void> {
     try {
-      await this.internshipProcessHistoryRepository.registerHistoryByFuncionario(
-        createInternshipProcessHistoryDto,
+      await this.internshipProcessHistoryRepository.updateHistory(
+        updateInternshipProcessHistoryDto,
       );
     } catch (error) {
       console.error(error);

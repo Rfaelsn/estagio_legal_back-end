@@ -1,6 +1,6 @@
-import { IsDate, IsString } from 'class-validator';
+import { IsDate, IsOptional, IsString } from 'class-validator';
 
-export class CreateInternshipProcessHistoryByFuncionarioDto {
+export class CreateInternshipProcessHistoryDto {
   @IsDate()
   endDate?: Date;
 
@@ -15,4 +15,8 @@ export class CreateInternshipProcessHistoryByFuncionarioDto {
 
   @IsString()
   idInternshipProcess: string;
+
+  @IsString()
+  @IsOptional()
+  fileId?: string;
 }
