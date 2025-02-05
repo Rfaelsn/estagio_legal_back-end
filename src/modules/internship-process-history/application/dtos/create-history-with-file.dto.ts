@@ -1,6 +1,6 @@
 import { IsArray, IsDate, IsOptional, IsString } from 'class-validator';
 
-export class CreateInternshipProcessHistoryDto {
+export class CreateHistoryWithFileDto {
   @IsDate()
   @IsOptional()
   endDate?: Date;
@@ -20,5 +20,5 @@ export class CreateInternshipProcessHistoryDto {
 
   @IsArray()
   @IsOptional()
-  fileIds?: string[];
+  files?: [{ fileId: string; fileType: string }];
 }

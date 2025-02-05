@@ -1,6 +1,6 @@
 import { File } from '@prisma/client';
-import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
-import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
+import { InternshipProcessEntity } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
+import { TermCommitmentEntity } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { v4 as uuidv4 } from 'uuid';
 
 export enum Role {
@@ -22,8 +22,8 @@ export class User {
   createdAt?: string | Date;
   updatedAt?: string | Date;
   id_institution?: string;
-  termsCommitment?: TermCommitment[];
-  internshipProcess?: InternshipProcess[];
+  termsCommitment?: TermCommitmentEntity[];
+  internshipProcess?: InternshipProcessEntity[];
   files?: File[];
 
   constructor(props: Omit<User, 'id'>, id?: string) {

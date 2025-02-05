@@ -12,4 +12,8 @@ export class FileService {
   ): Promise<FileEntity> {
     return await this.fileRepository.registerFilePath(registerFilePathDto);
   }
+
+  async registerFilePathsProcess(registerFilePathsDto: RegisterFilePathDto[]) {
+    return await this.fileRepository.registerFilePaths(registerFilePathsDto);
+  }
 }

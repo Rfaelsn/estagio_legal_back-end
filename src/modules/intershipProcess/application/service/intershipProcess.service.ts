@@ -2,7 +2,8 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
 import {
-  InternshipProcess,
+  InternshipProcessEntity,
+  InternshipProcessMovement,
   InternshipProcessStatus,
 } from '../../domain/entities/internshipProcess.entity';
 import { CreateInternshipProcessUseCase } from '../../domain/usecase/creatIntershipProcess.usecase';
@@ -16,6 +17,10 @@ import { NotificationService } from 'src/modules/notification/application/servic
 import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
 import { FileService } from 'src/modules/file/application/services/file.service';
 import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
+import { RegisterEndInternshipProcessDto } from '../dto/registerEndInternshipProcess.dto';
+import { FileType } from '@/modules/file/domain/entities/file.entity';
+import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
+import { ValidateAssignEndInternshipProcessDto } from '../dto/validateAssignEndInternshipProcess.dto';
 
 @Injectable()
 export class InternshipProcessService {
@@ -63,7 +68,7 @@ export class InternshipProcessService {
 
   async filterByEmployee(
     intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     const filterInternshipProcessUsecase = new FilterInternshipProcessUsecase(
       this.internshipProcessRepository,
     );
@@ -76,7 +81,7 @@ export class InternshipProcessService {
 
   async filterByStudent(
     internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     const internshipProcess =
       await this.internshipProcessRepository.filterByStudent(
         internshipProcessFilterByStudentDto,
@@ -84,9 +89,132 @@ export class InternshipProcessService {
     return internshipProcess;
   }
 
+  async findEligibleProcessesForCompletion(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ) {
+    const internshipProcess =
+      await this.internshipProcessRepository.findEligibleProcessesForCompletion(
+        userId,
+        page,
+        pageSize,
+      );
+    return internshipProcess;
+  }
+
+  async registerEndInternshipProcess(
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+  ) {
+    // const formatFilePaths =
+    //   registerEndInternshipProcessDto.internshipEvaluationFilesPaths.map(
+    //     (filePath) => {
+    //       if (filePath) {
+    //         return {
+    //           filePath,
+    //           fileType: FileType.EVALUATION,
+    //         };
+    //       }
+    //     },
+    //   );
+    // const registeredFiles =
+    //   await this.fileService.registerFilePathsProcess(formatFilePaths);
+
+    await this.updateInternshipProcess({
+      id: registerEndInternshipProcessDto.internshipProcessId,
+      status: InternshipProcessStatus.EM_ANALISE,
+      movement: InternshipProcessMovement.FIM_ESTAGIO,
+    });
+
+    // const newHistory: CreateInternshipProcessHistoryDto = {
+    //   movement: InternshipProcessMovement.FIM_ESTAGIO,
+    //   status: InternshipProcessStatus.EM_ANALISE,
+    //   idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
+    //   fileIds: registeredFiles.map((registeredFile) => {
+    //     return registeredFile.id;
+    //   }),
+    // };
+
+    // await this.internshipProcessHistoryService.updateHistory({
+    //   endDate: new Date(),
+    //   idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
+    // });
+
+    // await this.internshipProcessHistoryService.registerHistory(newHistory);
+  }
+
+  async validateAssignEndInternshipProcess(
+    validateAssignEndInternshipProcessDto: ValidateAssignEndInternshipProcessDto,
+  ) {
+    if (
+      validateAssignEndInternshipProcessDto.validate &&
+      validateAssignEndInternshipProcessDto.internshipEvaluationFilesPaths
+    ) {
+      const formatFilePaths =
+        validateAssignEndInternshipProcessDto.internshipEvaluationFilesPaths.map(
+          (filePath) => {
+            if (filePath) {
+              return {
+                filePath,
+                fileType: FileType.EVALUATION,
+              };
+            }
+          },
+        );
+
+      const registeredFiles =
+        await this.fileService.registerFilePathsProcess(formatFilePaths);
+
+      this.updateInternshipProcess({
+        id: validateAssignEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.CONCLUIDO,
+        movement: InternshipProcessMovement.FIM_ESTAGIO,
+      });
+
+      const newHistory: CreateInternshipProcessHistoryDto = {
+        movement: InternshipProcessMovement.FIM_ESTAGIO,
+        status: InternshipProcessStatus.CONCLUIDO,
+        idInternshipProcess:
+          validateAssignEndInternshipProcessDto.internshipProcessId,
+        fileIds: registeredFiles.map((registeredFile) => registeredFile.id),
+      };
+
+      //ajustar para determinar a data apenas da ultima movimentação
+      this.internshipProcessHistoryService.updateHistory({
+        endDate: new Date(),
+        idInternshipProcess:
+          validateAssignEndInternshipProcessDto.internshipProcessId,
+      });
+
+      this.internshipProcessHistoryService.registerHistory(newHistory);
+    } else {
+      this.updateInternshipProcess({
+        id: validateAssignEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.RECUSADO,
+        movement: InternshipProcessMovement.FIM_ESTAGIO,
+      });
+
+      this.internshipProcessHistoryService.updateHistory({
+        endDate: new Date(),
+        idInternshipProcess:
+          validateAssignEndInternshipProcessDto.internshipProcessId,
+      });
+
+      const newHistory: CreateInternshipProcessHistoryDto = {
+        movement: InternshipProcessMovement.FIM_ESTAGIO,
+        status: InternshipProcessStatus.RECUSADO,
+        idInternshipProcess:
+          validateAssignEndInternshipProcessDto.internshipProcessId,
+        observacoes: validateAssignEndInternshipProcessDto.remark,
+      };
+
+      this.internshipProcessHistoryService.registerHistory(newHistory);
+    }
+  }
+
   async findByQuery(
     findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     const filterInternshipProcessUsecase =
       new FindInternshipProcessByQueryUsecase(this.internshipProcessRepository);
     const internshipProcess = await filterInternshipProcessUsecase.handle(
@@ -95,7 +223,7 @@ export class InternshipProcessService {
     return internshipProcess;
   }
 
-  async findById(id: string): Promise<InternshipProcess> {
+  async findById(id: string): Promise<InternshipProcessEntity> {
     const filterInternshipProcessUsecase = new FindInternshipProcessByIdUsecase(
       this.internshipProcessRepository,
     );

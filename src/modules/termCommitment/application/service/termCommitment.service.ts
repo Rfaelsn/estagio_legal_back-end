@@ -14,6 +14,7 @@ import { FileService } from '@/modules/file/application/services/file.service';
 import { FileType } from '@/modules/file/domain/entities/file.entity';
 import { RegisterAssignDto } from '../dto/register-assign.dto';
 import { ValidateAssignTermDto } from '../dto/validate-assign-term.dto';
+import { UpdateTermInfoDto } from '../dto/updateTermInfo.dto';
 
 @Injectable()
 export class TermCommitmentService {
@@ -33,11 +34,17 @@ export class TermCommitmentService {
       createTermCommitmentDTO,
     );
 
-    this.internshipProcessService.create(
+    const { id } = await this.internshipProcessService.create(
       termCommitment.id,
       termCommitment.id_user,
     );
-    return termCommitment;
+
+    const outputDto = {
+      ...termCommitment,
+      internshipProcessId: id,
+    };
+
+    return outputDto;
   }
 
   async registerAssignTermByAluno(
@@ -58,7 +65,7 @@ export class TermCommitmentService {
       movement: InternshipProcessMovement.INICIO_ESTAGIO,
       status: InternshipProcessStatus.EM_ANALISE,
       idInternshipProcess: registerAssignDto.internshipProcessId,
-      fileId: registeredFile.id,
+      fileIds: [registeredFile.id],
     };
     //transação
     this.internshipProcessHistoryService.updateHistory({
@@ -72,6 +79,7 @@ export class TermCommitmentService {
   async validateAssignTerm(
     validateAssignTermDto: ValidateAssignTermDto,
   ): Promise<void> {
+    //se ja tiver o status de aprovação nao deve ir pro fluxo de aprovação novamente o mesmo para recusa
     if (validateAssignTermDto.validate && validateAssignTermDto.termFilePath) {
       const registeredFile = await this.fileService.registerFilePathProcess({
         filePath: validateAssignTermDto.termFilePath,
@@ -88,8 +96,10 @@ export class TermCommitmentService {
         movement: InternshipProcessMovement.INICIO_ESTAGIO,
         status: InternshipProcessStatus.CONCLUIDO,
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
-        fileId: registeredFile.id,
+        fileIds: [registeredFile.id],
       };
+
+      //ajustar para determinar a data apenas da ultima movimentação
       this.internshipProcessHistoryService.updateHistory({
         endDate: new Date(),
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
@@ -112,19 +122,43 @@ export class TermCommitmentService {
         movement: InternshipProcessMovement.INICIO_ESTAGIO,
         status: InternshipProcessStatus.RECUSADO,
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
+        observacoes: validateAssignTermDto.remark,
       };
 
       this.internshipProcessHistoryService.registerHistory(newHistory);
     }
   }
 
-  // async
-
   async linkDocumentToTermCommitment(
     linkTermCommitmentFilePathDTO: LinkTermCommitmentFilePathDTO,
   ) {
     return this.termCommitmentRepository.linkDocumentToTermCommitment(
       linkTermCommitmentFilePathDTO,
+    );
+  }
+
+  async updateTermInfo(
+    idTerm: string,
+    updateTermInfoDto: UpdateTermInfoDto,
+  ): Promise<any> {
+    //procurar id do processo pelo id do termo ou pegar do dto
+    await this.internshipProcessHistoryService.registerHistory({
+      status: InternshipProcessStatus.EM_ANDAMENTO,
+      movement: InternshipProcessMovement.INICIO_ESTAGIO,
+      observacoes: 'atualizado pelo aluno',
+      idInternshipProcess: updateTermInfoDto.internshipProcessId,
+    });
+
+    //atualizar o processo também entidade processo
+    this.internshipProcessService.updateInternshipProcess({
+      id: updateTermInfoDto.internshipProcessId,
+      status: InternshipProcessStatus.EM_ANDAMENTO,
+      movement: InternshipProcessMovement.INICIO_ESTAGIO,
+    });
+
+    return await this.termCommitmentRepository.update(
+      idTerm,
+      updateTermInfoDto,
     );
   }
 }

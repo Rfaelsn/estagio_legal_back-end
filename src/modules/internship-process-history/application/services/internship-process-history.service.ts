@@ -4,6 +4,7 @@ import { CreateInternshipProcessHistoryDto } from '../dtos/create-internship-pro
 import { InternshipProcessHistoryServiceInterface } from '../../domain/ports/internship-process-history.service.port';
 import { InternshipProcessHistoryRepository } from '../../adapters/repositories/internship-process-history.repository';
 import { UpdateInternshipProcessHistoryDto } from '../dtos/update-internship-process-history.dto';
+import { CreateHistoryWithFileDto } from '../dtos/create-history-with-file.dto';
 
 @Injectable()
 export class InternshipProcessHistoryService
@@ -19,6 +20,18 @@ export class InternshipProcessHistoryService
     try {
       await this.internshipProcessHistoryRepository.registerHistory(
         createInternshipProcessHistoryDto,
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async registerHistoryWithFile(
+    createHistoryWithFileDto: CreateHistoryWithFileDto,
+  ): Promise<void> {
+    try {
+      await this.internshipProcessHistoryRepository.registerHistoryWithFile(
+        createHistoryWithFileDto,
       );
     } catch (error) {
       console.error(error);

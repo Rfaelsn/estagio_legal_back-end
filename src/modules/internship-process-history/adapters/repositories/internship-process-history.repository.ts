@@ -3,6 +3,7 @@ import { PrismaService } from 'src/config/prisma/prisma.service';
 import { CreateInternshipProcessHistoryDto } from '../../application/dtos/create-internship-process-history.dto';
 import { InternshipProcessHistoryRepositoryInterface } from '../../domain/ports/internship-process-history.repository.port';
 import { UpdateInternshipProcessHistoryDto } from '../../application/dtos/update-internship-process-history.dto';
+import { CreateHistoryWithFileDto } from '../../application/dtos/create-history-with-file.dto';
 
 @Injectable()
 export class InternshipProcessHistoryRepository
@@ -13,8 +14,11 @@ export class InternshipProcessHistoryRepository
   async registerHistory(
     createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
   ): Promise<void> {
-    const { idInternshipProcess, fileId, ...rest } =
-      createInternshipProcessHistoryDto;
+    const {
+      idInternshipProcess,
+      fileIds: fileIds,
+      ...rest
+    } = createInternshipProcessHistoryDto;
 
     await this.prisma.internshipProcessHistory.create({
       data: {
@@ -24,13 +28,40 @@ export class InternshipProcessHistoryRepository
             id: idInternshipProcess,
           },
         },
-        ...(fileId && {
-          file: {
-            connect: {
-              id: fileId,
-            },
+        ...(fileIds && {
+          files: {
+            connect: fileIds.map((fileId) => ({ id: fileId })),
           },
         }),
+      },
+    });
+  }
+
+  async registerHistoryWithFile(
+    createHistoryWithFileDto: CreateHistoryWithFileDto,
+  ): Promise<void> {
+    const { idInternshipProcess, files, ...rest } = createHistoryWithFileDto;
+
+    await this.prisma.internshipProcessHistory.create({
+      data: {
+        ...rest,
+        internshipProcess: {
+          connect: {
+            id: idInternshipProcess,
+          },
+        },
+
+        files: {
+          connectOrCreate: files.map((file) => ({
+            where: {
+              filePath: file.fileId,
+            },
+            create: {
+              filePath: file.fileId,
+              fileType: file.fileType,
+            },
+          })),
+        },
       },
     });
   }

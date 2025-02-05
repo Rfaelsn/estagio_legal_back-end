@@ -7,6 +7,8 @@ import {
   UseGuards,
   Patch,
   Request,
+  ParseIntPipe,
+  Post,
 } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { InternshipProcessFilterByEmployeeDTO } from 'src/modules/intershipProcess/application/dto/internshipProcessFilterByEmployee.dto';
@@ -18,6 +20,8 @@ import { RoleGuard } from '@/auth/guards/role.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { Role } from '@/modules/user/domain/entities/user.entity';
 import { InternshipProcessFilterByStudentDTO } from '@/modules/intershipProcess/application/dto/internshipProcessFilterByStudent.dto';
+import { RegisterEndInternshipProcessDto } from '@/modules/intershipProcess/application/dto/registerEndInternshipProcess.dto';
+import { ValidateAssignEndInternshipProcessDto } from '@/modules/intershipProcess/application/dto/validateAssignEndInternshipProcess.dto';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
@@ -45,12 +49,24 @@ export class InternshipProcessController {
     );
   }
 
-  @Patch('register/assign-end-internship')
+  @Roles(Role.ALUNO)
+  @Post('register/assign-end-internship')
   async registerEndInternshipByAluno(
-    @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+    @Body() registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
   ) {
-    return await this.internshipProcessService.updateInternshipProcess(
-      updateInternshipProcessStatusDTO,
+    await this.internshipProcessService.registerEndInternshipProcess(
+      registerEndInternshipProcessDto,
+    );
+  }
+
+  @Roles(Role.ADMINISTRADOR, Role.FUNCIONARIO)
+  @Post('validate/assign-end-internship')
+  async validateAssignEndInternshipProcess(
+    @Body()
+    validateAssignEndInternshipProcessDto: ValidateAssignEndInternshipProcessDto,
+  ) {
+    await this.internshipProcessService.validateAssignEndInternshipProcess(
+      validateAssignEndInternshipProcessDto,
     );
   }
 
@@ -72,8 +88,23 @@ export class InternshipProcessController {
     @Request() req,
   ) {
     internshipProcessFilterByStudentDto.idUser = req.user.id;
-    return this.internshipProcessService.filterByStudent(
+    return await this.internshipProcessService.filterByStudent(
       internshipProcessFilterByStudentDto,
+    );
+  }
+
+  @Roles(Role.ALUNO)
+  @Get('elegible-for-completation')
+  async findEligibleProcessesForCompletion(
+    @Request() req,
+    @Query('page', new ParseIntPipe()) page: number,
+    @Query('pageSize', new ParseIntPipe()) pageSize: number,
+  ) {
+    const userId = req.user.id;
+    return await this.internshipProcessService.findEligibleProcessesForCompletion(
+      userId,
+      page,
+      pageSize,
     );
   }
 

@@ -1,6 +1,6 @@
 import { InternshipProcess as InternshipProcessPrisma } from '@prisma/client';
 import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
-import { TermCommitment } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
+import { TermCommitmentEntity } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,7 +18,7 @@ export enum InternshipProcessMovement {
   CREDITACAO = 'CREDITAÇÃO',
 }
 
-export class InternshipProcess implements InternshipProcessPrisma {
+export class InternshipProcessEntity implements InternshipProcessPrisma {
   id: string;
   movement: string;
   status: string;
@@ -27,10 +27,10 @@ export class InternshipProcess implements InternshipProcessPrisma {
   id_user: string | null;
   user?: User;
   id_termCommitment: string | null;
-  termCommitment?: TermCommitment;
+  termCommitment?: TermCommitmentEntity;
   internshipEvaluation?: InternshipEvaluation[];
 
-  constructor(props: Omit<InternshipProcess, 'id'>, id?: string) {
+  constructor(props: Omit<InternshipProcessEntity, 'id'>, id?: string) {
     Object.assign(this, props);
     if (!id) {
       this.id = uuidv4();

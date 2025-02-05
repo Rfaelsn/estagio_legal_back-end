@@ -2,7 +2,6 @@ import { Transform } from 'class-transformer';
 import {
   IsString,
   IsDate,
-  IsOptional,
   IsBoolean,
   IsEmail,
   IsNotEmpty,
@@ -15,19 +14,7 @@ import {
 import { IsCNPJ } from 'src/shared/decorators/isCnpj.decorator';
 import { IsTime } from 'src/shared/decorators/isTime.decorator';
 
-export class CreateTermCommitmentDTO {
-  @IsString()
-  @IsOptional()
-  id?: string;
-
-  @IsString()
-  @IsOptional()
-  numApoliceSeguro?: string;
-
-  @IsString()
-  @IsOptional()
-  nomeSeguradora?: string;
-
+export class UpdateTermInfoDto {
   @IsDate()
   @Transform(({ value }) => new Date(value))
   @IsNotEmpty()
@@ -119,13 +106,5 @@ export class CreateTermCommitmentDTO {
   cargoSupervisor: string;
 
   @IsString()
-  @IsNotEmpty()
-  id_user: string;
-
-  @IsString()
-  @IsOptional()
-  termFilePathId?: string;
-
-  // @IsString()
-  // id_internshipGrantor: string;
+  internshipProcessId: string;
 }

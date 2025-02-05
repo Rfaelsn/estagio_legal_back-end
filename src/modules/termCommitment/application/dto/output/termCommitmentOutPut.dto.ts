@@ -6,6 +6,10 @@ import { IsTime } from 'src/shared/decorators/isTime.decorator';
 export class CreatedTermCommitmentOutputDTO {
   @IsString()
   @Expose()
+  id?: string;
+
+  @IsString()
+  @Expose()
   numApoliceSeguro: string;
 
   @IsString()
@@ -105,6 +109,10 @@ export class CreatedTermCommitmentOutputDTO {
   @IsString()
   @Expose()
   cargoSupervisor: string;
+
+  @IsString()
+  @Expose()
+  internshipProcessId: string;
 
   @Expose()
   @Type(() => UserAlunoOutputDTO)

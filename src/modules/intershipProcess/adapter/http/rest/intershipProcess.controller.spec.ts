@@ -2,7 +2,7 @@ import { FindInternshipProcessByQueryDTO } from 'src/modules/intershipProcess/ap
 import { CreateInternshipProcessDTO } from 'src/modules/intershipProcess/application/dto/input/intershipProcess.dto';
 import { InternshipProcessFilterByEmployeeDTO } from 'src/modules/intershipProcess/application/dto/internshipProcessFilterByEmployee.dto';
 import { InternshipProcessService } from 'src/modules/intershipProcess/application/service/intershipProcess.service';
-import { InternshipProcess } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
+import { InternshipProcessEntity } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
 import { IInternshipProcessRepository } from 'src/modules/intershipProcess/domain/port/intershipProcessRepository.port';
 import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 import { InternshipProcessController } from './intershipProcess.controller';
@@ -16,20 +16,20 @@ class PrismaServiceMock extends PrismaService {}
 class InternshipProcessRepositoryMock extends InternshipProcessRepository {
   create(
     intershipProcess: CreateInternshipProcessDTO,
-  ): Promise<InternshipProcess> {
+  ): Promise<InternshipProcessEntity> {
     throw new Error('Method not implemented.');
   }
   filter(
     intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     throw new Error('Method not implemented.');
   }
   findByQuery(
     findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     throw new Error('Method not implemented.');
   }
-  findById(id: string): Promise<InternshipProcess> {
+  findById(id: string): Promise<InternshipProcessEntity> {
     throw new Error('Method not implemented.');
   }
 }

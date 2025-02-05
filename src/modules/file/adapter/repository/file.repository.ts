@@ -14,4 +14,10 @@ export class FileRepository {
       data: registerFilePathDto,
     });
   }
+
+  async registerFilePaths(registerFilePathDto: RegisterFilePathDto[]) {
+    return await this.prisma.file.createManyAndReturn({
+      data: registerFilePathDto,
+    });
+  }
 }

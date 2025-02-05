@@ -9,5 +9,9 @@ export class ValidateAssignTermDto {
   termFilePath?: string;
 
   @IsString()
+  @IsOptional()
+  remark?: string;
+
+  @IsString()
   internshipProcessId: string;
 }

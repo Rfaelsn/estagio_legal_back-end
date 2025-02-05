@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
-import { InternshipProcess } from '../../domain/entities/internshipProcess.entity';
+import { InternshipProcessEntity } from '../../domain/entities/internshipProcess.entity';
 import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
@@ -18,7 +18,7 @@ export class InternshipProcessRepository
 
   async create(
     createIntershipProcessDTO: CreateInternshipProcessDTO,
-  ): Promise<InternshipProcess> {
+  ): Promise<InternshipProcessEntity> {
     const newIntershipProcess = await this.prisma.internshipProcess.create({
       data: {
         movement: createIntershipProcessDTO.movement,
@@ -42,11 +42,13 @@ export class InternshipProcessRepository
     if (updateInternshipProcessStatusDTO.status === 'CONCLUÍDO') {
       prismaData = {
         status: updateInternshipProcessStatusDTO.status,
+        movement: updateInternshipProcessStatusDTO.movement,
         endDateProcess: new Date(),
       };
     } else {
       prismaData = {
         status: updateInternshipProcessStatusDTO.status,
+        movement: updateInternshipProcessStatusDTO.movement,
       };
     }
     await this.prisma.internshipProcess.update({
@@ -59,7 +61,7 @@ export class InternshipProcessRepository
 
   async filter(
     intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     const {
       user,
       termCommitment,
@@ -102,7 +104,7 @@ export class InternshipProcessRepository
 
   async filterByStudent(
     intershipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     const {
       idUser,
       termCommitment,
@@ -143,9 +145,32 @@ export class InternshipProcessRepository
     return internshipProcess;
   }
 
+  async findEligibleProcessesForCompletion(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ) {
+    const take: number = pageSize || 10;
+    const skip: number = page ? (page - 1) * take : 0;
+
+    const internshipProcess = await this.prisma.internshipProcess.findMany({
+      where: {
+        user: { id: userId },
+      },
+      include: {
+        user: true,
+        termCommitment: true,
+      },
+      take,
+      skip,
+    });
+
+    return internshipProcess;
+  }
+
   async findByQuery(
     findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcess[]> {
+  ): Promise<InternshipProcessEntity[]> {
     const { query, page, pageSize } = findInternshipProcessByQueryDTO;
 
     // Lógica de paginação
@@ -173,7 +198,7 @@ export class InternshipProcessRepository
     return internshipProcess;
   }
 
-  async findById(id: string): Promise<InternshipProcess> {
+  async findById(id: string): Promise<InternshipProcessEntity> {
     const internshipProcess = await this.prisma.internshipProcess.findFirst({
       where: {
         id,
@@ -181,6 +206,11 @@ export class InternshipProcessRepository
       include: {
         user: true,
         termCommitment: true,
+        statusHistory: {
+          include: {
+            files: true,
+          },
+        },
       },
     });
 

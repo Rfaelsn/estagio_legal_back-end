@@ -40,9 +40,9 @@ model Notification {
 
 model File{
   id                  String             @id @default(uuid())
-  filePath            String             @db.VarChar(255)
+  filePath            String             @unique
   fileType            String             @db.VarChar(255)
-  internshipProcessHistory   InternshipProcessHistory? @relation
+  internshipProcessHistories InternshipProcessHistory[] @relation("ProcessHistoryFiles")
   @@map("tb_internship_process_files")
 }
 
@@ -123,8 +123,7 @@ model InternshipProcessHistory {
   movement            String      @db.VarChar(127)
   description         String?      @db.Text()
   observacoes         String?     @db.Text()
-  fileId                String?                 @unique
-  file                  File?                   @relation(fields: [fileId], references: [id])
+  files              File[]                 @relation("ProcessHistoryFiles")
   idInternshipProcess String
   internshipProcess    InternshipProcess  @relation("historicoStatusProcesso", fields: [idInternshipProcess], references: [id])
 

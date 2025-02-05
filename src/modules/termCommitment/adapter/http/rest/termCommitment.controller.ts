@@ -1,8 +1,9 @@
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { RegisterAssignDto } from '@/modules/termCommitment/application/dto/register-assign.dto';
+import { UpdateTermInfoDto } from '@/modules/termCommitment/application/dto/updateTermInfo.dto';
 import { ValidateAssignTermDto } from '@/modules/termCommitment/application/dto/validate-assign-term.dto';
 import { Role } from '@/modules/user/domain/entities/user.entity';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
@@ -59,5 +60,21 @@ export class termCommitmentController {
     return this.termCommitmentService.linkDocumentToTermCommitment(
       linkTermCommitmentFilePathDTO,
     );
+  }
+
+  @IsPublic()
+  @Patch('update/:id')
+  async updateTermInfo(
+    @Param('id') idTerm: string,
+    @Body() updateTermInfoDto: UpdateTermInfoDto,
+  ): Promise<any> {
+    try {
+      return await this.termCommitmentService.updateTermInfo(
+        idTerm,
+        updateTermInfoDto,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
