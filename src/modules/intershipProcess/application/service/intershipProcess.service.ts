@@ -18,7 +18,6 @@ import { InternshipProcessHistoryService } from 'src/modules/internship-process-
 import { FileService } from 'src/modules/file/application/services/file.service';
 import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 import { RegisterEndInternshipProcessDto } from '../dto/registerEndInternshipProcess.dto';
-import { FileType } from '@/modules/file/domain/entities/file.entity';
 import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
 import { ValidateAssignEndInternshipProcessDto } from '../dto/validateAssignEndInternshipProcess.dto';
 
@@ -43,12 +42,12 @@ export class InternshipProcessService {
       idUser,
     );
 
-    await this.internshipProcessHistoryService.registerHistory({
-      status: InternshipProcessStatus.EM_ANDAMENTO,
-      movement: intershipProcess.movement,
-      observacoes: 'registrado pelo aluno',
-      idInternshipProcess: intershipProcess.id,
-    });
+    // await this.internshipProcessHistoryService.registerHistory({
+    //   status: InternshipProcessStatus.EM_ANDAMENTO,
+    //   movement: intershipProcess.movement,
+    //   observacoes: 'registrado pelo aluno',
+    //   idInternshipProcess: intershipProcess.id,
+    // });
 
     this.notificationService.sendNotification(
       idUser,
@@ -117,8 +116,9 @@ export class InternshipProcessService {
     //       }
     //     },
     //   );
-    // const registeredFiles =
-    //   await this.fileService.registerFilePathsProcess(formatFilePaths);
+    const registeredFiles = await this.fileService.registerFilePathsProcess(
+      registerEndInternshipProcessDto.internshipEvaluationFilesPaths,
+    );
 
     await this.updateInternshipProcess({
       id: registerEndInternshipProcessDto.internshipProcessId,
@@ -126,21 +126,21 @@ export class InternshipProcessService {
       movement: InternshipProcessMovement.FIM_ESTAGIO,
     });
 
-    // const newHistory: CreateInternshipProcessHistoryDto = {
-    //   movement: InternshipProcessMovement.FIM_ESTAGIO,
-    //   status: InternshipProcessStatus.EM_ANALISE,
-    //   idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
-    //   fileIds: registeredFiles.map((registeredFile) => {
-    //     return registeredFile.id;
-    //   }),
-    // };
+    const newHistory: CreateInternshipProcessHistoryDto = {
+      movement: InternshipProcessMovement.FIM_ESTAGIO,
+      status: InternshipProcessStatus.EM_ANALISE,
+      idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
+      fileIds: registeredFiles.map((registeredFile) => {
+        return registeredFile.id;
+      }),
+    };
 
     // await this.internshipProcessHistoryService.updateHistory({
     //   endDate: new Date(),
     //   idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
     // });
 
-    // await this.internshipProcessHistoryService.registerHistory(newHistory);
+    await this.internshipProcessHistoryService.registerHistory(newHistory);
   }
 
   async validateAssignEndInternshipProcess(
@@ -148,22 +148,13 @@ export class InternshipProcessService {
   ) {
     if (
       validateAssignEndInternshipProcessDto.validate &&
-      validateAssignEndInternshipProcessDto.internshipEvaluationFilesPaths
+      validateAssignEndInternshipProcessDto.internshipCertificateFilePath
     ) {
       const formatFilePaths =
-        validateAssignEndInternshipProcessDto.internshipEvaluationFilesPaths.map(
-          (filePath) => {
-            if (filePath) {
-              return {
-                filePath,
-                fileType: FileType.EVALUATION,
-              };
-            }
-          },
-        );
+        validateAssignEndInternshipProcessDto.internshipCertificateFilePath;
 
       const registeredFiles =
-        await this.fileService.registerFilePathsProcess(formatFilePaths);
+        await this.fileService.registerFilePathProcess(formatFilePaths);
 
       this.updateInternshipProcess({
         id: validateAssignEndInternshipProcessDto.internshipProcessId,
@@ -176,7 +167,7 @@ export class InternshipProcessService {
         status: InternshipProcessStatus.CONCLUIDO,
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
-        fileIds: registeredFiles.map((registeredFile) => registeredFile.id),
+        fileIds: [registeredFiles.id],
       };
 
       //ajustar para determinar a data apenas da ultima movimentação

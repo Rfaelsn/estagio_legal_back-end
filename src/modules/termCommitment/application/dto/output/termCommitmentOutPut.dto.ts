@@ -115,6 +115,9 @@ export class CreatedTermCommitmentOutputDTO {
   internshipProcessId: string;
 
   @Expose()
+  createdHistory: any;
+
+  @Expose()
   @Type(() => UserAlunoOutputDTO)
   user: UserAlunoOutputDTO;
 }

@@ -5,6 +5,7 @@ import { InternshipProcessHistoryServiceInterface } from '../../domain/ports/int
 import { InternshipProcessHistoryRepository } from '../../adapters/repositories/internship-process-history.repository';
 import { UpdateInternshipProcessHistoryDto } from '../dtos/update-internship-process-history.dto';
 import { CreateHistoryWithFileDto } from '../dtos/create-history-with-file.dto';
+import { RegisterFileInHistoryDto } from '../dtos/register-file-history.dto';
 
 @Injectable()
 export class InternshipProcessHistoryService
@@ -48,5 +49,11 @@ export class InternshipProcessHistoryService
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async registerFileInHistory(
+    registerFileInHistoryDto: RegisterFileInHistoryDto,
+  ) {
+    return;
   }
 }

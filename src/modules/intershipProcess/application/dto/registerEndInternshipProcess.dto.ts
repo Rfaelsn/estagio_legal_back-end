@@ -1,3 +1,4 @@
+import { RegisterFilePathDto } from '@/modules/file/application/dtos/registerFilePath.dto';
 import { IsArray, IsString } from 'class-validator';
 
 export class RegisterEndInternshipProcessDto {
@@ -5,5 +6,5 @@ export class RegisterEndInternshipProcessDto {
   internshipProcessId: string;
 
   @IsArray()
-  internshipEvaluationFilesPaths: string[];
+  internshipEvaluationFilesPaths: RegisterFilePathDto[];
 }

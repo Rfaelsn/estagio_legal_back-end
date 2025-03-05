@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
-import { InternshipProcessEntity } from '../../domain/entities/internshipProcess.entity';
+import {
+  InternshipProcessEntity,
+  InternshipProcessMovement,
+  InternshipProcessStatus,
+} from '../../domain/entities/internshipProcess.entity';
 import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
 
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
@@ -29,6 +33,7 @@ export class InternshipProcessRepository
       },
       include: {
         termCommitment: true,
+        statusHistory: true,
       },
     });
 
@@ -156,6 +161,8 @@ export class InternshipProcessRepository
     const internshipProcess = await this.prisma.internshipProcess.findMany({
       where: {
         user: { id: userId },
+        movement: InternshipProcessMovement.INICIO_ESTAGIO,
+        status: InternshipProcessStatus.CONCLUIDO,
       },
       include: {
         user: true,

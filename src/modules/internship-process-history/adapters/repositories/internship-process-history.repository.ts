@@ -4,6 +4,7 @@ import { CreateInternshipProcessHistoryDto } from '../../application/dtos/create
 import { InternshipProcessHistoryRepositoryInterface } from '../../domain/ports/internship-process-history.repository.port';
 import { UpdateInternshipProcessHistoryDto } from '../../application/dtos/update-internship-process-history.dto';
 import { CreateHistoryWithFileDto } from '../../application/dtos/create-history-with-file.dto';
+import { RegisterFileInHistoryDto } from '../../application/dtos/register-file-history.dto';
 
 @Injectable()
 export class InternshipProcessHistoryRepository
@@ -75,6 +76,29 @@ export class InternshipProcessHistoryRepository
           updateInternshipProcessHistoryDto.idInternshipProcess,
       },
       data: updateInternshipProcessHistoryDto,
+    });
+  }
+
+  async registerFileInHistory(
+    registerFileInHistoryDto: RegisterFileInHistoryDto,
+  ): Promise<void> {
+    await this.prisma.internshipProcessHistory.update({
+      where: {
+        id: registerFileInHistoryDto.idHistory,
+      },
+      data: {
+        files: {
+          connectOrCreate: registerFileInHistoryDto.files.map((file) => ({
+            where: {
+              filePath: file.fileId,
+            },
+            create: {
+              filePath: file.fileId,
+              fileType: file.fileType,
+            },
+          })),
+        },
+      },
     });
   }
 }
