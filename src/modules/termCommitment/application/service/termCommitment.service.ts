@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { TermCommitmentRepository } from '../../adapter/repository/termCommitment.repository';
 import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
@@ -27,24 +33,48 @@ export class TermCommitmentService {
   ) {}
 
   async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {
-    const createTermCommitmentUsecase = new CreateTermCommitmentUsecase(
-      this.termCommitmentRepository,
-    );
-    const termCommitment = await createTermCommitmentUsecase.handle(
-      createTermCommitmentDTO,
-    );
+    if (
+      await this.isValidJornadaSemanalLimit(
+        createTermCommitmentDTO.id_user,
+        createTermCommitmentDTO.jornadaSemanal,
+        createTermCommitmentDTO.dataInicioEstagio,
+        createTermCommitmentDTO.dataFimEstagio,
+      )
+    ) {
+      const createTermCommitmentUsecase = new CreateTermCommitmentUsecase(
+        this.termCommitmentRepository,
+      );
+      const termCommitment = await createTermCommitmentUsecase.handle(
+        createTermCommitmentDTO,
+      );
 
-    const { id } = await this.internshipProcessService.create(
-      termCommitment.id,
-      termCommitment.id_user,
+      const { id } = await this.internshipProcessService.create(
+        termCommitment.id,
+        termCommitment.id_user,
+      );
+
+      const outputDto = {
+        ...termCommitment,
+        dataInicioEstagio: termCommitment.dataInicioEstagio
+          .toISOString()
+          .split('Z')[0],
+        dataFimEstagio: termCommitment.dataFimEstagio
+          .toISOString()
+          .split('Z')[0],
+        internshipProcessId: id,
+      };
+
+      return outputDto;
+    }
+
+    throw new HttpException(
+      `A jornada semanal ultrapassa o limite permitido de 30 horas. verifique a jornada semanal de seus processos no intervalo de ${new Date(
+        createTermCommitmentDTO.dataInicioEstagio.toISOString().split('Z')[0],
+      ).toLocaleDateString('pt-BR')} a ${new Date(
+        createTermCommitmentDTO.dataFimEstagio.toISOString().split('Z')[0],
+      ).toLocaleDateString('pt-BR')}`,
+      HttpStatus.BAD_REQUEST,
     );
-
-    const outputDto = {
-      ...termCommitment,
-      internshipProcessId: id,
-    };
-
-    return outputDto;
   }
 
   async registerAssignTermByAluno(
@@ -160,5 +190,27 @@ export class TermCommitmentService {
       idTerm,
       updateTermInfoDto,
     );
+  }
+
+  async isValidJornadaSemanalLimit(
+    idUser: string,
+    newJornadaSemanal: number,
+    startDateNewInternship: Date,
+    endDateNewInternship: Date,
+  ): Promise<boolean> {
+    const userTerms =
+      await this.termCommitmentRepository.findTermsUserInIntervalDates(
+        idUser,
+        startDateNewInternship,
+        endDateNewInternship,
+      );
+
+    const totJornadaSemanalInInterval = userTerms.reduce(
+      (totJornadaInterval, term) => {
+        return totJornadaInterval + term.jornadaSemanal;
+      },
+      0,
+    );
+    return totJornadaSemanalInInterval + newJornadaSemanal <= 30;
   }
 }

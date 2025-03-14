@@ -96,6 +96,9 @@ export class InternshipProcessRepository
         user: { ...user },
         termCommitment: { ...termCommitment },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
       include: {
         user: true,
         termCommitment: true,
@@ -142,6 +145,9 @@ export class InternshipProcessRepository
       include: {
         user: true,
         termCommitment: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
       take,
       skip,

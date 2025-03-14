@@ -75,4 +75,28 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
       },
     });
   }
+
+  async findTermsUserInIntervalDates(
+    idUser: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<TermCommitmentEntity[]> {
+    return this.prisma.termCommitment.findMany({
+      where: {
+        id_user: idUser,
+        AND: [
+          {
+            dataInicioEstagio: {
+              lte: endDate,
+            },
+          },
+          {
+            dataFimEstagio: {
+              gte: startDate,
+            },
+          },
+        ],
+      },
+    });
+  }
 }

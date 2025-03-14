@@ -9,6 +9,8 @@ import {
   Request,
   ParseIntPipe,
   Post,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { InternshipProcessFilterByEmployeeDTO } from 'src/modules/intershipProcess/application/dto/internshipProcessFilterByEmployee.dto';
@@ -22,6 +24,8 @@ import { Role } from '@/modules/user/domain/entities/user.entity';
 import { InternshipProcessFilterByStudentDTO } from '@/modules/intershipProcess/application/dto/internshipProcessFilterByStudent.dto';
 import { RegisterEndInternshipProcessDto } from '@/modules/intershipProcess/application/dto/registerEndInternshipProcess.dto';
 import { ValidateAssignEndInternshipProcessDto } from '@/modules/intershipProcess/application/dto/validateAssignEndInternshipProcess.dto';
+import { User } from '@/auth/decorators/user.decorator';
+import { UserFromJwt } from '@/auth/models/UserFromJwt';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
@@ -64,7 +68,15 @@ export class InternshipProcessController {
   async validateAssignEndInternshipProcess(
     @Body()
     validateAssignEndInternshipProcessDto: ValidateAssignEndInternshipProcessDto,
+    @User() user: UserFromJwt,
   ) {
+    if (
+      user.role === Role.ADMINISTRADOR &&
+      !validateAssignEndInternshipProcessDto.remark &&
+      !validateAssignEndInternshipProcessDto.validate
+    ) {
+      throw new HttpException('remark is required', HttpStatus.BAD_REQUEST);
+    }
     await this.internshipProcessService.validateAssignEndInternshipProcess(
       validateAssignEndInternshipProcessDto,
     );
@@ -75,6 +87,7 @@ export class InternshipProcessController {
   async intershipProcessFilter(
     @Query() intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
   ) {
+    console.log('oi');
     return this.internshipProcessService.filterByEmployee(
       intershipProcessFilterDTO,
     );

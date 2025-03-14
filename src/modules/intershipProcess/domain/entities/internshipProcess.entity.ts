@@ -28,6 +28,8 @@ export class InternshipProcessEntity implements InternshipProcessPrisma {
   startDateProcess: Date;
   endDateProcess: Date;
   id_user: string | null;
+  createdAt: Date;
+  updatedAt: Date;
   user?: User;
   id_termCommitment: string | null;
   termCommitment?: TermCommitmentEntity;
