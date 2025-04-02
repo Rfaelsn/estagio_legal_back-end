@@ -33,11 +33,11 @@ export class InternshipProcessService {
   ) {}
 
   async create(idTermCommitment: string, idUser: string) {
-    const createIntershipProcessUsecase = new CreateInternshipProcessUseCase(
+    const createInternshipProcessUseCase = new CreateInternshipProcessUseCase(
       this.internshipProcessRepository,
     );
 
-    const intershipProcess = await createIntershipProcessUsecase.handle(
+    const internshipProcess = await createInternshipProcessUseCase.handle(
       idTermCommitment,
       idUser,
     );
@@ -54,7 +54,7 @@ export class InternshipProcessService {
       'novo processo de estágio cadastrado',
     );
 
-    return intershipProcess;
+    return internshipProcess;
   }
 
   async updateInternshipProcess(

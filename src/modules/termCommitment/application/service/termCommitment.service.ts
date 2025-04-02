@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { TermCommitmentRepository } from '../../adapter/repository/termCommitment.repository';
-import { CreateTermCommitmentUsecase } from '../../domain/usecase/createTermCommitment.usecase';
+import { CreateTermCommitmentUseCase } from '../../domain/usecase/createTermCommitment.usecase';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '../dto/LinkTermCommitmentFilePath.dto';
 import { InternshipProcessService } from 'src/modules/intershipProcess/application/service/intershipProcess.service';
@@ -41,7 +41,7 @@ export class TermCommitmentService {
         createTermCommitmentDTO.dataFimEstagio,
       )
     ) {
-      const createTermCommitmentUsecase = new CreateTermCommitmentUsecase(
+      const createTermCommitmentUsecase = new CreateTermCommitmentUseCase(
         this.termCommitmentRepository,
       );
       const termCommitment = await createTermCommitmentUsecase.handle(

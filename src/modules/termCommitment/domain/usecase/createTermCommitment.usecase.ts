@@ -1,7 +1,7 @@
 import { CreateTermCommitmentDTO } from '../../application/dto/createTermCommitment.dto';
 import { ITermCommitmentRepository } from '../port/ITermCommitmentRepository.port';
 
-export class CreateTermCommitmentUsecase {
+export class CreateTermCommitmentUseCase {
   constructor(
     private readonly termCommitmentRepository: ITermCommitmentRepository,
   ) {}
