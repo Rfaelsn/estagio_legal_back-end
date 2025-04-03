@@ -1,8 +1,8 @@
-import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
+import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
 export class FindInternshipProcessByIdUsecase {
   constructor(
-    private readonly intershipProcessRepository: IInternshipProcessRepository,
+    private readonly intershipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
   async handle(id: string) {

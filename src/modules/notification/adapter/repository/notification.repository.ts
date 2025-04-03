@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { CreateNotificationDTO } from '../../application/dto/createNotification.dto';
 import { FindLatestNotificationsByUserIdDTO } from '../../application/dto/findLatestNotificationsByUserId.dto';
-import { INotificationRepository } from '../../domain/port/notificationRepository.interface';
+import { INotificationRepository } from '../../domain/port/notificationRepository.port';
 
 @Injectable()
 export class NotificationsRepository implements INotificationRepository {

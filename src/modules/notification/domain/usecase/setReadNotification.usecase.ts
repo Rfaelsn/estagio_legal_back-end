@@ -1,5 +1,5 @@
 import { CreateNotificationDTO } from '../../application/dto/createNotification.dto';
-import { INotificationRepository } from '../port/notificationRepository.interface';
+import { INotificationRepository } from '../port/notificationRepository.port';
 
 export class SetReadNotificationUsecase {
   constructor(

@@ -13,31 +13,33 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
-import { InternshipProcessFilterByEmployeeDTO } from 'src/modules/intershipProcess/application/dto/internshipProcessFilterByEmployee.dto';
-import { InternshipProcessService } from 'src/modules/intershipProcess/application/service/intershipProcess.service';
-import { FindInternshipProcessByQueryDTO } from 'src/modules/intershipProcess/application/dto/findInternshipProcessByQuery.dto';
 
-import { UpdateIntershipProcessDTO } from 'src/modules/intershipProcess/application/dto/updateInternshiProcess.dto';
 import { RoleGuard } from '@/auth/guards/role.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { Role } from '@/modules/user/domain/entities/user.entity';
-import { InternshipProcessFilterByStudentDTO } from '@/modules/intershipProcess/application/dto/internshipProcessFilterByStudent.dto';
-import { RegisterEndInternshipProcessDto } from '@/modules/intershipProcess/application/dto/registerEndInternshipProcess.dto';
-import { ValidateAssignEndInternshipProcessDto } from '@/modules/intershipProcess/application/dto/validateAssignEndInternshipProcess.dto';
 import { User } from '@/auth/decorators/user.decorator';
 import { UserFromJwt } from '@/auth/models/UserFromJwt';
+import { InternshipProcessService } from '@/modules/internshipProcess/application/service/internshipProcess.service';
+import { UpdateInternshipProcessDTO } from '@/modules/internshipProcess/application/dto/updateInternshipProcess.dto';
+import { ValidateAssignEndInternshipProcessDto } from '@/modules/internshipProcess/application/dto/validateAssignEndInternshipProcess.dto';
+import { RegisterEndInternshipProcessDto } from '@/modules/internshipProcess/application/dto/registerEndInternshipProcess.dto';
+import { InternshipProcessFilterByStudentDTO } from '@/modules/internshipProcess/application/dto/internshipProcessFilterByStudent.dto';
+import { InternshipProcessFilterByEmployeeDTO } from '@/modules/internshipProcess/application/dto/internshipProcessFilterByEmployee.dto';
+import { FindInternshipProcessByQueryDTO } from '@/modules/internshipProcess/application/dto/findInternshipProcessByQuery.dto';
+import { InternshipProcessControllerPort } from '@/modules/internshipProcess/domain/port/internshipProcessController.port';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
-export class InternshipProcessController {
+export class InternshipProcessController
+  implements InternshipProcessControllerPort
+{
   constructor(
     private readonly internshipProcessService: InternshipProcessService,
   ) {}
-
   @IsPublic()
   @Patch('update/status')
   async updateInternshipProcess(
-    @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+    @Body() updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
   ) {
     return await this.internshipProcessService.updateInternshipProcess(
       updateInternshipProcessStatusDTO,
@@ -45,8 +47,8 @@ export class InternshipProcessController {
   }
 
   @Patch('register/response/submit/docs')
-  async registerRenovationByAluno(
-    @Body() updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
+  async registerRenovationByStudent(
+    @Body() updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
   ) {
     return await this.internshipProcessService.updateInternshipProcess(
       updateInternshipProcessStatusDTO,
@@ -55,7 +57,7 @@ export class InternshipProcessController {
 
   @Roles(Role.ALUNO)
   @Post('register/assign-end-internship')
-  async registerEndInternshipByAluno(
+  async registerEndInternshipByStudent(
     @Body() registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
   ) {
     await this.internshipProcessService.registerEndInternshipProcess(
@@ -84,18 +86,18 @@ export class InternshipProcessController {
 
   @Roles(Role.ADMINISTRADOR)
   @Get('filter')
-  async intershipProcessFilter(
-    @Query() intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+  async internshipProcessFilter(
+    @Query() internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
   ) {
     console.log('oi');
     return this.internshipProcessService.filterByEmployee(
-      intershipProcessFilterDTO,
+      internshipProcessFilterDTO,
     );
   }
 
   @Roles(Role.ALUNO)
   @Get('filter/my-process')
-  async intershipProcessFilterByStudent(
+  async internshipProcessFilterByStudent(
     @Query()
     internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
     @Request() req,

@@ -1,13 +1,13 @@
-import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
+import { CreateInternshipProcessDTO } from '../../application/dto/input/internshipProcess.dto';
 import {
   InternshipProcessMovement,
   InternshipProcessStatus,
 } from '../entities/internshipProcess.entity';
-import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
+import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
 export class CreateInternshipProcessUseCase {
   constructor(
-    private readonly interNshipProcessRepository: IInternshipProcessRepository,
+    private readonly interNshipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
   async handle(idTermCommitment: string, idUser: string) {

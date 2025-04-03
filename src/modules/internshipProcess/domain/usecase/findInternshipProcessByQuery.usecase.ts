@@ -1,9 +1,9 @@
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
+import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
 export class FindInternshipProcessByQueryUsecase {
   constructor(
-    private readonly intershipProcessRepository: IInternshipProcessRepository,
+    private readonly intershipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
   async handle(

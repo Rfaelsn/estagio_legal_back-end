@@ -4,7 +4,7 @@ import {
   InternshipProcessStatus,
 } from '../../domain/entities/internshipProcess.entity';
 
-export class UpdateIntershipProcessDTO {
+export class UpdateInternshipProcessDTO {
   @IsString()
   id: string;
 

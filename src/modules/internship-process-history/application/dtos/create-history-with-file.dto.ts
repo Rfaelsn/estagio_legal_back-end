@@ -1,7 +1,7 @@
 import {
   InternshipProcessMovement,
   InternshipProcessStatus,
-} from '@/modules/intershipProcess/domain/entities/internshipProcess.entity';
+} from '@/modules/internshipProcess/domain/entities/internshipProcess.entity';
 import { IsArray, IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateHistoryWithFileDto {

@@ -1,35 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
+import { CreateInternshipProcessDTO } from '../../application/dto/input/internshipProcess.dto';
 import {
   InternshipProcessEntity,
   InternshipProcessMovement,
   InternshipProcessStatus,
 } from '../../domain/entities/internshipProcess.entity';
-import { IInternshipProcessRepository } from '../../domain/port/intershipProcessRepository.port';
+import { InternshipProcessRepositoryPort } from '../../domain/port/internshipProcessRepository.port';
 
 import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
 import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
-import { UpdateIntershipProcessDTO } from '../../application/dto/updateInternshiProcess.dto';
+import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
 import { InternshipProcessFilterByStudentDTO } from '../../application/dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
 export class InternshipProcessRepository
-  implements IInternshipProcessRepository
+  implements InternshipProcessRepositoryPort
 {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
-    createIntershipProcessDTO: CreateInternshipProcessDTO,
+    createInternshipProcessDTO: CreateInternshipProcessDTO,
   ): Promise<InternshipProcessEntity> {
-    const newIntershipProcess = await this.prisma.internshipProcess.create({
+    const newInternshipProcess = await this.prisma.internshipProcess.create({
       data: {
-        movement: createIntershipProcessDTO.movement,
-        status: createIntershipProcessDTO.status,
+        movement: createInternshipProcessDTO.movement,
+        status: createInternshipProcessDTO.status,
         startDateProcess: new Date(),
-        id_user: createIntershipProcessDTO.id_user,
-        id_termCommitment: createIntershipProcessDTO.id_termCommitment,
+        id_user: createInternshipProcessDTO.id_user,
+        id_termCommitment: createInternshipProcessDTO.id_termCommitment,
       },
       include: {
         termCommitment: true,
@@ -37,12 +37,12 @@ export class InternshipProcessRepository
       },
     });
 
-    return newIntershipProcess;
+    return newInternshipProcess;
   }
 
   async updateInternshipProcess(
-    updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
-  ) {
+    updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+  ): Promise<boolean> {
     let prismaData: Prisma.InternshipProcessUpdateInput;
     if (updateInternshipProcessStatusDTO.status === 'CONCLUÍDO') {
       prismaData = {
@@ -65,7 +65,7 @@ export class InternshipProcessRepository
   }
 
   async filter(
-    intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
   ): Promise<InternshipProcessEntity[]> {
     const {
       user,
@@ -77,7 +77,7 @@ export class InternshipProcessRepository
       endDateProcessRangeStart,
       endDateProcessRangeEnd,
       ...rest
-    } = intershipProcessFilterDTO;
+    } = internshipProcessFilterDTO;
 
     const take: number = pageSize || 10;
     const skip: number = page ? (page - 1) * take : 0;
@@ -111,7 +111,7 @@ export class InternshipProcessRepository
   }
 
   async filterByStudent(
-    intershipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
+    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
   ): Promise<InternshipProcessEntity[]> {
     const {
       idUser,
@@ -123,7 +123,7 @@ export class InternshipProcessRepository
       endDateProcessRangeStart,
       endDateProcessRangeEnd,
       ...rest
-    } = intershipProcessFilterByStudentDto;
+    } = internshipProcessFilterByStudentDto;
 
     const take: number = pageSize || 10;
     const skip: number = page ? (page - 1) * take : 0;

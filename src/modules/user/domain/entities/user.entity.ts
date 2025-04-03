@@ -1,5 +1,5 @@
+import { InternshipProcessEntity } from '@/modules/internshipProcess/domain/entities/internshipProcess.entity';
 import { File } from '@prisma/client';
-import { InternshipProcessEntity } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
 import { TermCommitmentEntity } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
 import { v4 as uuidv4 } from 'uuid';
 

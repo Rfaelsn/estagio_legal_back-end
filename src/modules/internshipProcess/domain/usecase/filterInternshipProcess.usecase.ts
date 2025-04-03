@@ -1,9 +1,9 @@
 import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
-import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
+import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
-export class FilterInternshipProcessUsecase {
+export class FilterInternshipProcessUseCase {
   constructor(
-    private readonly intershipProcessRepository: IInternshipProcessRepository,
+    private readonly intershipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
   async handle(

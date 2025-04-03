@@ -1,5 +1,5 @@
 import { FindLatestNotificationsByUserIdDTO } from '../../application/dto/findLatestNotificationsByUserId.dto';
-import { INotificationRepository } from '../port/notificationRepository.interface';
+import { INotificationRepository } from '../port/notificationRepository.port';
 
 export class FindLatestNotificationsByUserIdUsecase {
   constructor(

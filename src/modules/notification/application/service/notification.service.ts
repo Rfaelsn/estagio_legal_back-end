@@ -6,9 +6,10 @@ import { NotificationsRepository } from '../../adapter/repository/notification.r
 import { FindLatestNotificationsByUserIdDTO } from '../dto/findLatestNotificationsByUserId.dto';
 import { FindLatestNotificationsByUserIdUsecase } from '../../domain/usecase/findLatestNotificationsByUserId.usecase';
 import { SetReadNotificationUsecase } from '../../domain/usecase/setReadNotification.usecase';
+import { INotificationServicePort } from '../../domain/port/INotificationService.port';
 
 @Injectable()
-export class NotificationService {
+export class NotificationService implements INotificationServicePort {
   constructor(
     private readonly notificationRepository: NotificationsRepository,
   ) {}

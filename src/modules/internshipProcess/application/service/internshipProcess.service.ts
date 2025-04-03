@@ -1,38 +1,46 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
-import { InternshipProcessRepository } from '../../adapter/repository/intershipProcess.repository';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   InternshipProcessEntity,
   InternshipProcessMovement,
   InternshipProcessStatus,
 } from '../../domain/entities/internshipProcess.entity';
 import { CreateInternshipProcessUseCase } from '../../domain/usecase/creatIntershipProcess.usecase';
-import { FilterInternshipProcessUsecase } from '../../domain/usecase/filterInternshipProcess.usecase';
+import { FilterInternshipProcessUseCase } from '../../domain/usecase/filterInternshipProcess.usecase';
 import { FindInternshipProcessByIdUsecase } from '../../domain/usecase/findByIdInternshipProcess.usecase';
 import { FindInternshipProcessByQueryUsecase } from '../../domain/usecase/findInternshipProcessByQuery.usecase';
 import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQuery.dto';
 import { InternshipProcessFilterByEmployeeDTO } from '../dto/internshipProcessFilterByEmployee.dto';
-import { UpdateIntershipProcessDTO } from '../dto/updateInternshiProcess.dto';
-import { NotificationService } from 'src/modules/notification/application/service/notification.service';
+import { UpdateInternshipProcessDTO } from '../dto/updateInternshipProcess.dto';
 import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
-import { FileService } from 'src/modules/file/application/services/file.service';
 import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 import { RegisterEndInternshipProcessDto } from '../dto/registerEndInternshipProcess.dto';
 import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
 import { ValidateAssignEndInternshipProcessDto } from '../dto/validateAssignEndInternshipProcess.dto';
+import { InternshipProcessRepositoryPort } from '../../domain/port/internshipProcessRepository.port';
+import { IFileServicePort } from '@/modules/file/domain/ports/IFileService.port';
+import { INotificationServicePort } from '@/modules/notification/domain/port/INotificationService.port';
+import { InternshipProcessServicePort } from '../../domain/port/internshipProcessService.port';
 
 @Injectable()
-export class InternshipProcessService {
+export class InternshipProcessService implements InternshipProcessServicePort {
   constructor(
-    private readonly internshipProcessRepository: InternshipProcessRepository,
-    @Inject(forwardRef(() => TermCommitmentService))
-    private readonly termCommitmentService: TermCommitmentService,
-    private readonly fileService: FileService,
-    private readonly notificationService: NotificationService,
+    @Inject('InternshipProcessRepository')
+    private internshipProcessRepository: InternshipProcessRepositoryPort,
+
+    @Inject('FileService')
+    private readonly fileService: IFileServicePort,
+
+    @Inject('NotificationService')
+    private readonly notificationService: INotificationServicePort,
+
+    @Inject('InternshipProcessHistoryService')
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
   ) {}
 
-  async create(idTermCommitment: string, idUser: string) {
+  async create(
+    idTermCommitment: string,
+    idUser: string,
+  ): Promise<InternshipProcessEntity> {
     const createInternshipProcessUseCase = new CreateInternshipProcessUseCase(
       this.internshipProcessRepository,
     );
@@ -42,38 +50,31 @@ export class InternshipProcessService {
       idUser,
     );
 
-    // await this.internshipProcessHistoryService.registerHistory({
-    //   status: InternshipProcessStatus.EM_ANDAMENTO,
-    //   movement: intershipProcess.movement,
-    //   observacoes: 'registrado pelo aluno',
-    //   idInternshipProcess: intershipProcess.id,
-    // });
-
     this.notificationService.sendNotification(
       idUser,
-      'novo processo de estágio cadastrado',
+      'created new internship process',
     );
 
     return internshipProcess;
   }
 
   async updateInternshipProcess(
-    updateInternshipProcessStatusDTO: UpdateIntershipProcessDTO,
-  ) {
+    updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+  ): Promise<boolean> {
     return await this.internshipProcessRepository.updateInternshipProcess(
       updateInternshipProcessStatusDTO,
     );
   }
 
   async filterByEmployee(
-    intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
   ): Promise<InternshipProcessEntity[]> {
-    const filterInternshipProcessUsecase = new FilterInternshipProcessUsecase(
+    const filterInternshipProcessUseCase = new FilterInternshipProcessUseCase(
       this.internshipProcessRepository,
     );
 
-    const internshipProcess = await filterInternshipProcessUsecase.handle(
-      intershipProcessFilterDTO,
+    const internshipProcess = await filterInternshipProcessUseCase.handle(
+      internshipProcessFilterDTO,
     );
     return internshipProcess;
   }

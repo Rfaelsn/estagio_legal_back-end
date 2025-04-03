@@ -49,7 +49,7 @@ export class termCommitmentController {
   @Roles(Role.ALUNO)
   @Post('register/assign')
   async registerAssign(@Body() registerAssignDto: RegisterAssignDto) {
-    await this.termCommitmentService.registerAssignTermByAluno(
+    await this.termCommitmentService.registerAssignTermByStudent(
       registerAssignDto,
     );
   }

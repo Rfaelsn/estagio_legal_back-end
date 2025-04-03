@@ -1,17 +1,19 @@
-import { CreateInternshipProcessDTO } from '../../application/dto/input/intershipProcess.dto';
-import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
+import { CreateInternshipProcessDTO } from '../../application/dto/input/internshipProcess.dto';
+import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
-export class CreateIntershipProcessByTermCommitmentUsecase {
+export class CreateInternshipProcessByTermCommitmentUseCase {
   constructor(
-    private readonly intershipProcessRepository: IInternshipProcessRepository,
+    private readonly internshipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
-  async handle(createIntershipProcessDTO: CreateInternshipProcessDTO) {
+  async handle(createInternshipProcessDTO: CreateInternshipProcessDTO) {
     try {
-      const createIntershipProcess =
-        await this.intershipProcessRepository.create(createIntershipProcessDTO);
+      const createInternshipProcess =
+        await this.internshipProcessRepository.create(
+          createInternshipProcessDTO,
+        );
 
-      return createIntershipProcess;
+      return createInternshipProcess;
     } catch (error) {
       console.error(error);
     }

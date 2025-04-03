@@ -9,42 +9,44 @@ import { TermCommitmentRepository } from '../../adapter/repository/termCommitmen
 import { CreateTermCommitmentUseCase } from '../../domain/usecase/createTermCommitment.usecase';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '../dto/LinkTermCommitmentFilePath.dto';
-import { InternshipProcessService } from 'src/modules/intershipProcess/application/service/intershipProcess.service';
 import { InternshipProcessHistoryService } from '@/modules/internship-process-history/application/services/internship-process-history.service';
-import {
-  InternshipProcessMovement,
-  InternshipProcessStatus,
-} from '@/modules/intershipProcess/domain/entities/internshipProcess.entity';
 import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
 import { FileService } from '@/modules/file/application/services/file.service';
 import { FileType } from '@/modules/file/domain/entities/file.entity';
 import { RegisterAssignDto } from '../dto/register-assign.dto';
 import { ValidateAssignTermDto } from '../dto/validate-assign-term.dto';
 import { UpdateTermInfoDto } from '../dto/updateTermInfo.dto';
+import {
+  InternshipProcessMovement,
+  InternshipProcessStatus,
+} from '@/modules/internshipProcess/domain/entities/internshipProcess.entity';
+import { InternshipProcessService } from '@/modules/internshipProcess/application/service/internshipProcess.service';
+import { ITermCommitmentService } from '../../domain/port/ITermCommitmentService.port';
+import { InternshipProcessServicePort } from '@/modules/internshipProcess/domain/port/internshipProcessService.port';
 
 @Injectable()
-export class TermCommitmentService {
+export class TermCommitmentService implements ITermCommitmentService {
   constructor(
     private readonly termCommitmentRepository: TermCommitmentRepository,
     @Inject(forwardRef(() => InternshipProcessService))
-    private readonly internshipProcessService: InternshipProcessService,
+    private readonly internshipProcessService: InternshipProcessServicePort,
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
     private readonly fileService: FileService,
   ) {}
 
   async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {
     if (
-      await this.isValidJornadaSemanalLimit(
+      await this.isValidWeeklyWorkloadLimit(
         createTermCommitmentDTO.id_user,
         createTermCommitmentDTO.jornadaSemanal,
         createTermCommitmentDTO.dataInicioEstagio,
         createTermCommitmentDTO.dataFimEstagio,
       )
     ) {
-      const createTermCommitmentUsecase = new CreateTermCommitmentUseCase(
+      const createTermCommitmentUseCase = new CreateTermCommitmentUseCase(
         this.termCommitmentRepository,
       );
-      const termCommitment = await createTermCommitmentUsecase.handle(
+      const termCommitment = await createTermCommitmentUseCase.handle(
         createTermCommitmentDTO,
       );
 
@@ -77,7 +79,7 @@ export class TermCommitmentService {
     );
   }
 
-  async registerAssignTermByAluno(
+  async registerAssignTermByStudent(
     registerAssignDto: RegisterAssignDto,
   ): Promise<void> {
     const registeredFile = await this.fileService.registerFilePathProcess({
@@ -192,9 +194,9 @@ export class TermCommitmentService {
     );
   }
 
-  async isValidJornadaSemanalLimit(
+  async isValidWeeklyWorkloadLimit(
     idUser: string,
-    newJornadaSemanal: number,
+    newWeeklyWorkload: number,
     startDateNewInternship: Date,
     endDateNewInternship: Date,
   ): Promise<boolean> {
@@ -205,12 +207,12 @@ export class TermCommitmentService {
         endDateNewInternship,
       );
 
-    const totJornadaSemanalInInterval = userTerms.reduce(
-      (totJornadaInterval, term) => {
-        return totJornadaInterval + term.jornadaSemanal;
+    const totWeeklyWorkloadInInterval = userTerms.reduce(
+      (totWeeklyWorkloadInterval, term) => {
+        return totWeeklyWorkloadInterval + term.jornadaSemanal;
       },
       0,
     );
-    return totJornadaSemanalInInterval + newJornadaSemanal <= 30;
+    return totWeeklyWorkloadInInterval + newWeeklyWorkload <= 30;
   }
 }

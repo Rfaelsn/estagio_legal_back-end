@@ -5,10 +5,10 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { UserModule } from './modules/user/user.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { InternshipProcessModule } from './modules/intershipProcess/intershipProcess.module';
 // import { InternshipGrantorModule } from './modules/internshipGrantor/internshipGrantor.module';
 import { TermCommitmentModule } from './modules/termCommitment/termCommitment.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { InternshipProcessModule } from './modules/internshipProcess/intershipProcess.module';
 
 @Module({
   imports: [

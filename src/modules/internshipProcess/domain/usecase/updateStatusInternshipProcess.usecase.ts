@@ -1,12 +1,12 @@
-import { UpdateIntershipProcessDTO } from '../../application/dto/updateInternshiProcess.dto';
-import { IInternshipProcessRepository } from '../port/intershipProcessRepository.port';
+import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
+import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
 export class UpdateStatusInternshipProcessUsecase {
   constructor(
-    private readonly intershipProcessRepository: IInternshipProcessRepository,
+    private readonly intershipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
-  async handle(updateIntershipProcessDTO: UpdateIntershipProcessDTO) {
+  async handle(updateIntershipProcessDTO: UpdateInternshipProcessDTO) {
     try {
       this.intershipProcessRepository.updateInternshipProcess(
         updateIntershipProcessDTO,
