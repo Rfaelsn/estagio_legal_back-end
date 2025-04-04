@@ -123,13 +123,13 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
     await this.updateInternshipProcess({
       id: registerEndInternshipProcessDto.internshipProcessId,
-      status: InternshipProcessStatus.EM_ANALISE,
-      movement: InternshipProcessMovement.FIM_ESTAGIO,
+      status: InternshipProcessStatus.UNDER_REVIEW,
+      movement: InternshipProcessMovement.STAGE_END,
     });
 
     const newHistory: CreateInternshipProcessHistoryDto = {
-      movement: InternshipProcessMovement.FIM_ESTAGIO,
-      status: InternshipProcessStatus.EM_ANALISE,
+      movement: InternshipProcessMovement.STAGE_END,
+      status: InternshipProcessStatus.UNDER_REVIEW,
       idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
       fileIds: registeredFiles.map((registeredFile) => {
         return registeredFile.id;
@@ -159,13 +159,13 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
       this.updateInternshipProcess({
         id: validateAssignEndInternshipProcessDto.internshipProcessId,
-        status: InternshipProcessStatus.CONCLUIDO,
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
+        status: InternshipProcessStatus.COMPLETED,
+        movement: InternshipProcessMovement.STAGE_END,
       });
 
       const newHistory: CreateInternshipProcessHistoryDto = {
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
-        status: InternshipProcessStatus.CONCLUIDO,
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.COMPLETED,
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
         fileIds: [registeredFiles.id],
@@ -182,8 +182,8 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     } else {
       this.updateInternshipProcess({
         id: validateAssignEndInternshipProcessDto.internshipProcessId,
-        status: InternshipProcessStatus.RECUSADO,
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
+        status: InternshipProcessStatus.REJECTED,
+        movement: InternshipProcessMovement.STAGE_END,
       });
 
       this.internshipProcessHistoryService.updateHistory({
@@ -193,11 +193,11 @@ export class InternshipProcessService implements InternshipProcessServicePort {
       });
 
       const newHistory: CreateInternshipProcessHistoryDto = {
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
-        status: InternshipProcessStatus.RECUSADO,
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.REJECTED,
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
-        observacoes: validateAssignEndInternshipProcessDto.remark,
+        observations: validateAssignEndInternshipProcessDto.remark,
       };
 
       this.internshipProcessHistoryService.registerHistory(newHistory);

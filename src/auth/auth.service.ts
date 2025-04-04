@@ -6,21 +6,19 @@ import {
 import { UserPayload } from './models/UserPayload';
 import { UserToken } from './models/UserToken';
 import * as bcrypt from 'bcrypt';
-import { HttpService } from '@nestjs/axios';
 import { UnauthorizedError } from './errors/unauthorized.error';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@/modules/user/domain/entities/user.entity';
 import { UserService } from '@/modules/user/application/service/user.service';
+import { UserEntity } from '@/modules/user/domain/entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly http: HttpService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(user: User): Promise<UserToken> {
+  async login(user: UserEntity): Promise<UserToken> {
     const validatedUser = await this.validateUser(user.email, user.password);
 
     const accessToken = this.generateAccessToken(validatedUser);
@@ -32,7 +30,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(email: string, password: string): Promise<User> {
+  async validateUser(email: string, password: string): Promise<UserEntity> {
     const user = await this.userService.findByEmail(email);
 
     if (user) {
@@ -51,7 +49,7 @@ export class AuthService {
     );
   }
 
-  private generateAccessToken(user: User): string {
+  private generateAccessToken(user: UserEntity): string {
     const payload: UserPayload = {
       role: user.role,
       sub: user.id,
@@ -62,7 +60,7 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  private generateRefreshToken(user: User): string {
+  private generateRefreshToken(user: UserEntity): string {
     const payload: UserPayload = {
       role: user.role,
       sub: user.id,
@@ -71,7 +69,7 @@ export class AuthService {
     };
 
     return this.jwtService.sign(payload, {
-      secret: 'aizedamanga',
+      secret: 'secret_in_configService',
       expiresIn: '30d',
     });
   }
@@ -85,10 +83,9 @@ export class AuthService {
 
     try {
       const decodedToken = this.jwtService.verify(refreshToken, {
-        secret: 'aizedamanga',
+        secret: 'secret_in_configService',
       });
 
-      // Se você chegou até aqui, o token é válido
       const email = decodedToken['email'];
       const user = await this.userService.findByEmail(email);
 

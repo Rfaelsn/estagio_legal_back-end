@@ -1,27 +1,23 @@
-import {
-  InternshipProcessHistory,
-  InternshipProcess as InternshipProcessPrisma,
-} from '@prisma/client';
-import { InternshipEvaluation } from 'src/modules/IntershipEvaluation/domain/entities/internshipEvaluation.entity';
+import { UserEntity } from '@/modules/user/domain/entities/user.entity';
+import { InternshipProcessHistory, InternshipProcess } from '@prisma/client';
 import { TermCommitmentEntity } from 'src/modules/termCommitment/domain/entities/termCommitment.entity';
-import { User } from 'src/modules/user/domain/entities/user.entity';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 export enum InternshipProcessStatus {
-  CONCLUIDO = 'CONCLUIDO',
-  EM_ANALISE = 'EM_ANALISE',
-  EM_ANDAMENTO = 'EM_ANDAMENTO',
-  RECUSADO = 'RECUSADO',
+  COMPLETED = 'COMPLETED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  IN_PROGRESS = 'IN_PROGRESS',
+  REJECTED = 'REJECTED',
 }
 
 export enum InternshipProcessMovement {
-  INICIO_ESTAGIO = 'INICIO_DE_ESTAGIO',
-  RENOVACAO = 'RENOVACAO_DE_ESTAGIO',
-  FIM_ESTAGIO = 'FIM_DE_ESTAGIO',
-  CREDITACAO = 'CREDITACAO',
+  STAGE_START = 'INTERNSHIP_START',
+  RENEWAL = 'INTERNSHIP_RENEWAL',
+  STAGE_END = 'INTERNSHIP_END',
+  CREDIT = 'CREDIT',
 }
 
-export class InternshipProcessEntity implements InternshipProcessPrisma {
+export class InternshipProcessEntity implements InternshipProcess {
   id: string;
   movement: string;
   status: string;
@@ -30,16 +26,15 @@ export class InternshipProcessEntity implements InternshipProcessPrisma {
   id_user: string | null;
   createdAt: Date;
   updatedAt: Date;
-  user?: User;
+  user?: UserEntity;
   id_termCommitment: string | null;
   termCommitment?: TermCommitmentEntity;
   statusHistory?: InternshipProcessHistory[];
-  internshipEvaluation?: InternshipEvaluation[];
 
   constructor(props: Omit<InternshipProcessEntity, 'id'>, id?: string) {
     Object.assign(this, props);
     if (!id) {
-      this.id = uuidv4();
+      this.id = uuid();
     } else {
       this.id = id;
     }

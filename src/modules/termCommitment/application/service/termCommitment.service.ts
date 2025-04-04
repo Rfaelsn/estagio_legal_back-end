@@ -38,9 +38,9 @@ export class TermCommitmentService implements ITermCommitmentService {
     if (
       await this.isValidWeeklyWorkloadLimit(
         createTermCommitmentDTO.id_user,
-        createTermCommitmentDTO.jornadaSemanal,
-        createTermCommitmentDTO.dataInicioEstagio,
-        createTermCommitmentDTO.dataFimEstagio,
+        createTermCommitmentDTO.weeklyWorkload,
+        createTermCommitmentDTO.internshipStartDate,
+        createTermCommitmentDTO.internshipEndDate,
       )
     ) {
       const createTermCommitmentUseCase = new CreateTermCommitmentUseCase(
@@ -57,10 +57,10 @@ export class TermCommitmentService implements ITermCommitmentService {
 
       const outputDto = {
         ...termCommitment,
-        dataInicioEstagio: termCommitment.dataInicioEstagio
+        internshipStartDate: termCommitment.internshipStartDate
           .toISOString()
           .split('Z')[0],
-        dataFimEstagio: termCommitment.dataFimEstagio
+        internshipEndDate: termCommitment.internshipEndDate
           .toISOString()
           .split('Z')[0],
         internshipProcessId: id,
@@ -71,9 +71,9 @@ export class TermCommitmentService implements ITermCommitmentService {
 
     throw new HttpException(
       `A jornada semanal ultrapassa o limite permitido de 30 horas. verifique a jornada semanal de seus processos no intervalo de ${new Date(
-        createTermCommitmentDTO.dataInicioEstagio.toISOString().split('Z')[0],
+        createTermCommitmentDTO.internshipStartDate.toISOString().split('Z')[0],
       ).toLocaleDateString('pt-BR')} a ${new Date(
-        createTermCommitmentDTO.dataFimEstagio.toISOString().split('Z')[0],
+        createTermCommitmentDTO.internshipEndDate.toISOString().split('Z')[0],
       ).toLocaleDateString('pt-BR')}`,
       HttpStatus.BAD_REQUEST,
     );
@@ -89,13 +89,13 @@ export class TermCommitmentService implements ITermCommitmentService {
 
     this.internshipProcessService.updateInternshipProcess({
       id: registerAssignDto.internshipProcessId,
-      status: InternshipProcessStatus.EM_ANALISE,
-      movement: InternshipProcessMovement.INICIO_ESTAGIO,
+      status: InternshipProcessStatus.UNDER_REVIEW,
+      movement: InternshipProcessMovement.STAGE_START,
     });
 
     const newHistory: CreateInternshipProcessHistoryDto = {
-      movement: InternshipProcessMovement.INICIO_ESTAGIO,
-      status: InternshipProcessStatus.EM_ANALISE,
+      movement: InternshipProcessMovement.STAGE_START,
+      status: InternshipProcessStatus.UNDER_REVIEW,
       idInternshipProcess: registerAssignDto.internshipProcessId,
       fileIds: [registeredFile.id],
     };
@@ -120,13 +120,13 @@ export class TermCommitmentService implements ITermCommitmentService {
 
       this.internshipProcessService.updateInternshipProcess({
         id: validateAssignTermDto.internshipProcessId,
-        status: InternshipProcessStatus.CONCLUIDO,
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
+        status: InternshipProcessStatus.COMPLETED,
+        movement: InternshipProcessMovement.STAGE_START,
       });
 
       const newHistory: CreateInternshipProcessHistoryDto = {
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
-        status: InternshipProcessStatus.CONCLUIDO,
+        movement: InternshipProcessMovement.STAGE_START,
+        status: InternshipProcessStatus.COMPLETED,
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
         fileIds: [registeredFile.id],
       };
@@ -141,8 +141,8 @@ export class TermCommitmentService implements ITermCommitmentService {
     } else {
       this.internshipProcessService.updateInternshipProcess({
         id: validateAssignTermDto.internshipProcessId,
-        status: InternshipProcessStatus.RECUSADO,
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
+        status: InternshipProcessStatus.REJECTED,
+        movement: InternshipProcessMovement.STAGE_START,
       });
 
       this.internshipProcessHistoryService.updateHistory({
@@ -151,10 +151,10 @@ export class TermCommitmentService implements ITermCommitmentService {
       });
 
       const newHistory: CreateInternshipProcessHistoryDto = {
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
-        status: InternshipProcessStatus.RECUSADO,
+        movement: InternshipProcessMovement.STAGE_START,
+        status: InternshipProcessStatus.REJECTED,
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
-        observacoes: validateAssignTermDto.remark,
+        observations: validateAssignTermDto.remark,
       };
 
       this.internshipProcessHistoryService.registerHistory(newHistory);
@@ -173,19 +173,17 @@ export class TermCommitmentService implements ITermCommitmentService {
     idTerm: string,
     updateTermInfoDto: UpdateTermInfoDto,
   ): Promise<any> {
-    //procurar id do processo pelo id do termo ou pegar do dto
     await this.internshipProcessHistoryService.registerHistory({
-      status: InternshipProcessStatus.EM_ANDAMENTO,
-      movement: InternshipProcessMovement.INICIO_ESTAGIO,
-      observacoes: 'atualizado pelo aluno',
+      status: InternshipProcessStatus.IN_PROGRESS,
+      movement: InternshipProcessMovement.STAGE_START,
+      observations: 'atualizado pelo aluno',
       idInternshipProcess: updateTermInfoDto.internshipProcessId,
     });
 
-    //atualizar o processo também entidade processo
     this.internshipProcessService.updateInternshipProcess({
       id: updateTermInfoDto.internshipProcessId,
-      status: InternshipProcessStatus.EM_ANDAMENTO,
-      movement: InternshipProcessMovement.INICIO_ESTAGIO,
+      status: InternshipProcessStatus.IN_PROGRESS,
+      movement: InternshipProcessMovement.STAGE_START,
     });
 
     return await this.termCommitmentRepository.update(
@@ -209,7 +207,7 @@ export class TermCommitmentService implements ITermCommitmentService {
 
     const totWeeklyWorkloadInInterval = userTerms.reduce(
       (totWeeklyWorkloadInterval, term) => {
-        return totWeeklyWorkloadInterval + term.jornadaSemanal;
+        return totWeeklyWorkloadInterval + term.weeklyWorkload;
       },
       0,
     );

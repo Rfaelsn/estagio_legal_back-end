@@ -1,11 +1,11 @@
 import { IUserRepository } from '../port/user-repository.port';
-import { User } from '../entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 
 export class FindUserByEmailUsecase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async handle(email: string): Promise<User> {
-    const user: User = await this.userRepository.getByEmail(email);
+  async handle(email: string): Promise<UserEntity> {
+    const user: UserEntity = await this.userRepository.getByEmail(email);
     return user;
   }
 }

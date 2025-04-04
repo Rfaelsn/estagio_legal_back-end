@@ -2,7 +2,7 @@ import { IsEmail, IsString, IsEnum } from 'class-validator';
 import { Role } from '../../domain/entities/user.entity';
 import { IsCPF } from 'src/shared/decorators/isCpf.decorator';
 
-export class CreateAlunoDTO {
+export class CreateStudentDTO {
   @IsString()
   name: string;
 
@@ -16,7 +16,7 @@ export class CreateAlunoDTO {
   email: string;
 
   @IsString()
-  telefone: string;
+  telephone: string;
 
   @IsString()
   courseStudy?: string;

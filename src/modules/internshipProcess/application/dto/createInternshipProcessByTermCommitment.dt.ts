@@ -29,7 +29,4 @@ export class CreateIntershipProcessByTermCommitmentDTO
 
   @IsOptional()
   termCommitment?: TermCommitmentDTO;
-
-  @IsOptional()
-  internshipEvaluation?: Prisma.InternshipEvaluationUncheckedCreateNestedManyWithoutInternshipProcessInput;
 }

@@ -8,9 +8,10 @@ export class CreateTermCommitmentUseCase {
 
   async handle(createTermCommitmentDTO: CreateTermCommitmentDTO) {
     try {
-      if (createTermCommitmentDTO.isObrigatorio) {
-        createTermCommitmentDTO.numApoliceSeguro = '1234';
-        createTermCommitmentDTO.nomeSeguradora = 'seguradora do balaco baco';
+      if (createTermCommitmentDTO.isMandatory) {
+        createTermCommitmentDTO.insurancePolicyNumber = '1234';
+        createTermCommitmentDTO.insuranceCompanyName =
+          'seguradora do balaco baco';
       }
       const createTermCommitment = await this.termCommitmentRepository.create(
         createTermCommitmentDTO,

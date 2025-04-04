@@ -55,7 +55,7 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ALUNO)
+  @Roles(Role.STUDENT)
   @Post('register/assign-end-internship')
   async registerEndInternshipByStudent(
     @Body() registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
@@ -65,7 +65,7 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ADMINISTRADOR, Role.FUNCIONARIO)
+  @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE)
   @Post('validate/assign-end-internship')
   async validateAssignEndInternshipProcess(
     @Body()
@@ -73,7 +73,7 @@ export class InternshipProcessController
     @User() user: UserFromJwt,
   ) {
     if (
-      user.role === Role.ADMINISTRADOR &&
+      user.role === Role.ADMINISTRATOR &&
       !validateAssignEndInternshipProcessDto.remark &&
       !validateAssignEndInternshipProcessDto.validate
     ) {
@@ -84,7 +84,7 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ADMINISTRADOR)
+  @Roles(Role.ADMINISTRATOR)
   @Get('filter')
   async internshipProcessFilter(
     @Query() internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
@@ -95,7 +95,7 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ALUNO)
+  @Roles(Role.STUDENT)
   @Get('filter/my-process')
   async internshipProcessFilterByStudent(
     @Query()
@@ -108,7 +108,7 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ALUNO)
+  @Roles(Role.STUDENT)
   @Get('elegible-for-completation')
   async findEligibleProcessesForCompletion(
     @Request() req,

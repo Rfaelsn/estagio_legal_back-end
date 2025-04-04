@@ -4,12 +4,11 @@ export class InternshipProcessHistoryEntity
   implements InternshipProcessHistory
 {
   id: string;
-  startDate: Date | null;
-  endDate: Date;
+  startDate: Date;
+  endDate: Date | null;
   status: string;
   movement: string;
   description: string;
-  observacoes: string | null;
-  fileId: string;
+  observations: string | null;
   idInternshipProcess: string;
 }

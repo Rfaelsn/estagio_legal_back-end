@@ -167,8 +167,8 @@ export class InternshipProcessRepository
     const internshipProcess = await this.prisma.internshipProcess.findMany({
       where: {
         user: { id: userId },
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
-        status: InternshipProcessStatus.CONCLUIDO,
+        movement: InternshipProcessMovement.STAGE_START,
+        status: InternshipProcessStatus.COMPLETED,
       },
       include: {
         user: true,

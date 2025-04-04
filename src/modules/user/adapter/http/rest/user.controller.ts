@@ -1,7 +1,7 @@
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserService } from '../../../application/service/user.service';
 import { Role } from '../../../domain/entities/user.entity';
-import { CreateAlunoDTO } from '../../../application/dto/createAluno.dto';
+import { CreateStudentDTO } from '../../../application/dto/createStudent.dto';
 import {
   Body,
   Controller,
@@ -12,7 +12,7 @@ import {
   Query,
   Request,
 } from '@nestjs/common';
-import { CreateFuncionarioDTO } from 'src/modules/user/application/dto/createFuncionario';
+import { CreateEmployeeDTO } from '@/modules/user/application/dto/createEmployee';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 
 @Controller('user')
@@ -20,9 +20,9 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @IsPublic()
-  @Post('createAluno')
-  async createAluno(@Body() createAlunoDTO: CreateAlunoDTO) {
-    return this.userService.create(createAlunoDTO);
+  @Post('student')
+  async createStudent(@Body() createStudentDTO: CreateStudentDTO) {
+    return this.userService.create(createStudentDTO);
   }
 
   @Get('findByEmail')
@@ -32,21 +32,20 @@ export class UserController {
 
   @Get('me')
   async showUser(@Request() req) {
-    console.log('to sendo usado demaise');
     return req.user;
   }
 
   @Get(':id')
-  async findAluno() {}
+  async findUser() {}
 
-  @Roles(Role.ALUNO)
-  @Put('updateAluno:id')
-  async updateAluno(user: CreateAlunoDTO) {}
+  @Roles(Role.STUDENT)
+  @Put('student:id')
+  async updateStudent(user: CreateStudentDTO) {}
 
-  @Delete('deleteAluno:id')
-  async deleteAluno(user: CreateAlunoDTO) {}
+  @Delete('student:id')
+  async deleteAluno(user: CreateStudentDTO) {}
 
-  @Post('createFuncionario')
-  @Roles(Role.ADMINISTRADOR)
-  async createFuncionario(user: CreateFuncionarioDTO) {}
+  @Post('employee')
+  @Roles(Role.ADMINISTRATOR)
+  async createEmployee(user: CreateEmployeeDTO) {}
 }

@@ -46,7 +46,7 @@ export class termCommitmentController {
     return termCommitmentOutput;
   }
 
-  @Roles(Role.ALUNO)
+  @Roles(Role.STUDENT)
   @Post('register/assign')
   async registerAssign(@Body() registerAssignDto: RegisterAssignDto) {
     await this.termCommitmentService.registerAssignTermByStudent(
@@ -54,14 +54,14 @@ export class termCommitmentController {
     );
   }
 
-  @Roles(Role.ADMINISTRADOR, Role.FUNCIONARIO)
+  @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE)
   @Post('validate/assign')
   async validateAssignTerm(
     @Body() validateAssignTermDto: ValidateAssignTermDto,
     @User() user: UserFromJwt,
   ) {
     if (
-      user.role === Role.ADMINISTRADOR &&
+      user.role === Role.ADMINISTRATOR &&
       !validateAssignTermDto.remark &&
       !validateAssignTermDto.validate
     ) {

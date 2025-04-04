@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsString, IsDate } from 'class-validator';
 // import { InternshipGrantor } from 'src/modules/internshipGrantor/domain/entities/internshipGrantor.entity';
-import { User } from 'src/modules/user/domain/entities/user.entity';
+import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 // import { TermCommitment } from '../../domain/entities/termCommitment.entity';
 
 export class TermCommitmentDTO {
@@ -39,7 +39,7 @@ export class TermCommitmentDTO {
   @IsString()
   id_user: string;
 
-  user?: User;
+  user?: UserEntity;
 
   // @IsString()
   // id_internshipGrantor: string;

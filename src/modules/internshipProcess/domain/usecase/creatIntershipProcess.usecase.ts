@@ -13,8 +13,8 @@ export class CreateInternshipProcessUseCase {
   async handle(idTermCommitment: string, idUser: string) {
     try {
       const createInternshipProcessDTO: CreateInternshipProcessDTO = {
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
-        status: InternshipProcessStatus.EM_ANDAMENTO,
+        movement: InternshipProcessMovement.STAGE_START,
+        status: InternshipProcessStatus.IN_PROGRESS,
         id_user: idUser,
         id_termCommitment: idTermCommitment,
       };
