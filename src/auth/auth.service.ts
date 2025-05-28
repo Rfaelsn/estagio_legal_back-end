@@ -4,12 +4,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserPayload } from './models/UserPayload';
-import { UserToken } from './models/UserToken';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedError } from './errors/unauthorized.error';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '@/modules/user/application/service/user.service';
 import { UserEntity } from '@/modules/user/domain/entities/user.entity';
+import { Request, Response } from 'express';
+import { extractTokensFromCookies } from './utils/extract-tokens.util';
 
 @Injectable()
 export class AuthService {
@@ -18,16 +19,15 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(user: UserEntity): Promise<UserToken> {
+  async login(user: UserEntity, response: Response): Promise<any> {
     const validatedUser = await this.validateUser(user.email, user.password);
 
     const accessToken = this.generateAccessToken(validatedUser);
     const refreshToken = this.generateRefreshToken(validatedUser);
 
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
+    this.setAuthCookies(response, accessToken, refreshToken);
+
+    return validatedUser;
   }
 
   async validateUser(email: string, password: string): Promise<UserEntity> {
@@ -60,6 +60,24 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
+  async validateAccessToken(request: Request): Promise<boolean> {
+    const { accessToken } = extractTokensFromCookies(request);
+
+    if (!accessToken) {
+      throw new UnauthorizedError('Token not found in cookies');
+    }
+
+    try {
+      const payload = await this.jwtService.verifyAsync(accessToken, {
+        secret: process.env.JWT_SECRET,
+      });
+      request.user = payload;
+      return true;
+    } catch (error) {
+      throw new UnauthorizedError('Token invalid or expired');
+    }
+  }
+
   private generateRefreshToken(user: UserEntity): string {
     const payload: UserPayload = {
       role: user.role,
@@ -69,13 +87,13 @@ export class AuthService {
     };
 
     return this.jwtService.sign(payload, {
-      secret: 'secret_in_configService',
+      secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: '30d',
     });
   }
 
-  async verifyRefreshToken(body) {
-    const refreshToken = body.refresh_token;
+  async refreshAuthCookieTokens(request: Request, response: Response) {
+    const { refreshToken } = extractTokensFromCookies(request);
 
     if (!refreshToken) {
       throw new NotFoundException('User not found');
@@ -83,7 +101,7 @@ export class AuthService {
 
     try {
       const decodedToken = this.jwtService.verify(refreshToken, {
-        secret: 'secret_in_configService',
+        secret: process.env.JWT_REFRESH_SECRET,
       });
 
       const email = decodedToken['email'];
@@ -96,10 +114,7 @@ export class AuthService {
       const accessToken = this.generateAccessToken(user);
       const newRefreshToken = this.generateRefreshToken(user);
 
-      return {
-        access_token: accessToken,
-        refresh_token: newRefreshToken,
-      };
+      this.setAuthCookies(response, accessToken, newRefreshToken);
     } catch (err) {
       if (err.name === 'JsonWebTokenError') {
         throw new UnauthorizedException('Invalid Assign');
@@ -109,5 +124,27 @@ export class AuthService {
       }
       throw new UnauthorizedException(err.name);
     }
+  }
+
+  private setAuthCookies(
+    response: Response,
+    accessToken: string,
+    refreshToken: string,
+  ) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    response.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 1000,
+    });
+
+    response.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
   }
 }

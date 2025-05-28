@@ -10,7 +10,7 @@ import { NotificationService } from '../../application/service/notification.serv
 
 @WebSocketGateway(3002, {
   cors: {
-    origin: '*',
+    origin: 'http://localhost:5173',
   },
 })
 export class NotificationGateway
@@ -30,7 +30,6 @@ export class NotificationGateway
   }
 
   handleDisconnect(client: any) {
-    console.log('desconexão');
     this.notificationService.handleDisconnect(client);
   }
 

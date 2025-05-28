@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '@/modules/user/domain/entities/user.entity';
@@ -7,21 +12,30 @@ import { Role } from '@/modules/user/domain/entities/user.entity';
 export class RoleGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
-  async canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
-      //context.getArgs(),//to apply guard in args
     ]);
 
     if (!requiredRoles) {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest();
 
-    const rolesFiltered = requiredRoles.filter((role) => role === user.role);
+    if (!request.user) {
+      throw new UnauthorizedException('User not authenticated"');
+    }
 
-    return rolesFiltered.length > 0;
+    const hasRole = requiredRoles.some((role) => role === request.user.role);
+
+    if (!hasRole) {
+      throw new UnauthorizedException(
+        `Unauthorized. Required Role: ${requiredRoles.join(', ')}`,
+      );
+    }
+
+    return true;
   }
 }

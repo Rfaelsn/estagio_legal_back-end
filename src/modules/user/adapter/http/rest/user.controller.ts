@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { CreateEmployeeDTO } from '@/modules/user/application/dto/createEmployee';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+import { User } from '@/auth/decorators/user.decorator';
 
 @Controller('user')
 export class UserController {
@@ -33,6 +34,11 @@ export class UserController {
   @Get('me')
   async showUser(@Request() req) {
     return req.user;
+  }
+
+  @Get('profile')
+  async getUser(@User() user: any) {
+    return this.findByEmail(user.email);
   }
 
   @Get(':id')

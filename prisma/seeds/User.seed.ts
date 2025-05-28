@@ -13,7 +13,7 @@ export async function seedUsers(prismaTransaction: Prisma.TransactionClient) {
         telephone: '3278163183618736',
         courseStudy: 'TECNOLOGIA EM ANÁLISE E DESENVOLVIMENTO DE SISTEMAS',
         password: await bcrypt.hash('#Rafael01', await bcrypt.genSalt()),
-        role: 'ALUNO',
+        role: 'STUDENT',
       },
       {
         name: 'Diego',
@@ -23,7 +23,7 @@ export async function seedUsers(prismaTransaction: Prisma.TransactionClient) {
         telephone: '3278163183618736',
         courseStudy: 'TECNOLOGIA EM ANÁLISE E DESENVOLVIMENTO DE SISTEMAS',
         password: await bcrypt.hash('#Rafael01', await bcrypt.genSalt()),
-        role: 'ADMINISTRADOR',
+        role: 'ADMINISTRATOR',
       },
     ],
   });

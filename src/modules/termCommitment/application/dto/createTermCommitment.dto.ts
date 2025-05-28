@@ -127,8 +127,8 @@ export class CreateTermCommitmentDTO {
   supervisorPosition: string;
 
   @IsString()
-  @IsNotEmpty()
-  id_user: string;
+  @IsOptional()
+  id_user?: string;
 
   @IsString()
   @IsOptional()
