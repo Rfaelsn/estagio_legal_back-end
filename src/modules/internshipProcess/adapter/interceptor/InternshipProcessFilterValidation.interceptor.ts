@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
+import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
 import { UserFilterDTO } from 'src/modules/user/application/dto/userFilter.dto';
 import { TermCommitmentFilterDTO } from 'src/modules/termCommitment/application/dto/termCommitmentFilter.dto';
 
@@ -18,8 +18,7 @@ export class InternshipProcessFilterValidationInterceptor
 {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    const internshipProcessFilterDto =
-      new InternshipProcessFilterByEmployeeDTO();
+    const internshipProcessFilterDto = new InternshipProcessFilterDto();
     const allowedInternshipProcessAttributes = [
       'movement',
       'status',

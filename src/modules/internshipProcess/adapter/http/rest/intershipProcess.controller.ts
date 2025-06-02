@@ -23,9 +23,7 @@ import { InternshipProcessService } from '@/modules/internshipProcess/applicatio
 import { UpdateInternshipProcessDTO } from '@/modules/internshipProcess/application/dto/updateInternshipProcess.dto';
 import { ValidateAssignEndInternshipProcessDto } from '@/modules/internshipProcess/application/dto/validateAssignEndInternshipProcess.dto';
 import { RegisterEndInternshipProcessDto } from '@/modules/internshipProcess/application/dto/registerEndInternshipProcess.dto';
-import { InternshipProcessFilterByStudentDTO } from '@/modules/internshipProcess/application/dto/internshipProcessFilterByStudent.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '@/modules/internshipProcess/application/dto/internshipProcessFilterByEmployee.dto';
-import { FindInternshipProcessByQueryDTO } from '@/modules/internshipProcess/application/dto/findInternshipProcessByQuery.dto';
+import { InternshipProcessFilterDto } from '@/modules/internshipProcess/application/dto/internshipProcessFilter.dto';
 import { InternshipProcessControllerPort } from '@/modules/internshipProcess/domain/port/internshipProcessController.port';
 
 @Controller('processo/estagio')
@@ -36,7 +34,7 @@ export class InternshipProcessController
   constructor(
     private readonly internshipProcessService: InternshipProcessService,
   ) {}
-  @IsPublic()
+
   @Patch('update/status')
   async updateInternshipProcess(
     @Body() updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
@@ -84,27 +82,16 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ADMINISTRATOR)
-  @Get('filter')
+  @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE, Role.STUDENT)
+  @Post('filter')
   async internshipProcessFilter(
-    @Query() internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    @Body() internshipProcessFilterDTO: InternshipProcessFilterDto,
+    @User() user: UserFromJwt,
   ) {
-    console.log('oi');
-    return this.internshipProcessService.filterByEmployee(
+    return this.internshipProcessService.filter(
       internshipProcessFilterDTO,
-    );
-  }
-
-  @Roles(Role.STUDENT)
-  @Get('filter/my-process')
-  async internshipProcessFilterByStudent(
-    @Query()
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
-    @Request() req,
-  ) {
-    internshipProcessFilterByStudentDto.idUser = req.user.id;
-    return await this.internshipProcessService.filterByStudent(
-      internshipProcessFilterByStudentDto,
+      user.id,
+      user.role,
     );
   }
 
@@ -120,16 +107,6 @@ export class InternshipProcessController
       userId,
       page,
       pageSize,
-    );
-  }
-
-  @IsPublic()
-  @Get('findBy')
-  async findByQuery(
-    @Query() findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ) {
-    return this.internshipProcessService.findByQuery(
-      findInternshipProcessByQueryDTO,
     );
   }
 

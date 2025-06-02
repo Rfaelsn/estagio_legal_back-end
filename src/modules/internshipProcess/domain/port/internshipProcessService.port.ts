@@ -1,5 +1,4 @@
-import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
+import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
 import { InternshipProcessFilterByStudentDTO } from '../../application/dto/internshipProcessFilterByStudent.dto';
 import { RegisterEndInternshipProcessDto } from '../../application/dto/registerEndInternshipProcess.dto';
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
@@ -16,8 +15,10 @@ export interface InternshipProcessServicePort {
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
   ): Promise<boolean>;
 
-  filterByEmployee(
-    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+  filter(
+    internshipProcessFilterDTO: InternshipProcessFilterDto,
+    userId: string,
+    userRole: string,
   ): Promise<InternshipProcessEntity[]>;
 
   filterByStudent(
@@ -37,10 +38,6 @@ export interface InternshipProcessServicePort {
   validateAssignEndInternshipProcess(
     validateAssignEndInternshipProcessDto: ValidateAssignEndInternshipProcessDto,
   );
-
-  findByQuery(
-    findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcessEntity[]>;
 
   findById(id: string): Promise<InternshipProcessEntity>;
 }

@@ -9,10 +9,8 @@ import {
 } from '../../domain/entities/internshipProcess.entity';
 import { InternshipProcessRepositoryPort } from '../../domain/port/internshipProcessRepository.port';
 
-import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
+import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
-import { InternshipProcessFilterByStudentDTO } from '../../application/dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
 export class InternshipProcessRepository
@@ -65,13 +63,13 @@ export class InternshipProcessRepository
   }
 
   async filter(
-    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    internshipProcessFilterDTO: InternshipProcessFilterDto,
   ): Promise<InternshipProcessEntity[]> {
     const {
       user,
       termCommitment,
       page,
-      pageSize,
+      perPage,
       startDateProcessRangeStart,
       startDateProcessRangeEnd,
       endDateProcessRangeStart,
@@ -79,7 +77,7 @@ export class InternshipProcessRepository
       ...rest
     } = internshipProcessFilterDTO;
 
-    const take: number = pageSize || 10;
+    const take: number = perPage || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
     const internshipProcess = await this.prisma.internshipProcess.findMany({
@@ -111,26 +109,27 @@ export class InternshipProcessRepository
   }
 
   async filterByStudent(
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
+    internshipProcessFilterByStudentDto: InternshipProcessFilterDto,
+    userId: string,
   ): Promise<InternshipProcessEntity[]> {
     const {
-      idUser,
       termCommitment,
       page,
-      pageSize,
+      perPage,
+      movement,
+      status,
       startDateProcessRangeStart,
       startDateProcessRangeEnd,
       endDateProcessRangeStart,
       endDateProcessRangeEnd,
-      ...rest
+      internshipGrantor,
     } = internshipProcessFilterByStudentDto;
 
-    const take: number = pageSize || 10;
+    const take: number = perPage || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
     const internshipProcess = await this.prisma.internshipProcess.findMany({
       where: {
-        ...rest,
         startDateProcess: {
           gte: startDateProcessRangeStart,
           lte: startDateProcessRangeEnd,
@@ -139,8 +138,22 @@ export class InternshipProcessRepository
           gte: endDateProcessRangeStart,
           lte: endDateProcessRangeEnd,
         },
-        user: { id: idUser },
-        termCommitment: { ...termCommitment },
+        movement: movement,
+        status: status,
+        user: { id: userId, courseStudy: termCommitment.courseStudy },
+        termCommitment: {
+          grantingCompanyCNPJ: internshipGrantor.cnpj,
+          grantingCompanyName: internshipGrantor.name,
+          internshipStartDate: {
+            gte: termCommitment.startDateInitialSearchInterval,
+            lte: termCommitment.startDateFinalSearchInterval,
+          },
+          internshipEndDate: {
+            gte: termCommitment.endDateInitialSearchInterval,
+            lte: termCommitment.endDateFinalSearchInterval,
+          },
+          isMandatory: termCommitment.isMandatory,
+        },
       },
       include: {
         user: true,
@@ -169,36 +182,6 @@ export class InternshipProcessRepository
         user: { id: userId },
         movement: InternshipProcessMovement.STAGE_START,
         status: InternshipProcessStatus.COMPLETED,
-      },
-      include: {
-        user: true,
-        termCommitment: true,
-      },
-      take,
-      skip,
-    });
-
-    return internshipProcess;
-  }
-
-  async findByQuery(
-    findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcessEntity[]> {
-    const { query, page, pageSize } = findInternshipProcessByQueryDTO;
-
-    // Lógica de paginação
-    const take: number = pageSize || 10;
-    const skip: number = page ? (page - 1) * take : 0;
-
-    const internshipProcess = await this.prisma.internshipProcess.findMany({
-      where: {
-        OR: [
-          { movement: { contains: query } },
-          { status: { contains: query } },
-          { user: { name: { contains: query } } },
-          { user: { registration: { contains: query } } },
-          { user: { courseStudy: { contains: query } } },
-        ],
       },
       include: {
         user: true,

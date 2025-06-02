@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpCode, Inject, Injectable } from '@nestjs/common';
 import {
   InternshipProcessEntity,
   InternshipProcessMovement,
@@ -7,12 +7,9 @@ import {
 import { CreateInternshipProcessUseCase } from '../../domain/usecase/creatIntershipProcess.usecase';
 import { FilterInternshipProcessUseCase } from '../../domain/usecase/filterInternshipProcess.usecase';
 import { FindInternshipProcessByIdUsecase } from '../../domain/usecase/findByIdInternshipProcess.usecase';
-import { FindInternshipProcessByQueryUsecase } from '../../domain/usecase/findInternshipProcessByQuery.usecase';
-import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQuery.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '../dto/internshipProcessFilterByEmployee.dto';
+import { InternshipProcessFilterDto } from '../dto/internshipProcessFilter.dto';
 import { UpdateInternshipProcessDTO } from '../dto/updateInternshipProcess.dto';
 import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
-import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 import { RegisterEndInternshipProcessDto } from '../dto/registerEndInternshipProcess.dto';
 import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
 import { ValidateAssignEndInternshipProcessDto } from '../dto/validateAssignEndInternshipProcess.dto';
@@ -20,6 +17,7 @@ import { InternshipProcessRepositoryPort } from '../../domain/port/internshipPro
 import { IFileServicePort } from '@/modules/file/domain/ports/IFileService.port';
 import { INotificationServicePort } from '@/modules/notification/domain/port/INotificationService.port';
 import { InternshipProcessServicePort } from '../../domain/port/internshipProcessService.port';
+import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
 export class InternshipProcessService implements InternshipProcessServicePort {
@@ -36,6 +34,11 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     @Inject('InternshipProcessHistoryService')
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
   ) {}
+  filterByStudent(
+    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
+  ): Promise<InternshipProcessEntity[]> {
+    throw new Error('Method not implemented.');
+  }
 
   async create(
     idTermCommitment: string,
@@ -66,8 +69,11 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     );
   }
 
-  async filterByEmployee(
-    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+  @HttpCode(200)
+  async filter(
+    internshipProcessFilterDTO: InternshipProcessFilterDto,
+    userId: string,
+    userRole: string,
   ): Promise<InternshipProcessEntity[]> {
     const filterInternshipProcessUseCase = new FilterInternshipProcessUseCase(
       this.internshipProcessRepository,
@@ -75,17 +81,9 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
     const internshipProcess = await filterInternshipProcessUseCase.handle(
       internshipProcessFilterDTO,
+      userId,
+      userRole,
     );
-    return internshipProcess;
-  }
-
-  async filterByStudent(
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
-  ): Promise<InternshipProcessEntity[]> {
-    const internshipProcess =
-      await this.internshipProcessRepository.filterByStudent(
-        internshipProcessFilterByStudentDto,
-      );
     return internshipProcess;
   }
 
@@ -202,17 +200,6 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
       this.internshipProcessHistoryService.registerHistory(newHistory);
     }
-  }
-
-  async findByQuery(
-    findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcessEntity[]> {
-    const filterInternshipProcessUsecase =
-      new FindInternshipProcessByQueryUsecase(this.internshipProcessRepository);
-    const internshipProcess = await filterInternshipProcessUsecase.handle(
-      findInternshipProcessByQueryDTO,
-    );
-    return internshipProcess;
   }
 
   async findById(id: string): Promise<InternshipProcessEntity> {
