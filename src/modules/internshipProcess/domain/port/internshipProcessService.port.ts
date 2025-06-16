@@ -1,5 +1,4 @@
 import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
-import { InternshipProcessFilterByStudentDTO } from '../../application/dto/internshipProcessFilterByStudent.dto';
 import { RegisterEndInternshipProcessDto } from '../../application/dto/registerEndInternshipProcess.dto';
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
 import { ValidateAssignEndInternshipProcessDto } from '../../application/dto/validateAssignEndInternshipProcess.dto';
@@ -19,10 +18,6 @@ export interface InternshipProcessServicePort {
     internshipProcessFilterDTO: InternshipProcessFilterDto,
     userId: string,
     userRole: string,
-  ): Promise<InternshipProcessEntity[]>;
-
-  filterByStudent(
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
   ): Promise<InternshipProcessEntity[]>;
 
   findEligibleProcessesForCompletion(

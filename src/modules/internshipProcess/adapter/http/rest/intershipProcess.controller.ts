@@ -86,11 +86,11 @@ export class InternshipProcessController
   @Post('filter')
   async internshipProcessFilter(
     @Body() internshipProcessFilterDTO: InternshipProcessFilterDto,
-    @User() user: UserFromJwt,
+    @User() user: UserFromJwt & { sub: string },
   ) {
     return this.internshipProcessService.filter(
       internshipProcessFilterDTO,
-      user.id,
+      user.sub,
       user.role,
     );
   }

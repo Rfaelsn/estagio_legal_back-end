@@ -42,10 +42,10 @@ export class InternshipProcessFilterDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  page: number;
+  page: number | null;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  perPage: number;
+  perPage: number | null;
 }

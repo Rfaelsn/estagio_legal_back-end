@@ -112,49 +112,18 @@ export class InternshipProcessRepository
     internshipProcessFilterByStudentDto: InternshipProcessFilterDto,
     userId: string,
   ): Promise<InternshipProcessEntity[]> {
-    const {
-      termCommitment,
-      page,
-      perPage,
-      movement,
-      status,
-      startDateProcessRangeStart,
-      startDateProcessRangeEnd,
-      endDateProcessRangeStart,
-      endDateProcessRangeEnd,
-      internshipGrantor,
-    } = internshipProcessFilterByStudentDto;
+    const { page, perPage } = internshipProcessFilterByStudentDto;
+
+    const where = this.constructFilterWhere(
+      internshipProcessFilterByStudentDto,
+      userId,
+    );
 
     const take: number = perPage || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
     const internshipProcess = await this.prisma.internshipProcess.findMany({
-      where: {
-        startDateProcess: {
-          gte: startDateProcessRangeStart,
-          lte: startDateProcessRangeEnd,
-        },
-        endDateProcess: {
-          gte: endDateProcessRangeStart,
-          lte: endDateProcessRangeEnd,
-        },
-        movement: movement,
-        status: status,
-        user: { id: userId, courseStudy: termCommitment.courseStudy },
-        termCommitment: {
-          grantingCompanyCNPJ: internshipGrantor.cnpj,
-          grantingCompanyName: internshipGrantor.name,
-          internshipStartDate: {
-            gte: termCommitment.startDateInitialSearchInterval,
-            lte: termCommitment.startDateFinalSearchInterval,
-          },
-          internshipEndDate: {
-            gte: termCommitment.endDateInitialSearchInterval,
-            lte: termCommitment.endDateFinalSearchInterval,
-          },
-          isMandatory: termCommitment.isMandatory,
-        },
-      },
+      where,
       include: {
         user: true,
         termCommitment: true,
@@ -211,5 +180,112 @@ export class InternshipProcessRepository
     });
 
     return internshipProcess;
+  }
+
+  private constructFilterWhere(
+    internshipProcessFilterByStudentDto: InternshipProcessFilterDto,
+    userId: string,
+  ): any {
+    const {
+      termCommitment,
+      movement,
+      status,
+      startDateProcessRangeStart,
+      startDateProcessRangeEnd,
+      endDateProcessRangeStart,
+      endDateProcessRangeEnd,
+      internshipGrantor,
+    } = internshipProcessFilterByStudentDto;
+    const where: any = {};
+
+    if (
+      startDateProcessRangeStart != null ||
+      startDateProcessRangeEnd != null
+    ) {
+      where.startDateProcess = {
+        ...(startDateProcessRangeStart != null && {
+          gte: new Date(startDateProcessRangeStart),
+        }),
+        ...(startDateProcessRangeEnd != null && {
+          lte: new Date(startDateProcessRangeEnd),
+        }),
+      };
+    }
+
+    if (endDateProcessRangeStart != null || endDateProcessRangeEnd != null) {
+      where.endDateProcess = {
+        ...(endDateProcessRangeStart != null && {
+          gte: new Date(endDateProcessRangeStart),
+        }),
+        ...(endDateProcessRangeEnd != null && {
+          lte: new Date(endDateProcessRangeEnd),
+        }),
+      };
+    }
+
+    if (movement != null) {
+      where.movement = movement;
+    }
+
+    if (status != null) {
+      where.status = status;
+    }
+
+    where.user = { id: userId };
+
+    if (termCommitment?.courseStudy != null) {
+      where.user.courseStudy = termCommitment.courseStudy;
+    }
+
+    const termCommitmentWhere: any = {};
+
+    if (internshipGrantor) {
+      if (internshipGrantor.cnpj != null) {
+        termCommitmentWhere.grantingCompanyCNPJ = internshipGrantor.cnpj;
+      }
+      if (internshipGrantor.name != null) {
+        termCommitmentWhere.grantingCompanyName = internshipGrantor.name;
+      }
+    }
+
+    if (termCommitment) {
+      if (
+        termCommitment.startDateInitialSearchInterval != null ||
+        termCommitment.startDateFinalSearchInterval != null
+      ) {
+        termCommitmentWhere.internshipStartDate = {
+          ...(termCommitment.startDateInitialSearchInterval != null && {
+            gte: new Date(termCommitment.startDateInitialSearchInterval),
+          }),
+          ...(termCommitment.startDateFinalSearchInterval != null && {
+            lte: new Date(termCommitment.startDateFinalSearchInterval),
+          }),
+        };
+      }
+
+      if (
+        termCommitment.endDateInitialSearchInterval != null ||
+        termCommitment.endDateFinalSearchInterval != null
+      ) {
+        termCommitmentWhere.internshipEndDate = {
+          ...(termCommitment.endDateInitialSearchInterval != null && {
+            gte: new Date(termCommitment.endDateInitialSearchInterval),
+          }),
+          ...(termCommitment.endDateFinalSearchInterval != null && {
+            lte: new Date(termCommitment.endDateFinalSearchInterval),
+          }),
+        };
+      }
+
+      if (termCommitment.isMandatory != null) {
+        termCommitmentWhere.isMandatory = termCommitment.isMandatory;
+      }
+    }
+
+    if (Object.keys(termCommitmentWhere).length > 0) {
+      where.termCommitment = termCommitmentWhere;
+    }
+
+    return where;
   }
 }

@@ -17,7 +17,6 @@ import { InternshipProcessRepositoryPort } from '../../domain/port/internshipPro
 import { IFileServicePort } from '@/modules/file/domain/ports/IFileService.port';
 import { INotificationServicePort } from '@/modules/notification/domain/port/INotificationService.port';
 import { InternshipProcessServicePort } from '../../domain/port/internshipProcessService.port';
-import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
 export class InternshipProcessService implements InternshipProcessServicePort {
@@ -34,11 +33,6 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     @Inject('InternshipProcessHistoryService')
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
   ) {}
-  filterByStudent(
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
-  ): Promise<InternshipProcessEntity[]> {
-    throw new Error('Method not implemented.');
-  }
 
   async create(
     idTermCommitment: string,
