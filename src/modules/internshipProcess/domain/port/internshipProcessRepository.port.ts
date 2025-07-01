@@ -2,10 +2,12 @@ import { CreateInternshipProcessDTO } from '../../application/dto/input/internsh
 import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
 import { InternshipProcessEntity } from '../entities/internshipProcess.entity';
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
+import { Prisma } from '@prisma/client';
 
 export interface InternshipProcessRepositoryPort {
   create(
     createInternshipProcessDTO: CreateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<InternshipProcessEntity>;
 
   updateInternshipProcess(

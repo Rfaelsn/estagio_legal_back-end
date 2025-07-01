@@ -1,11 +1,39 @@
 import { IsPublic } from '@/auth/decorators/is-public.decorator';
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  FileType,
+  FileTypeToFileName,
+} from '@/modules/file/domain/entities/file.entity';
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { RegisterFilePathDto } from 'src/modules/file/application/dtos/registerFilePath.dto';
 import { FileService } from 'src/modules/file/application/services/file.service';
 
 @Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
+
+  @IsPublic()
+  @Post('download')
+  async downloadFile(
+    @Body() downloadFileDto: { fileId: string; fileType: FileType },
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const fileStream = await this.fileService.downloadFile(downloadFileDto);
+
+      const localTypeFile = FileTypeToFileName[downloadFileDto.fileType];
+
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${localTypeFile}.pdf"`,
+      );
+
+      fileStream.pipe(res);
+    } catch (error) {
+      throw new Error('deu ruim ao baixar pdf');
+    }
+  }
 
   @IsPublic()
   @Post('register-path')
@@ -30,6 +58,4 @@ export class FileController {
       console.error(error);
     }
   }
-
-  //colocar as rotas para cadastrar os files recedendo o id do processo e o filepath da api de arquivos
 }

@@ -6,6 +6,7 @@ import { InternshipProcessHistoryRepository } from '../../adapters/repositories/
 import { UpdateInternshipProcessHistoryDto } from '../dtos/update-internship-process-history.dto';
 import { CreateHistoryWithFileDto } from '../dtos/create-history-with-file.dto';
 import { RegisterFileInHistoryDto } from '../dtos/register-file-history.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class InternshipProcessHistoryService
@@ -29,10 +30,12 @@ export class InternshipProcessHistoryService
 
   async registerHistoryWithFile(
     createHistoryWithFileDto: CreateHistoryWithFileDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
     try {
       await this.internshipProcessHistoryRepository.registerHistoryWithFile(
         createHistoryWithFileDto,
+        prismaClientTransaction,
       );
     } catch (error) {
       console.error(error);

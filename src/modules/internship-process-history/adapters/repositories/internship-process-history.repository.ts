@@ -5,6 +5,7 @@ import { InternshipProcessHistoryRepositoryInterface } from '../../domain/ports/
 import { UpdateInternshipProcessHistoryDto } from '../../application/dtos/update-internship-process-history.dto';
 import { CreateHistoryWithFileDto } from '../../application/dtos/create-history-with-file.dto';
 import { RegisterFileInHistoryDto } from '../../application/dtos/register-file-history.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class InternshipProcessHistoryRepository
@@ -40,10 +41,12 @@ export class InternshipProcessHistoryRepository
 
   async registerHistoryWithFile(
     createHistoryWithFileDto: CreateHistoryWithFileDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
+    const prisma = prismaClientTransaction || this.prisma;
     const { idInternshipProcess, files, ...rest } = createHistoryWithFileDto;
 
-    await this.prisma.internshipProcessHistory.create({
+    await prisma.internshipProcessHistory.create({
       data: {
         ...rest,
         internshipProcess: {
@@ -53,15 +56,7 @@ export class InternshipProcessHistoryRepository
         },
 
         files: {
-          connectOrCreate: files.map((file) => ({
-            where: {
-              filePath: file.fileId,
-            },
-            create: {
-              filePath: file.fileId,
-              fileType: file.fileType,
-            },
-          })),
+          connect: files.map((file) => ({ id: file.fileId })),
         },
       },
     });

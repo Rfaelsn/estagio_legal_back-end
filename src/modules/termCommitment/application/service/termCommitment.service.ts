@@ -1,12 +1,5 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TermCommitmentRepository } from '../../adapter/repository/termCommitment.repository';
-import { CreateTermCommitmentUseCase } from '../../domain/usecase/createTermCommitment.usecase';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '../dto/LinkTermCommitmentFilePath.dto';
 import { InternshipProcessHistoryService } from '@/modules/internship-process-history/application/services/internship-process-history.service';
@@ -23,6 +16,11 @@ import {
 import { InternshipProcessService } from '@/modules/internshipProcess/application/service/internshipProcess.service';
 import { ITermCommitmentService } from '../../domain/port/ITermCommitmentService.port';
 import { InternshipProcessServicePort } from '@/modules/internshipProcess/domain/port/internshipProcessService.port';
+import { GeneratePdfService } from '@/modules/generate-pdf/application/services/generate-pdf.service';
+import { FileStorageService } from '@/modules/file-storage/application/services/file-storage.service';
+import { PrismaService } from '@/config/prisma/prisma.service';
+import { CreateTermCommitmentUseCase } from '../../domain/usecase/createTermCommitment.usecase';
+import { UserService } from '@/modules/user/application/service/user.service';
 
 @Injectable()
 export class TermCommitmentService implements ITermCommitmentService {
@@ -32,51 +30,101 @@ export class TermCommitmentService implements ITermCommitmentService {
     private readonly internshipProcessService: InternshipProcessServicePort,
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
     private readonly fileService: FileService,
+    private readonly generatePdfService: GeneratePdfService,
+    private readonly fileStorageService: FileStorageService,
+    private readonly prismaService: PrismaService,
+    private readonly userService: UserService,
   ) {}
 
+  private termCommitmentFileId: string;
+
   async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {
-    if (
-      await this.isValidWeeklyWorkloadLimit(
+    // if (
+    //   await this.isValidWeeklyWorkloadLimit(
+    //     createTermCommitmentDTO.id_user,
+    //     createTermCommitmentDTO.weeklyWorkload,
+    //     createTermCommitmentDTO.internshipStartDate,
+    //     createTermCommitmentDTO.internshipEndDate,
+    //   )
+    // ) {
+    try {
+      const userData = await this.userService.getUserById(
         createTermCommitmentDTO.id_user,
-        createTermCommitmentDTO.weeklyWorkload,
-        createTermCommitmentDTO.internshipStartDate,
-        createTermCommitmentDTO.internshipEndDate,
-      )
-    ) {
-      const createTermCommitmentUseCase = new CreateTermCommitmentUseCase(
-        this.termCommitmentRepository,
-      );
-      const termCommitment = await createTermCommitmentUseCase.handle(
-        createTermCommitmentDTO,
       );
 
-      const { id } = await this.internshipProcessService.create(
-        termCommitment.id,
-        termCommitment.id_user,
+      const pdf = await this.generatePdfService.createTermCommitmentPdf({
+        ...createTermCommitmentDTO,
+        user: {
+          ...userData,
+        },
+        institution: {
+          ...userData.institution,
+        },
+      });
+      this.termCommitmentFileId =
+        await this.fileStorageService.uploadPdfFile(pdf);
+
+      const result = await this.prismaService.$transaction(
+        async (prismaClientTransaction) => {
+          const createTermCommitmentUseCase = new CreateTermCommitmentUseCase(
+            this.termCommitmentRepository,
+          );
+          const termCommitment = await createTermCommitmentUseCase.handle(
+            createTermCommitmentDTO,
+            prismaClientTransaction,
+          );
+          const { id } = await this.internshipProcessService.create(
+            termCommitment.id,
+            termCommitment.id_user,
+            prismaClientTransaction,
+          );
+
+          const { id: termCommitmentEntityFileId } =
+            await this.fileService.registerFilePathProcess({
+              filePath: this.termCommitmentFileId,
+              fileType: FileType.TERM_COMMITMENT,
+            });
+
+          await this.internshipProcessHistoryService.registerHistoryWithFile(
+            {
+              status: InternshipProcessStatus.IN_PROGRESS,
+              movement: InternshipProcessMovement.STAGE_START,
+              idInternshipProcess: id,
+              files: [
+                {
+                  fileId: termCommitmentEntityFileId,
+                },
+              ],
+            },
+            prismaClientTransaction,
+          );
+          return { id, termCommitment, termCommitmentEntityFileId };
+        },
       );
 
-      const outputDto = {
-        ...termCommitment,
-        internshipStartDate: termCommitment.internshipStartDate
-          .toISOString()
-          .split('Z')[0],
-        internshipEndDate: termCommitment.internshipEndDate
-          .toISOString()
-          .split('Z')[0],
-        internshipProcessId: id,
+      return {
+        termFilePathId: result.termCommitmentEntityFileId,
+        internshipProcessId: result.id,
       };
+    } catch (error) {
+      if (this.termCommitmentFileId) {
+        try {
+          await this.fileStorageService.deletePdfFile(
+            this.termCommitmentFileId,
+          );
+        } catch (deleteError) {
+          console.error('Erro ao deletar arquivo:', deleteError);
+        }
+      }
 
-      return outputDto;
+      throw error;
     }
-
-    throw new HttpException(
-      `A jornada semanal ultrapassa o limite permitido de 30 horas. verifique a jornada semanal de seus processos no intervalo de ${new Date(
-        createTermCommitmentDTO.internshipStartDate.toISOString().split('Z')[0],
-      ).toLocaleDateString('pt-BR')} a ${new Date(
-        createTermCommitmentDTO.internshipEndDate.toISOString().split('Z')[0],
-      ).toLocaleDateString('pt-BR')}`,
-      HttpStatus.BAD_REQUEST,
-    );
+    // } else {
+    //   throw new HttpException(
+    //     'período de criação de termo inválido (limite de carga horária 30hrs semanais)',
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
   }
 
   async registerAssignTermByStudent(

@@ -8,22 +8,29 @@ datasource db {
 }
 
 model User {
-  id                String              @id @default(uuid())
-  name              String              @db.VarChar(63)
-  cpf               String              @unique @db.VarChar(127)
-  registration      String?             @unique @db.VarChar(127)
-  email             String              @unique @db.VarChar(127)
-  telephone         String              @db.VarChar(127)
-  courseStudy       String?             @db.VarChar(127)
-  password          String              @db.VarChar(127)
-  role              String              @db.VarChar(127)
-  createdAt         DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt         DateTime            @default(now()) @db.Timestamp(0)
-  id_institution    String?
-  institution       Institution?        @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
-  TermsCommitment   TermCommitment[]    @relation("userTerm")
-  internshipProcess InternshipProcess[] @relation("studentInternshipProcess")
-  Notifications     Notification[]      @relation("userNotification")
+  id                       String              @id @default(uuid())
+  name                     String              @db.VarChar(63)
+  cpf                      String              @unique @db.VarChar(127)
+  rg                       String              @db.VarChar(127)
+  academicRegistrationCode String?             @unique @db.VarChar(127)
+  birthDate                DateTime            @db.Date
+  email                    String              @unique @db.VarChar(127)
+  telephone                String              @db.VarChar(127)
+  courseStudy              String?             @db.VarChar(127)
+  password                 String              @db.VarChar(127)
+  role                     String              @db.VarChar(127)
+  UF                       String              @db.VarChar(127)
+  city                     String              @db.VarChar(127)
+  district                 String              @db.VarChar(127)
+  address                  String              @db.VarChar(127)
+  postalCode               String              @db.VarChar(127)
+  createdAt                DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt                DateTime            @default(now()) @db.Timestamp(0)
+  id_institution           String?
+  institution              Institution?        @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
+  TermsCommitment          TermCommitment[]    @relation("userTerm")
+  internshipProcess        InternshipProcess[] @relation("studentInternshipProcess")
+  Notifications            Notification[]      @relation("userNotification")
 
   @@map("tb_users")
 }
@@ -49,14 +56,21 @@ model File {
 }
 
 model Institution {
-  id        String   @id @default(uuid())
-  name      String   @db.VarChar(63)
-  campus    String   @db.VarChar(127)
-  cnpj      String   @db.VarChar(127)
-  UF        String   @db.VarChar(127)
-  createdAt DateTime @default(now()) @db.Timestamp(0)
-  updatedAt DateTime @default(now()) @db.Timestamp(0)
-  users     User[]   @relation("userInstitution")
+  id                      String    @id @default(uuid())
+  name                    String    @db.VarChar(63)
+  campus                  String    @db.VarChar(127)
+  cnpj                    String    @db.VarChar(127)
+  UF                      String    @db.VarChar(127)
+  city                    String    @db.VarChar(127)
+  district                String    @db.VarChar(127)
+  address                 String    @db.VarChar(127)
+  telephone               String    @db.VarChar(127)
+  postalCode              String    @db.VarChar(127)
+  legalRepresentative     String    @db.VarChar(127)
+  legalRepresentativeRole String    @db.VarChar(127)
+  createdAt               DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt               DateTime? @default(now()) @db.Timestamp(0)
+  users                   User[]    @relation("userInstitution")
 
   @@map("tb_institution")
 }

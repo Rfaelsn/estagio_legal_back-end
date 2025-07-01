@@ -20,8 +20,10 @@ export class InternshipProcessRepository
 
   async create(
     createInternshipProcessDTO: CreateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<InternshipProcessEntity> {
-    const newInternshipProcess = await this.prisma.internshipProcess.create({
+    const prisma = prismaClientTransaction || this.prisma;
+    const newInternshipProcess = await prisma.internshipProcess.create({
       data: {
         movement: createInternshipProcessDTO.movement,
         status: createInternshipProcessDTO.status,

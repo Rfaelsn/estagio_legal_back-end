@@ -17,6 +17,7 @@ import { InternshipProcessRepositoryPort } from '../../domain/port/internshipPro
 import { IFileServicePort } from '@/modules/file/domain/ports/IFileService.port';
 import { INotificationServicePort } from '@/modules/notification/domain/port/INotificationService.port';
 import { InternshipProcessServicePort } from '../../domain/port/internshipProcessService.port';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class InternshipProcessService implements InternshipProcessServicePort {
@@ -37,6 +38,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
   async create(
     idTermCommitment: string,
     idUser: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<InternshipProcessEntity> {
     const createInternshipProcessUseCase = new CreateInternshipProcessUseCase(
       this.internshipProcessRepository,
@@ -45,6 +47,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     const internshipProcess = await createInternshipProcessUseCase.handle(
       idTermCommitment,
       idUser,
+      prismaClientTransaction,
     );
 
     this.notificationService.sendNotification(

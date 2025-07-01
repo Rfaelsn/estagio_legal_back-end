@@ -34,6 +34,7 @@ export class UserRepository implements IUserRepository {
     const data: Prisma.UserCreateInput = {
       ...createEmployeeDTO,
       TermsCommitment: {},
+      institution: {},
       internshipProcess: {},
     };
     const newUser = await this.prisma.user.create({ data });
@@ -49,7 +50,10 @@ export class UserRepository implements IUserRepository {
     return users;
   }
   async getById(id: string): Promise<UserEntity> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { institution: true },
+    });
     return user;
   }
   updateById(user: UserEntity): Promise<void> {

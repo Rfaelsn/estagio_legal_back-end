@@ -6,6 +6,9 @@ import { TermCommitmentRepository } from './adapter/repository/termCommitment.re
 import { InternshipProcessHistoryModule } from '../internship-process-history/internship-process-history.module';
 import { FileModule } from '../file/file.module';
 import { InternshipProcessModule } from '../internshipProcess/intershipProcess.module';
+import { FileStorageModule } from '../file-storage/file-storage.module';
+import { GeneratePdfModule } from '../generate-pdf/generate-pdf.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   controllers: [termCommitmentController],
@@ -15,6 +18,9 @@ import { InternshipProcessModule } from '../internshipProcess/intershipProcess.m
     forwardRef(() => InternshipProcessModule),
     InternshipProcessHistoryModule,
     FileModule,
+    FileStorageModule,
+    GeneratePdfModule,
+    UserModule,
   ],
   exports: [TermCommitmentService],
 })

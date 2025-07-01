@@ -43,7 +43,7 @@ export class InternshipProcessFilterValidationInterceptor
     const allowedUserAttributes = [
       'name',
       'cpf',
-      'registration',
+      'academicRegistrationCode',
       'email',
       'telefone',
       'courseStudy',

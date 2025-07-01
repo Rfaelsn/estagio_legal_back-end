@@ -24,5 +24,5 @@ export class CreateHistoryWithFileDto {
 
   @IsArray()
   @IsOptional()
-  files?: [{ fileId: string; fileType: string }];
+  files?: [{ fileId: string }];
 }

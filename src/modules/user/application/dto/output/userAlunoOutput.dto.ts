@@ -12,7 +12,7 @@ export class UserAlunoOutputDTO {
 
   @IsString()
   @Expose()
-  registration: string;
+  academicRegistrationCode: string;
 
   @IsEmail()
   @Expose()

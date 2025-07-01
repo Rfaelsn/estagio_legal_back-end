@@ -1,6 +1,7 @@
-import { IsEmail, IsString, IsEnum } from 'class-validator';
+import { IsEmail, IsString, IsEnum, IsNotEmpty } from 'class-validator';
 import { Role } from '../../domain/entities/user.entity';
 import { IsCPF } from 'src/shared/decorators/isCpf.decorator';
+import { IsTime } from '@/shared/decorators/isTime.decorator';
 
 export class CreateStudentDTO {
   @IsString()
@@ -10,7 +11,14 @@ export class CreateStudentDTO {
   cpf: string;
 
   @IsString()
-  registration?: string;
+  rg: string;
+
+  @IsNotEmpty()
+  @IsTime('toDate')
+  birthDate: Date;
+
+  @IsString()
+  academicRegistrationCode?: string;
 
   @IsEmail()
   email: string;
@@ -26,4 +34,19 @@ export class CreateStudentDTO {
 
   @IsEnum(Role)
   role: string;
+
+  @IsString()
+  UF: string;
+
+  @IsString()
+  city: string;
+
+  @IsString()
+  district: string;
+
+  @IsString()
+  address: string;
+
+  @IsString()
+  postalCode: string;
 }

@@ -14,11 +14,10 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { IsPublic } from 'src/auth/decorators/is-public.decorator';
-import { CreateTermCommitmentDTO } from 'src/modules/termCommitment/application/dto/createTermCommitment.dto';
-import { LinkTermCommitmentFilePathDTO } from 'src/modules/termCommitment/application/dto/LinkTermCommitmentFilePath.dto';
-import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
-
+import { IsPublic } from '@/auth/decorators/is-public.decorator';
+import { CreateTermCommitmentDTO } from '@/modules/termCommitment/application/dto/createTermCommitment.dto';
+import { LinkTermCommitmentFilePathDTO } from '@/modules/termCommitment/application/dto/LinkTermCommitmentFilePath.dto';
+import { TermCommitmentService } from '@/modules/termCommitment/application/service/termCommitment.service';
 @Controller('termCommitment')
 export class termCommitmentController {
   constructor(private readonly termCommitmentService: TermCommitmentService) {}
