@@ -42,7 +42,9 @@ export class InternshipProcessRepository
 
   async updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<boolean> {
+    const prisma = prismaClientTransaction || this.prisma;
     let prismaData: Prisma.InternshipProcessUpdateInput;
     if (updateInternshipProcessStatusDTO.status === 'CONCLUÍDO') {
       prismaData = {
@@ -56,7 +58,7 @@ export class InternshipProcessRepository
         movement: updateInternshipProcessStatusDTO.movement,
       };
     }
-    await this.prisma.internshipProcess.update({
+    await prisma.internshipProcess.update({
       where: { id: updateInternshipProcessStatusDTO.id },
       data: prismaData,
     });
@@ -163,6 +165,22 @@ export class InternshipProcessRepository
     });
 
     return internshipProcess;
+  }
+
+  async isElegibleForCompletion(
+    internshipProcessId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const internshipProcess = await this.prisma.internshipProcess.findFirst({
+      where: {
+        id: internshipProcessId,
+        user: { id: userId },
+        movement: InternshipProcessMovement.STAGE_START,
+        status: InternshipProcessStatus.COMPLETED,
+      },
+    });
+
+    return !!internshipProcess;
   }
 
   async findById(id: string): Promise<InternshipProcessEntity> {

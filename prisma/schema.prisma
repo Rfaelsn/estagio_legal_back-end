@@ -50,6 +50,7 @@ model File {
   id                         String                     @id @default(uuid())
   filePath                   String                     @unique
   fileType                   String                     @db.VarChar(255)
+  isAssigned                 Boolean                    @default(false)
   internshipProcessHistories InternshipProcessHistory[] @relation("ProcessHistoryFiles")
 
   @@map("tb_internship_process_files")

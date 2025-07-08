@@ -7,9 +7,10 @@ export class FileStorageService {
   constructor(private readonly fileStorageProvider: FileStorageProvider) {}
 
   async uploadPdfFile(
-    pdfFileStream: Uint8Array<ArrayBufferLike>,
+    pdfFileStream: Uint8Array,
+    fileType: FileType,
   ): Promise<string> {
-    return this.fileStorageProvider.uploadPdfFile(pdfFileStream);
+    return this.fileStorageProvider.uploadPdfFile(pdfFileStream, fileType);
   }
 
   async deletePdfFile(termCommitmentFileId: string): Promise<void> {

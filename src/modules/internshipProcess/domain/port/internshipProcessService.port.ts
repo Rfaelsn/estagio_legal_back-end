@@ -4,6 +4,7 @@ import { RegisterEndInternshipProcessDto } from '../../application/dto/registerE
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
 import { ValidateAssignEndInternshipProcessDto } from '../../application/dto/validateAssignEndInternshipProcess.dto';
 import { InternshipProcessEntity } from '../entities/internshipProcess.entity';
+import { UserFromJwt } from '@/auth/models/UserFromJwt';
 
 export interface InternshipProcessServicePort {
   create(
@@ -14,6 +15,7 @@ export interface InternshipProcessServicePort {
 
   updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<boolean>;
 
   filter(
@@ -30,6 +32,8 @@ export interface InternshipProcessServicePort {
 
   registerEndInternshipProcess(
     registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+    file: Express.Multer.File[],
+    user: UserFromJwt,
   );
 
   validateAssignEndInternshipProcess(

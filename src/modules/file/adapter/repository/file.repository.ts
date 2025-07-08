@@ -27,8 +27,12 @@ export class FileRepository {
     });
   }
 
-  async registerFilePaths(registerFilePathDto: RegisterFilePathDto[]) {
-    return await this.prisma.file.createManyAndReturn({
+  async registerFilePaths(
+    registerFilePathDto: RegisterFilePathDto[],
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ) {
+    const prisma = prismaClientTransaction || this.prisma;
+    return await prisma.file.createManyAndReturn({
       data: registerFilePathDto,
     });
   }

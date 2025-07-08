@@ -1,23 +1,22 @@
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { User } from '@/auth/decorators/user.decorator';
 import { UserFromJwt } from '@/auth/models/UserFromJwt';
-import { RegisterAssignDto } from '@/modules/termCommitment/application/dto/register-assign.dto';
 import { UpdateTermInfoDto } from '@/modules/termCommitment/application/dto/updateTermInfo.dto';
 import { ValidateAssignTermDto } from '@/modules/termCommitment/application/dto/validate-assign-term.dto';
 import { Role } from '@/modules/user/domain/entities/user.entity';
 import {
   Body,
   Controller,
-  HttpException,
-  HttpStatus,
   Param,
   Patch,
   Post,
+  UploadedFile,
 } from '@nestjs/common';
 import { IsPublic } from '@/auth/decorators/is-public.decorator';
 import { CreateTermCommitmentDTO } from '@/modules/termCommitment/application/dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '@/modules/termCommitment/application/dto/LinkTermCommitmentFilePath.dto';
 import { TermCommitmentService } from '@/modules/termCommitment/application/service/termCommitment.service';
+import { filePipe } from '@/modules/file/adapter/interceptors/config-file-interceptor';
 @Controller('termCommitment')
 export class termCommitmentController {
   constructor(private readonly termCommitmentService: TermCommitmentService) {}
@@ -44,29 +43,36 @@ export class termCommitmentController {
     return termCommitmentEntity;
   }
 
-  @Roles(Role.STUDENT)
-  @Post('register/assign')
-  async registerAssign(@Body() registerAssignDto: RegisterAssignDto) {
-    await this.termCommitmentService.registerAssignTermByStudent(
-      registerAssignDto,
-    );
-  }
-
-  @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE)
-  @Post('validate/assign')
-  async validateAssignTerm(
+  @Roles(Role.STUDENT, Role.ADMINISTRATOR, Role.EMPLOYEE)
+  @Post('assign')
+  async registerAssign(
+    @UploadedFile(filePipe)
+    file: Express.Multer.File,
     @Body() validateAssignTermDto: ValidateAssignTermDto,
     @User() user: UserFromJwt,
   ) {
-    if (
-      user.role === Role.ADMINISTRATOR &&
-      !validateAssignTermDto.remark &&
-      !validateAssignTermDto.validate
-    ) {
-      throw new HttpException('remark is required', HttpStatus.BAD_REQUEST);
-    }
-    await this.termCommitmentService.validateAssignTerm(validateAssignTermDto);
+    await this.termCommitmentService.registerAssignTerm(
+      validateAssignTermDto,
+      file,
+      user,
+    );
   }
+
+  // @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE)
+  // @Post('validate/assign')
+  // async validateAssignTerm(
+  //   @Body() validateAssignTermDto: ValidateAssignTermDto,
+  //   @User() user: UserFromJwt,
+  // ) {
+  //   if (
+  //     user.role === Role.ADMINISTRATOR &&
+  //     !validateAssignTermDto.remark &&
+  //     !validateAssignTermDto.validate
+  //   ) {
+  //     throw new HttpException('remark is required', HttpStatus.BAD_REQUEST);
+  //   }
+  //   await this.termCommitmentService.validateAssignTerm(validateAssignTermDto);
+  // }
 
   @IsPublic()
   @Post('update/filepath')

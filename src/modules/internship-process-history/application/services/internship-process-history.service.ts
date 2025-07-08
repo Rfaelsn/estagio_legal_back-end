@@ -18,10 +18,12 @@ export class InternshipProcessHistoryService
 
   async registerHistory(
     createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
     try {
       await this.internshipProcessHistoryRepository.registerHistory(
         createInternshipProcessHistoryDto,
+        prismaClientTransaction,
       );
     } catch (error) {
       console.error(error);
@@ -44,10 +46,12 @@ export class InternshipProcessHistoryService
 
   async updateHistory(
     updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
     try {
       await this.internshipProcessHistoryRepository.updateHistory(
         updateInternshipProcessHistoryDto,
+        prismaClientTransaction,
       );
     } catch (error) {
       console.error(error);
@@ -58,5 +62,15 @@ export class InternshipProcessHistoryService
     registerFileInHistoryDto: RegisterFileInHistoryDto,
   ) {
     return;
+  }
+
+  async getHistoriesByInternshipProcessId(internshipProcessId: string) {
+    try {
+      return this.internshipProcessHistoryRepository.getHistoriesByInternshipProcessId(
+        internshipProcessId,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

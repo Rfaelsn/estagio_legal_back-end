@@ -4,6 +4,7 @@ export class FileEntity implements File {
   id: string;
   filePath: string;
   fileType: string;
+  isAssigned: boolean;
 }
 
 export enum FileType {

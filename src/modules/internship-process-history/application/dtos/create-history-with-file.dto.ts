@@ -17,6 +17,10 @@ export class CreateHistoryWithFileDto {
 
   @IsString()
   @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
   observacoes?: string;
 
   @IsString()

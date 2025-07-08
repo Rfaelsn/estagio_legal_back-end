@@ -12,6 +12,7 @@ export interface InternshipProcessRepositoryPort {
 
   updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<boolean>;
 
   filter(
@@ -30,4 +31,9 @@ export interface InternshipProcessRepositoryPort {
   );
 
   findById(id: string): Promise<InternshipProcessEntity>;
+
+  isElegibleForCompletion(
+    internshipProcessId: string,
+    userId: string,
+  ): Promise<boolean>;
 }

@@ -18,6 +18,15 @@ import { IFileServicePort } from '@/modules/file/domain/ports/IFileService.port'
 import { INotificationServicePort } from '@/modules/notification/domain/port/INotificationService.port';
 import { InternshipProcessServicePort } from '../../domain/port/internshipProcessService.port';
 import { Prisma } from '@prisma/client';
+import { UserFromJwt } from '@/auth/models/UserFromJwt';
+import { FileStorageService } from '@/modules/file-storage/application/services/file-storage.service';
+import {
+  FileEntity,
+  FileType,
+} from '@/modules/file/domain/entities/file.entity';
+import { RegisterFilePathDto } from '@/modules/file/application/dtos/registerFilePath.dto';
+import { PrismaService } from '@/config/prisma/prisma.service';
+import { Role } from '@/modules/user/domain/entities/user.entity';
 
 @Injectable()
 export class InternshipProcessService implements InternshipProcessServicePort {
@@ -33,7 +42,20 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
     @Inject('InternshipProcessHistoryService')
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
+
+    @Inject('FileStorageService')
+    private readonly fileStorageService: FileStorageService,
+
+    @Inject('PrismaService')
+    private readonly prismaService: PrismaService,
   ) {}
+  registerEndInternshipProcess(
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+    file: Express.Multer.File[],
+    user: UserFromJwt,
+  ) {
+    throw new Error('Method not implemented.');
+  }
 
   async create(
     idTermCommitment: string,
@@ -60,9 +82,11 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
   async updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<boolean> {
     return await this.internshipProcessRepository.updateInternshipProcess(
       updateInternshipProcessStatusDTO,
+      prismaClientTransaction,
     );
   }
 
@@ -98,45 +122,174 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     return internshipProcess;
   }
 
-  async registerEndInternshipProcess(
+  async assignEndInternshipProcess(
     registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+    files: Express.Multer.File[],
+    user: UserFromJwt,
   ) {
-    // const formatFilePaths =
-    //   registerEndInternshipProcessDto.internshipEvaluationFilesPaths.map(
-    //     (filePath) => {
-    //       if (filePath) {
-    //         return {
-    //           filePath,
-    //           fileType: FileType.EVALUATION,
-    //         };
-    //       }
-    //     },
-    //   );
-    const registeredFiles = await this.fileService.registerFilePathsProcess(
-      registerEndInternshipProcessDto.internshipEvaluationFilesPaths,
+    if (
+      user.role !== Role.EMPLOYEE &&
+      user.role !== Role.ADMINISTRATOR &&
+      (registerEndInternshipProcessDto.validate ||
+        registerEndInternshipProcessDto.remark)
+    ) {
+      throw new Error(
+        'Apenas o funcionário ou administrador pode validar o processo de estágio.',
+      );
+    }
+
+    const isElegible = await this.isElegibleForCompletion(
+      registerEndInternshipProcessDto.internshipProcessId,
+      user.id,
     );
 
-    await this.updateInternshipProcess({
-      id: registerEndInternshipProcessDto.internshipProcessId,
-      status: InternshipProcessStatus.UNDER_REVIEW,
-      movement: InternshipProcessMovement.STAGE_END,
-    });
+    if (!isElegible) {
+      throw new Error(
+        'O processo de estágio não está elegível para ser concluído. precisa estar no estágio de início de estágio concluído.',
+      );
+    }
 
-    const newHistory: CreateInternshipProcessHistoryDto = {
-      movement: InternshipProcessMovement.STAGE_END,
-      status: InternshipProcessStatus.UNDER_REVIEW,
-      idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
-      fileIds: registeredFiles.map((registeredFile) => {
-        return registeredFile.id;
-      }),
-    };
+    const filePaths: RegisterFilePathDto[] = [];
 
-    // await this.internshipProcessHistoryService.updateHistory({
-    //   endDate: new Date(),
-    //   idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
-    // });
+    try {
+      await this.prismaService.$transaction(async (prismaClientTransaction) => {
+        files.forEach(async (file) => {
+          const fileType = this.getFileType(file.originalname);
 
-    await this.internshipProcessHistoryService.registerHistory(newHistory);
+          const filePath = await this.fileStorageService.uploadPdfFile(
+            file.buffer,
+            fileType,
+          );
+          filePaths.push({
+            filePath,
+            fileType,
+          });
+        });
+
+        const registeredFiles = await this.fileService.registerFilePathsProcess(
+          filePaths,
+          prismaClientTransaction,
+        );
+
+        const newHistory = this.getNewIntenrhsipProcessHistoryByUserRole(
+          user.role,
+          registeredFiles,
+          registerEndInternshipProcessDto,
+        );
+
+        const updatedInternshipProcessStateData =
+          this.getNewInternshipProcessStateDataByUserRole(
+            user.role,
+            registerEndInternshipProcessDto,
+          );
+
+        await this.updateInternshipProcess(
+          updatedInternshipProcessStateData,
+          prismaClientTransaction,
+        );
+
+        //atualizar para pegar att a end date do ultimo registro
+        await this.internshipProcessHistoryService.updateHistory(
+          {
+            endDate: new Date(),
+            idInternshipProcess:
+              registerEndInternshipProcessDto.internshipProcessId,
+          },
+          prismaClientTransaction,
+        );
+
+        await this.internshipProcessHistoryService.registerHistory(
+          newHistory,
+          prismaClientTransaction,
+        );
+      });
+    } catch (error) {
+      if (filePaths.length > 0) {
+        filePaths.forEach((filePath) => {
+          this.fileStorageService.deletePdfFile(filePath.filePath);
+        });
+      }
+      console.error('Erro ao deletar arquivo:', error);
+    }
+  }
+
+  private getNewIntenrhsipProcessHistoryByUserRole(
+    userRole: Role | string,
+    registeredFiles: FileEntity[],
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+  ) {
+    if (userRole === Role.STUDENT) {
+      return {
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.UNDER_REVIEW,
+        idInternshipProcess:
+          registerEndInternshipProcessDto.internshipProcessId,
+        fileIds: registeredFiles.map((file) => file.id),
+      };
+    } else if (
+      registerEndInternshipProcessDto.validate &&
+      (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR)
+    ) {
+      return {
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.COMPLETED,
+        idInternshipProcess:
+          registerEndInternshipProcessDto.internshipProcessId,
+        fileIds: registeredFiles.map((file) => file.id),
+      };
+    } else if (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR) {
+      return {
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.REJECTED,
+        idInternshipProcess:
+          registerEndInternshipProcessDto.internshipProcessId,
+        observations: registerEndInternshipProcessDto.remark,
+      };
+    }
+  }
+
+  private getNewInternshipProcessStateDataByUserRole(
+    userRole: Role | string,
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+  ) {
+    if (userRole === Role.STUDENT) {
+      return {
+        id: registerEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.UNDER_REVIEW,
+        movement: InternshipProcessMovement.STAGE_END,
+      };
+    } else if (
+      registerEndInternshipProcessDto.validate &&
+      (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR)
+    ) {
+      return {
+        id: registerEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.COMPLETED,
+        movement: InternshipProcessMovement.STAGE_END,
+      };
+    } else if (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR) {
+      return {
+        id: registerEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.REJECTED,
+        movement: InternshipProcessMovement.STAGE_END,
+      };
+    }
+  }
+
+  private getFileType(fileName: string): FileType {
+    if (fileName === 'avaliacao_aluno') {
+      return FileType.STUDENT_SELF_EVALUATION;
+    }
+  }
+
+  private async isElegibleForCompletion(
+    internshipProcessId: string,
+    userId: string,
+  ): Promise<boolean> {
+    return this.internshipProcessRepository.isElegibleForCompletion(
+      internshipProcessId,
+      userId,
+    );
   }
 
   async validateAssignEndInternshipProcess(

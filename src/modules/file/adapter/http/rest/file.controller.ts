@@ -3,10 +3,22 @@ import {
   FileType,
   FileTypeToFileName,
 } from '@/modules/file/domain/entities/file.entity';
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { RegisterFilePathDto } from 'src/modules/file/application/dtos/registerFilePath.dto';
 import { FileService } from 'src/modules/file/application/services/file.service';
+import {
+  configFileInterceptor,
+  filePipe,
+} from '../../interceptors/config-file-interceptor';
 
 @Controller('file')
 export class FileController {
@@ -32,6 +44,21 @@ export class FileController {
       fileStream.pipe(res);
     } catch (error) {
       throw new Error('deu ruim ao baixar pdf');
+    }
+  }
+
+  @IsPublic()
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', configFileInterceptor))
+  async uploadFile(
+    @UploadedFile(filePipe)
+    file: Express.Multer.File,
+    @Body() uploadFileDto: { fileType: FileType },
+  ): Promise<void> {
+    try {
+      await this.fileService.uploadFile(file, uploadFileDto.fileType);
+    } catch (error) {
+      throw new Error('deu ruim ao uploudar pdf');
     }
   }
 

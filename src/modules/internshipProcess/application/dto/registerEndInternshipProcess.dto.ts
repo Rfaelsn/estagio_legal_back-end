@@ -1,5 +1,5 @@
 import { RegisterFilePathDto } from '@/modules/file/application/dtos/registerFilePath.dto';
-import { IsArray, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class RegisterEndInternshipProcessDto {
   @IsString()
@@ -7,4 +7,12 @@ export class RegisterEndInternshipProcessDto {
 
   @IsArray()
   internshipEvaluationFilesPaths: RegisterFilePathDto[];
+
+  @IsString()
+  @IsOptional()
+  remark?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  validate: boolean;
 }

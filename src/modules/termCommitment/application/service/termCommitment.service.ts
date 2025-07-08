@@ -6,7 +6,6 @@ import { InternshipProcessHistoryService } from '@/modules/internship-process-hi
 import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
 import { FileService } from '@/modules/file/application/services/file.service';
 import { FileType } from '@/modules/file/domain/entities/file.entity';
-import { RegisterAssignDto } from '../dto/register-assign.dto';
 import { ValidateAssignTermDto } from '../dto/validate-assign-term.dto';
 import { UpdateTermInfoDto } from '../dto/updateTermInfo.dto';
 import {
@@ -21,6 +20,9 @@ import { FileStorageService } from '@/modules/file-storage/application/services/
 import { PrismaService } from '@/config/prisma/prisma.service';
 import { CreateTermCommitmentUseCase } from '../../domain/usecase/createTermCommitment.usecase';
 import { UserService } from '@/modules/user/application/service/user.service';
+import { UserFromJwt } from '@/auth/models/UserFromJwt';
+import { Prisma } from '@prisma/client';
+import { Role } from '@/modules/user/domain/entities/user.entity';
 
 @Injectable()
 export class TermCommitmentService implements ITermCommitmentService {
@@ -61,8 +63,10 @@ export class TermCommitmentService implements ITermCommitmentService {
           ...userData.institution,
         },
       });
-      this.termCommitmentFileId =
-        await this.fileStorageService.uploadPdfFile(pdf);
+      this.termCommitmentFileId = await this.fileStorageService.uploadPdfFile(
+        pdf,
+        FileType.TERM_COMMITMENT,
+      );
 
       const result = await this.prismaService.$transaction(
         async (prismaClientTransaction) => {
@@ -89,6 +93,7 @@ export class TermCommitmentService implements ITermCommitmentService {
             {
               status: InternshipProcessStatus.IN_PROGRESS,
               movement: InternshipProcessMovement.STAGE_START,
+              description: 'processo iniciado pelo aluno',
               idInternshipProcess: id,
               files: [
                 {
@@ -127,76 +132,132 @@ export class TermCommitmentService implements ITermCommitmentService {
     // }
   }
 
-  async registerAssignTermByStudent(
-    registerAssignDto: RegisterAssignDto,
+  async registerAssignTerm(
+    validateAssignTermDto: ValidateAssignTermDto,
+    file: Express.Multer.File,
+    user: UserFromJwt,
   ): Promise<void> {
-    const registeredFile = await this.fileService.registerFilePathProcess({
-      filePath: registerAssignDto.termFilePath,
-      fileType: FileType.TERM_COMMITMENT,
-    });
+    let termCommitmentFileId: string = '';
+    try {
+      termCommitmentFileId = await this.fileStorageService.uploadPdfFile(
+        file.buffer,
+        FileType.TERM_COMMITMENT,
+      );
 
-    this.internshipProcessService.updateInternshipProcess({
-      id: registerAssignDto.internshipProcessId,
-      status: InternshipProcessStatus.UNDER_REVIEW,
-      movement: InternshipProcessMovement.STAGE_START,
-    });
+      await this.prismaService.$transaction(async (prismaClientTransaction) => {
+        if (user.role !== Role.STUDENT) {
+          this.validateAssignTerm(
+            validateAssignTermDto,
+            termCommitmentFileId,
+            prismaClientTransaction,
+          );
+        } else {
+          this.registerAssignTermByStudent(
+            validateAssignTermDto,
+            termCommitmentFileId,
+            prismaClientTransaction,
+          );
+        }
+      });
+    } catch (error) {
+      if (termCommitmentFileId) {
+        try {
+          await this.fileStorageService.deletePdfFile(termCommitmentFileId);
+        } catch (deleteError) {
+          console.error('Erro ao deletar arquivo:', deleteError);
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  private async registerAssignTermByStudent(
+    validateAssignTermDto: ValidateAssignTermDto,
+    termCommitmentFileId: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ) {
+    this.internshipProcessService.updateInternshipProcess(
+      {
+        id: validateAssignTermDto.internshipProcessId,
+        status: InternshipProcessStatus.UNDER_REVIEW,
+        movement: InternshipProcessMovement.STAGE_START,
+      },
+      prismaClientTransaction,
+    );
 
     const newHistory: CreateInternshipProcessHistoryDto = {
       movement: InternshipProcessMovement.STAGE_START,
       status: InternshipProcessStatus.UNDER_REVIEW,
-      idInternshipProcess: registerAssignDto.internshipProcessId,
-      fileIds: [registeredFile.id],
+      idInternshipProcess: validateAssignTermDto.internshipProcessId,
+      fileIds: [termCommitmentFileId],
     };
-    //transação
-    this.internshipProcessHistoryService.updateHistory({
-      endDate: new Date(),
-      idInternshipProcess: registerAssignDto.internshipProcessId,
-    });
 
-    this.internshipProcessHistoryService.registerHistory(newHistory);
+    this.internshipProcessHistoryService.updateHistory(
+      {
+        endDate: new Date(),
+        idInternshipProcess: validateAssignTermDto.internshipProcessId,
+      },
+      prismaClientTransaction,
+    );
+
+    this.internshipProcessHistoryService.registerHistory(
+      newHistory,
+      prismaClientTransaction,
+    );
   }
 
-  async validateAssignTerm(
+  private async validateAssignTerm(
     validateAssignTermDto: ValidateAssignTermDto,
+    termCommitmentFileId: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
-    //se ja tiver o status de aprovação nao deve ir pro fluxo de aprovação novamente o mesmo para recusa
     if (validateAssignTermDto.validate && validateAssignTermDto.termFilePath) {
-      const registeredFile = await this.fileService.registerFilePathProcess({
-        filePath: validateAssignTermDto.termFilePath,
-        fileType: FileType.TERM_COMMITMENT,
-      });
-
-      this.internshipProcessService.updateInternshipProcess({
-        id: validateAssignTermDto.internshipProcessId,
-        status: InternshipProcessStatus.COMPLETED,
-        movement: InternshipProcessMovement.STAGE_START,
-      });
+      this.internshipProcessService.updateInternshipProcess(
+        {
+          id: validateAssignTermDto.internshipProcessId,
+          status: InternshipProcessStatus.COMPLETED,
+          movement: InternshipProcessMovement.STAGE_START,
+        },
+        prismaClientTransaction,
+      );
 
       const newHistory: CreateInternshipProcessHistoryDto = {
         movement: InternshipProcessMovement.STAGE_START,
         status: InternshipProcessStatus.COMPLETED,
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
-        fileIds: [registeredFile.id],
+        fileIds: [termCommitmentFileId],
       };
 
-      //ajustar para determinar a data apenas da ultima movimentação
-      this.internshipProcessHistoryService.updateHistory({
-        endDate: new Date(),
-        idInternshipProcess: validateAssignTermDto.internshipProcessId,
-      });
+      this.internshipProcessHistoryService.updateHistory(
+        {
+          endDate: new Date(),
+          idInternshipProcess: validateAssignTermDto.internshipProcessId,
+        },
+        prismaClientTransaction,
+      );
 
-      this.internshipProcessHistoryService.registerHistory(newHistory);
+      this.internshipProcessHistoryService.registerHistory(
+        newHistory,
+        prismaClientTransaction,
+      );
     } else {
-      this.internshipProcessService.updateInternshipProcess({
-        id: validateAssignTermDto.internshipProcessId,
-        status: InternshipProcessStatus.REJECTED,
-        movement: InternshipProcessMovement.STAGE_START,
-      });
+      this.internshipProcessService.updateInternshipProcess(
+        {
+          id: validateAssignTermDto.internshipProcessId,
+          status: InternshipProcessStatus.REJECTED,
+          movement: InternshipProcessMovement.STAGE_START,
+        },
+        prismaClientTransaction,
+      );
 
-      this.internshipProcessHistoryService.updateHistory({
-        endDate: new Date(),
-        idInternshipProcess: validateAssignTermDto.internshipProcessId,
-      });
+      this.internshipProcessHistoryService.updateHistory(
+        {
+          endDate: new Date(),
+          idInternshipProcess: validateAssignTermDto.internshipProcessId,
+        },
+        prismaClientTransaction,
+      );
 
       const newHistory: CreateInternshipProcessHistoryDto = {
         movement: InternshipProcessMovement.STAGE_START,
@@ -205,7 +266,10 @@ export class TermCommitmentService implements ITermCommitmentService {
         observations: validateAssignTermDto.remark,
       };
 
-      this.internshipProcessHistoryService.registerHistory(newHistory);
+      this.internshipProcessHistoryService.registerHistory(
+        newHistory,
+        prismaClientTransaction,
+      );
     }
   }
 

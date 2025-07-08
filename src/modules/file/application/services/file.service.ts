@@ -20,6 +20,11 @@ export class FileService {
     });
   }
 
+  async uploadFile(file: Express.Multer.File, fileType: FileType) {
+    const pdfFileStream = new Uint8Array(file.buffer);
+    return this.fileStorageService.uploadPdfFile(pdfFileStream, fileType);
+  }
+
   async registerFilePathProcess(
     registerFilePathDto: RegisterFilePathDto,
     prismaClientTransaction?: Prisma.TransactionClient,
@@ -29,7 +34,11 @@ export class FileService {
 
   async registerFilePathsProcess(
     registerFilePathsDto: RegisterFilePathDto[],
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<FileEntity[]> {
-    return await this.fileRepository.registerFilePaths(registerFilePathsDto);
+    return await this.fileRepository.registerFilePaths(
+      registerFilePathsDto,
+      prismaClientTransaction,
+    );
   }
 }

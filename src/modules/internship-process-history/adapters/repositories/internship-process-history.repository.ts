@@ -15,14 +15,16 @@ export class InternshipProcessHistoryRepository
 
   async registerHistory(
     createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
+    const prisma = prismaClientTransaction || this.prisma;
     const {
       idInternshipProcess,
       fileIds: fileIds,
       ...rest
     } = createInternshipProcessHistoryDto;
 
-    await this.prisma.internshipProcessHistory.create({
+    await prisma.internshipProcessHistory.create({
       data: {
         ...rest,
         internshipProcess: {
@@ -64,13 +66,27 @@ export class InternshipProcessHistoryRepository
 
   async updateHistory(
     updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
-    await this.prisma.internshipProcessHistory.updateMany({
+    const prisma = prismaClientTransaction || this.prisma;
+
+    await prisma.internshipProcessHistory.updateMany({
       where: {
         idInternshipProcess:
           updateInternshipProcessHistoryDto.idInternshipProcess,
       },
       data: updateInternshipProcessHistoryDto,
+    });
+  }
+
+  async getHistoriesByInternshipProcessId(internshipProcessId: string) {
+    return this.prisma.internshipProcessHistory.findMany({
+      where: {
+        idInternshipProcess: internshipProcessId,
+      },
+      include: {
+        files: true,
+      },
     });
   }
 

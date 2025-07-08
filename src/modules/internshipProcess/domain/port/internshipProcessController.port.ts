@@ -14,7 +14,9 @@ export interface InternshipProcessControllerPort {
   );
 
   registerEndInternshipByStudent(
+    file: Express.Multer.File[],
     registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+    user: UserFromJwt,
   );
 
   validateAssignEndInternshipProcess(
