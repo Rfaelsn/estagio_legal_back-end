@@ -11,12 +11,17 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { IsPublic } from '@/auth/decorators/is-public.decorator';
 import { CreateTermCommitmentDTO } from '@/modules/termCommitment/application/dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '@/modules/termCommitment/application/dto/LinkTermCommitmentFilePath.dto';
 import { TermCommitmentService } from '@/modules/termCommitment/application/service/termCommitment.service';
-import { filePipe } from '@/modules/file/adapter/interceptors/config-file-interceptor';
+import {
+  configFileInterceptor,
+  filePipe,
+} from '@/modules/file/adapter/interceptors/config-file-interceptor';
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('termCommitment')
 export class termCommitmentController {
   constructor(private readonly termCommitmentService: TermCommitmentService) {}
@@ -44,18 +49,15 @@ export class termCommitmentController {
   }
 
   @Roles(Role.STUDENT, Role.ADMINISTRATOR, Role.EMPLOYEE)
+  @UseInterceptors(FileInterceptor('file', configFileInterceptor))
   @Post('assign')
-  async registerAssign(
-    @UploadedFile(filePipe)
-    file: Express.Multer.File,
+  async assign(
     @Body() validateAssignTermDto: ValidateAssignTermDto,
     @User() user: UserFromJwt,
+    @UploadedFile(filePipe)
+    file?: Express.Multer.File,
   ) {
-    await this.termCommitmentService.registerAssignTerm(
-      validateAssignTermDto,
-      file,
-      user,
-    );
+    await this.termCommitmentService.assign(validateAssignTermDto, file, user);
   }
 
   // @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE)

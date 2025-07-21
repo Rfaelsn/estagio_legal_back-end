@@ -17,7 +17,7 @@ export class FileStorageProvider {
       const pdfBlob = new Blob([pdfFileBuffer], { type: 'application/pdf' });
 
       const formData = new FormData();
-      formData.append('file', pdfBlob, 'termo_de_compromisso.pdf');
+      formData.append('file', pdfBlob);
       formData.append('fileType', fileType);
 
       const response = await axios.post(

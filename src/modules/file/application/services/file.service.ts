@@ -29,7 +29,10 @@ export class FileService {
     registerFilePathDto: RegisterFilePathDto,
     prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<FileEntity> {
-    return await this.fileRepository.registerFilePath(registerFilePathDto);
+    return await this.fileRepository.registerFilePath(
+      registerFilePathDto,
+      prismaClientTransaction,
+    );
   }
 
   async registerFilePathsProcess(

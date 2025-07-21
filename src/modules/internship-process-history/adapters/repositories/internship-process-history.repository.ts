@@ -64,7 +64,7 @@ export class InternshipProcessHistoryRepository
     });
   }
 
-  async updateHistory(
+  async updateLatestHistory(
     updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
     prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
@@ -74,6 +74,7 @@ export class InternshipProcessHistoryRepository
       where: {
         idInternshipProcess:
           updateInternshipProcessHistoryDto.idInternshipProcess,
+        endDate: null,
       },
       data: updateInternshipProcessHistoryDto,
     });

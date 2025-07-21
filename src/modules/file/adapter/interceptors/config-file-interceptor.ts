@@ -20,6 +20,7 @@ const filePipe = new ParseFilePipe({
     new FileTypeValidator({ fileType: 'application/pdf' }),
     new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
   ],
+  fileIsRequired: false,
 });
 
 export { configFileInterceptor, filePipe };

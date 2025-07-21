@@ -142,6 +142,7 @@ model InternshipProcessHistory {
   files               File[]            @relation("ProcessHistoryFiles")
   idInternshipProcess String
   internshipProcess   InternshipProcess @relation("statusHistory_process", fields: [idInternshipProcess], references: [id])
+  createdAt           DateTime          @default(now()) @db.Timestamp(0)
 
   @@map("tb_internshipProcessStatusHistory")
 }

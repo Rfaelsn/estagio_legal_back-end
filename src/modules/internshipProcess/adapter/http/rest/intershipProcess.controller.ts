@@ -12,6 +12,7 @@ import {
   HttpException,
   HttpStatus,
   UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 
@@ -26,7 +27,11 @@ import { ValidateAssignEndInternshipProcessDto } from '@/modules/internshipProce
 import { RegisterEndInternshipProcessDto } from '@/modules/internshipProcess/application/dto/registerEndInternshipProcess.dto';
 import { InternshipProcessFilterDto } from '@/modules/internshipProcess/application/dto/internshipProcessFilter.dto';
 import { InternshipProcessControllerPort } from '@/modules/internshipProcess/domain/port/internshipProcessController.port';
-import { filePipe } from '@/modules/file/adapter/interceptors/config-file-interceptor';
+import {
+  configFileInterceptor,
+  filePipe,
+} from '@/modules/file/adapter/interceptors/config-file-interceptor';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
@@ -56,16 +61,18 @@ export class InternshipProcessController
   }
 
   @Roles(Role.STUDENT, Role.ADMINISTRATOR, Role.EMPLOYEE)
-  @Post('assign-end-internship')
-  async registerEndInternshipByStudent(
-    @UploadedFiles(filePipe)
-    file: Express.Multer.File[],
-    @Body() registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+  @UseInterceptors(FilesInterceptor('file', 3, configFileInterceptor))
+  @Post('assign-end-internship-process')
+  async assignEndInternshipProcess(
+    @Body()
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
     @User() user: UserFromJwt,
+    @UploadedFiles(filePipe)
+    files?: Express.Multer.File[],
   ) {
-    await this.internshipProcessService.registerEndInternshipProcess(
+    await this.internshipProcessService.assignEndInternshipProcess(
       registerEndInternshipProcessDto,
-      file,
+      files,
       user,
     );
   }

@@ -13,10 +13,10 @@ export interface InternshipProcessControllerPort {
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
   );
 
-  registerEndInternshipByStudent(
-    file: Express.Multer.File[],
+  assignEndInternshipProcess(
     registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
     user: UserFromJwt,
+    file?: Express.Multer.File[],
   );
 
   validateAssignEndInternshipProcess(

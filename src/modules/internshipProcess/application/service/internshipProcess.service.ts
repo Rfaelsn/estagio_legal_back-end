@@ -54,7 +54,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     file: Express.Multer.File[],
     user: UserFromJwt,
   ) {
-    throw new Error('Method not implemented.');
+    console.log('teste');
   }
 
   async create(
@@ -143,7 +143,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
       user.id,
     );
 
-    if (!isElegible) {
+    if (!isElegible && user.role === Role.STUDENT) {
       throw new Error(
         'O processo de estágio não está elegível para ser concluído. precisa estar no estágio de início de estágio concluído.',
       );
@@ -151,27 +151,27 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
     const filePaths: RegisterFilePathDto[] = [];
 
+    for (const file of files) {
+      const fileType = this.getFileType(file.originalname);
+      const filePath = await this.fileStorageService.uploadPdfFile(
+        file.buffer,
+        fileType,
+      );
+      filePaths.push({
+        filePath,
+        fileType,
+        isAssigned: true,
+      });
+    }
+
     try {
       await this.prismaService.$transaction(async (prismaClientTransaction) => {
-        files.forEach(async (file) => {
-          const fileType = this.getFileType(file.originalname);
-
-          const filePath = await this.fileStorageService.uploadPdfFile(
-            file.buffer,
-            fileType,
-          );
-          filePaths.push({
-            filePath,
-            fileType,
-          });
-        });
-
         const registeredFiles = await this.fileService.registerFilePathsProcess(
           filePaths,
           prismaClientTransaction,
         );
 
-        const newHistory = this.getNewIntenrhsipProcessHistoryByUserRole(
+        const newHistory = this.getNewInternshipProcessHistoryByUserRole(
           user.role,
           registeredFiles,
           registerEndInternshipProcessDto,
@@ -189,7 +189,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
         );
 
         //atualizar para pegar att a end date do ultimo registro
-        await this.internshipProcessHistoryService.updateHistory(
+        await this.internshipProcessHistoryService.updateLatestHistory(
           {
             endDate: new Date(),
             idInternshipProcess:
@@ -213,7 +213,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     }
   }
 
-  private getNewIntenrhsipProcessHistoryByUserRole(
+  private getNewInternshipProcessHistoryByUserRole(
     userRole: Role | string,
     registeredFiles: FileEntity[],
     registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
@@ -233,6 +233,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
       return {
         movement: InternshipProcessMovement.STAGE_END,
         status: InternshipProcessStatus.COMPLETED,
+        endDate: new Date(),
         idInternshipProcess:
           registerEndInternshipProcessDto.internshipProcessId,
         fileIds: registeredFiles.map((file) => file.id),
@@ -277,8 +278,17 @@ export class InternshipProcessService implements InternshipProcessServicePort {
   }
 
   private getFileType(fileName: string): FileType {
-    if (fileName === 'avaliacao_aluno') {
+    if (fileName === 'auto_avaliacao_estagiario.pdf') {
       return FileType.STUDENT_SELF_EVALUATION;
+    } else if (fileName === 'avaliacao_concedente.pdf') {
+      return FileType.INTERNSHIP_GRANTOR_EVALUATION;
+    } else if (fileName === 'avaliacao_professor_orientador.pdf') {
+      return FileType.SUPERVISOR_EVALUATION;
+    } else if (fileName === 'certificado_conclusao_estagio.pdf') {
+      return FileType.INTERNSHIP_CERTIFICATE;
+    } else {
+      console.log(fileName);
+      throw new Error(`Tipo de arquivo desconhecido ${fileName}`);
     }
   }
 
@@ -320,7 +330,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
       };
 
       //ajustar para determinar a data apenas da ultima movimentação
-      this.internshipProcessHistoryService.updateHistory({
+      this.internshipProcessHistoryService.updateLatestHistory({
         endDate: new Date(),
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
@@ -334,7 +344,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
         movement: InternshipProcessMovement.STAGE_END,
       });
 
-      this.internshipProcessHistoryService.updateHistory({
+      this.internshipProcessHistoryService.updateLatestHistory({
         endDate: new Date(),
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,

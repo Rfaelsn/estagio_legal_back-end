@@ -11,4 +11,5 @@ export class InternshipProcessHistoryEntity
   description: string;
   observations: string | null;
   idInternshipProcess: string;
+  createdAt: Date;
 }

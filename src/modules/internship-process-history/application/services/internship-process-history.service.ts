@@ -44,12 +44,12 @@ export class InternshipProcessHistoryService
     }
   }
 
-  async updateHistory(
+  async updateLatestHistory(
     updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
     prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
     try {
-      await this.internshipProcessHistoryRepository.updateHistory(
+      await this.internshipProcessHistoryRepository.updateLatestHistory(
         updateInternshipProcessHistoryDto,
         prismaClientTransaction,
       );

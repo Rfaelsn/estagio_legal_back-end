@@ -69,35 +69,15 @@ export class InternshipProcessRepository
   async filter(
     internshipProcessFilterDTO: InternshipProcessFilterDto,
   ): Promise<InternshipProcessEntity[]> {
-    const {
-      user,
-      termCommitment,
-      page,
-      perPage,
-      startDateProcessRangeStart,
-      startDateProcessRangeEnd,
-      endDateProcessRangeStart,
-      endDateProcessRangeEnd,
-      ...rest
-    } = internshipProcessFilterDTO;
+    const { page, perPage } = internshipProcessFilterDTO;
+
+    const where = this.constructFilterWhere(internshipProcessFilterDTO);
 
     const take: number = perPage || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
     const internshipProcess = await this.prisma.internshipProcess.findMany({
-      where: {
-        ...rest,
-        startDateProcess: {
-          gte: startDateProcessRangeStart,
-          lte: startDateProcessRangeEnd,
-        },
-        endDateProcess: {
-          gte: endDateProcessRangeStart,
-          lte: endDateProcessRangeEnd,
-        },
-        user: { ...user },
-        termCommitment: { ...termCommitment },
-      },
+      where,
       orderBy: {
         createdAt: 'desc',
       },
@@ -204,7 +184,7 @@ export class InternshipProcessRepository
 
   private constructFilterWhere(
     internshipProcessFilterByStudentDto: InternshipProcessFilterDto,
-    userId: string,
+    userId?: string,
   ): any {
     const {
       termCommitment,

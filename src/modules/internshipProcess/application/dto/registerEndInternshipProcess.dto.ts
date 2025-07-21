@@ -1,18 +1,20 @@
-import { RegisterFilePathDto } from '@/modules/file/application/dtos/registerFilePath.dto';
-import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class RegisterEndInternshipProcessDto {
   @IsString()
   internshipProcessId: string;
 
-  @IsArray()
-  internshipEvaluationFilesPaths: RegisterFilePathDto[];
-
   @IsString()
   @IsOptional()
   remark?: string;
 
+  @Transform(({ value }) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') return value.trim().toLowerCase() === 'true';
+    return false;
+  })
   @IsBoolean()
   @IsOptional()
-  validate: boolean;
+  validate?: boolean;
 }

@@ -3,7 +3,6 @@ import { TermCommitmentRepository } from '../../adapter/repository/termCommitmen
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '../dto/LinkTermCommitmentFilePath.dto';
 import { InternshipProcessHistoryService } from '@/modules/internship-process-history/application/services/internship-process-history.service';
-import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
 import { FileService } from '@/modules/file/application/services/file.service';
 import { FileType } from '@/modules/file/domain/entities/file.entity';
 import { ValidateAssignTermDto } from '../dto/validate-assign-term.dto';
@@ -21,7 +20,6 @@ import { PrismaService } from '@/config/prisma/prisma.service';
 import { CreateTermCommitmentUseCase } from '../../domain/usecase/createTermCommitment.usecase';
 import { UserService } from '@/modules/user/application/service/user.service';
 import { UserFromJwt } from '@/auth/models/UserFromJwt';
-import { Prisma } from '@prisma/client';
 import { Role } from '@/modules/user/domain/entities/user.entity';
 
 @Injectable()
@@ -132,37 +130,69 @@ export class TermCommitmentService implements ITermCommitmentService {
     // }
   }
 
-  async registerAssignTerm(
+  async assign(
     validateAssignTermDto: ValidateAssignTermDto,
     file: Express.Multer.File,
     user: UserFromJwt,
   ): Promise<void> {
-    let termCommitmentFileId: string = '';
+    let termCommitmentFilePathId: string = '';
     try {
-      termCommitmentFileId = await this.fileStorageService.uploadPdfFile(
-        file.buffer,
-        FileType.TERM_COMMITMENT,
-      );
+      if (file?.buffer) {
+        termCommitmentFilePathId = await this.fileStorageService.uploadPdfFile(
+          file.buffer,
+          FileType.TERM_COMMITMENT,
+        );
+      }
 
       await this.prismaService.$transaction(async (prismaClientTransaction) => {
-        if (user.role !== Role.STUDENT) {
-          this.validateAssignTerm(
-            validateAssignTermDto,
-            termCommitmentFileId,
+        let termCommitmentEntityFileId: string;
+        if (file?.buffer) {
+          const { id } = await this.fileService.registerFilePathProcess(
+            {
+              filePath: termCommitmentFilePathId,
+              fileType: FileType.TERM_COMMITMENT,
+              isAssigned: true,
+            },
             prismaClientTransaction,
           );
-        } else {
-          this.registerAssignTermByStudent(
-            validateAssignTermDto,
-            termCommitmentFileId,
-            prismaClientTransaction,
-          );
+
+          termCommitmentEntityFileId = id;
         }
+
+        const newHistory = this.getNewInternshipProcessHistoryByUserRole(
+          user.role,
+          validateAssignTermDto,
+          termCommitmentEntityFileId,
+        );
+
+        const updatedInternshipProcessStateData =
+          this.getNewInternshipProcessStateDataByUserRole(
+            user.role,
+            validateAssignTermDto,
+          );
+
+        await this.internshipProcessService.updateInternshipProcess(
+          updatedInternshipProcessStateData,
+          prismaClientTransaction,
+        );
+
+        await this.internshipProcessHistoryService.updateLatestHistory(
+          {
+            endDate: new Date(),
+            idInternshipProcess: validateAssignTermDto.internshipProcessId,
+          },
+          prismaClientTransaction,
+        );
+
+        await this.internshipProcessHistoryService.registerHistory(
+          newHistory,
+          prismaClientTransaction,
+        );
       });
     } catch (error) {
-      if (termCommitmentFileId) {
+      if (termCommitmentFilePathId) {
         try {
-          await this.fileStorageService.deletePdfFile(termCommitmentFileId);
+          await this.fileStorageService.deletePdfFile(termCommitmentFilePathId);
         } catch (deleteError) {
           console.error('Erro ao deletar arquivo:', deleteError);
         }
@@ -172,104 +202,64 @@ export class TermCommitmentService implements ITermCommitmentService {
     }
   }
 
-  private async registerAssignTermByStudent(
+  private getNewInternshipProcessHistoryByUserRole(
+    userRole: Role | string,
     validateAssignTermDto: ValidateAssignTermDto,
-    termCommitmentFileId: string,
-    prismaClientTransaction?: Prisma.TransactionClient,
+    registeredFileId?: string,
   ) {
-    this.internshipProcessService.updateInternshipProcess(
-      {
-        id: validateAssignTermDto.internshipProcessId,
-        status: InternshipProcessStatus.UNDER_REVIEW,
+    if (userRole === Role.STUDENT) {
+      return {
         movement: InternshipProcessMovement.STAGE_START,
-      },
-      prismaClientTransaction,
-    );
-
-    const newHistory: CreateInternshipProcessHistoryDto = {
-      movement: InternshipProcessMovement.STAGE_START,
-      status: InternshipProcessStatus.UNDER_REVIEW,
-      idInternshipProcess: validateAssignTermDto.internshipProcessId,
-      fileIds: [termCommitmentFileId],
-    };
-
-    this.internshipProcessHistoryService.updateHistory(
-      {
-        endDate: new Date(),
+        status: InternshipProcessStatus.UNDER_REVIEW,
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
-      },
-      prismaClientTransaction,
-    );
-
-    this.internshipProcessHistoryService.registerHistory(
-      newHistory,
-      prismaClientTransaction,
-    );
-  }
-
-  private async validateAssignTerm(
-    validateAssignTermDto: ValidateAssignTermDto,
-    termCommitmentFileId: string,
-    prismaClientTransaction?: Prisma.TransactionClient,
-  ): Promise<void> {
-    if (validateAssignTermDto.validate && validateAssignTermDto.termFilePath) {
-      this.internshipProcessService.updateInternshipProcess(
-        {
-          id: validateAssignTermDto.internshipProcessId,
-          status: InternshipProcessStatus.COMPLETED,
-          movement: InternshipProcessMovement.STAGE_START,
-        },
-        prismaClientTransaction,
-      );
-
-      const newHistory: CreateInternshipProcessHistoryDto = {
+        fileIds: [registeredFileId],
+      };
+    } else if (
+      validateAssignTermDto.validate &&
+      (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR)
+    ) {
+      return {
         movement: InternshipProcessMovement.STAGE_START,
         status: InternshipProcessStatus.COMPLETED,
+        endDate: new Date(),
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
-        fileIds: [termCommitmentFileId],
+        fileIds: [registeredFileId],
       };
-
-      this.internshipProcessHistoryService.updateHistory(
-        {
-          endDate: new Date(),
-          idInternshipProcess: validateAssignTermDto.internshipProcessId,
-        },
-        prismaClientTransaction,
-      );
-
-      this.internshipProcessHistoryService.registerHistory(
-        newHistory,
-        prismaClientTransaction,
-      );
-    } else {
-      this.internshipProcessService.updateInternshipProcess(
-        {
-          id: validateAssignTermDto.internshipProcessId,
-          status: InternshipProcessStatus.REJECTED,
-          movement: InternshipProcessMovement.STAGE_START,
-        },
-        prismaClientTransaction,
-      );
-
-      this.internshipProcessHistoryService.updateHistory(
-        {
-          endDate: new Date(),
-          idInternshipProcess: validateAssignTermDto.internshipProcessId,
-        },
-        prismaClientTransaction,
-      );
-
-      const newHistory: CreateInternshipProcessHistoryDto = {
+    } else if (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR) {
+      return {
         movement: InternshipProcessMovement.STAGE_START,
         status: InternshipProcessStatus.REJECTED,
         idInternshipProcess: validateAssignTermDto.internshipProcessId,
         observations: validateAssignTermDto.remark,
       };
+    }
+  }
 
-      this.internshipProcessHistoryService.registerHistory(
-        newHistory,
-        prismaClientTransaction,
-      );
+  private getNewInternshipProcessStateDataByUserRole(
+    userRole: Role | string,
+    validateAssignTermDto: ValidateAssignTermDto,
+  ) {
+    if (userRole === Role.STUDENT) {
+      return {
+        id: validateAssignTermDto.internshipProcessId,
+        status: InternshipProcessStatus.UNDER_REVIEW,
+        movement: InternshipProcessMovement.STAGE_START,
+      };
+    } else if (
+      validateAssignTermDto.validate &&
+      (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR)
+    ) {
+      return {
+        id: validateAssignTermDto.internshipProcessId,
+        status: InternshipProcessStatus.COMPLETED,
+        movement: InternshipProcessMovement.STAGE_START,
+      };
+    } else if (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR) {
+      return {
+        id: validateAssignTermDto.internshipProcessId,
+        status: InternshipProcessStatus.REJECTED,
+        movement: InternshipProcessMovement.STAGE_START,
+      };
     }
   }
 
