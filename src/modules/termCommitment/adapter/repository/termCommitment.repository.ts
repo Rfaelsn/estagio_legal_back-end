@@ -49,14 +49,32 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
     });
   }
 
-  async update(idTerm: string, updateTermInfoDto: UpdateTermInfoDto) {
-    const { internshipProcessId, ...rest } = updateTermInfoDto;
+  async update(
+    internshipProcessId: string,
+    updateTermInfoDto: UpdateTermInfoDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ) {
+    const prisma = prismaClientTransaction || this.prisma;
+    const internshipProcess = await prisma.internshipProcess.findUnique({
+      where: { id: internshipProcessId },
+      select: { id_termCommitment: true },
+    });
+
+    if (!internshipProcess?.id_termCommitment) {
+      throw new Error(
+        'Termo de compromisso não encontrado para este processo.',
+      );
+    }
+
     const data = {
-      ...rest,
-      planoAtividadesEstagio: JSON.stringify(rest.planoAtividadesEstagio),
+      ...updateTermInfoDto,
+      internshipActivityPlan: JSON.stringify(
+        updateTermInfoDto.internshipActivityPlan,
+      ),
     };
-    return await this.prisma.termCommitment.update({
-      where: { id: idTerm },
+
+    return await prisma.termCommitment.update({
+      where: { id: internshipProcess.id_termCommitment },
       data,
       include: {
         user: true,

@@ -61,6 +61,7 @@ export class TermCommitmentService implements ITermCommitmentService {
           ...userData.institution,
         },
       });
+
       this.termCommitmentFileId = await this.fileStorageService.uploadPdfFile(
         pdf,
         FileType.TERM_COMMITMENT,
@@ -272,26 +273,86 @@ export class TermCommitmentService implements ITermCommitmentService {
   }
 
   async updateTermInfo(
-    idTerm: string,
+    internshipProcessId: string,
+    idUser: string,
     updateTermInfoDto: UpdateTermInfoDto,
-  ): Promise<any> {
-    await this.internshipProcessHistoryService.registerHistory({
-      status: InternshipProcessStatus.IN_PROGRESS,
-      movement: InternshipProcessMovement.STAGE_START,
-      observations: 'atualizado pelo aluno',
-      idInternshipProcess: updateTermInfoDto.internshipProcessId,
-    });
+  ): Promise<void> {
+    try {
+      const userData = await this.userService.getUserById(idUser);
 
-    this.internshipProcessService.updateInternshipProcess({
-      id: updateTermInfoDto.internshipProcessId,
-      status: InternshipProcessStatus.IN_PROGRESS,
-      movement: InternshipProcessMovement.STAGE_START,
-    });
+      const pdf = await this.generatePdfService.createTermCommitmentPdf({
+        ...updateTermInfoDto,
+        user: {
+          ...userData,
+        },
+        institution: {
+          ...userData.institution,
+        },
+      });
 
-    return await this.termCommitmentRepository.update(
-      idTerm,
-      updateTermInfoDto,
-    );
+      this.termCommitmentFileId = await this.fileStorageService.uploadPdfFile(
+        pdf,
+        FileType.TERM_COMMITMENT,
+      );
+
+      await this.prismaService.$transaction(async (prismaClientTransaction) => {
+        const { id: termCommitmentEntityFileId } =
+          await this.fileService.registerFilePathProcess({
+            filePath: this.termCommitmentFileId,
+            fileType: FileType.TERM_COMMITMENT,
+          });
+
+        await this.internshipProcessHistoryService.registerHistoryWithFile(
+          {
+            status: InternshipProcessStatus.IN_PROGRESS,
+            movement: InternshipProcessMovement.STAGE_START,
+            description: 'atualizado pelo aluno',
+            idInternshipProcess: internshipProcessId,
+            files: [
+              {
+                fileId: termCommitmentEntityFileId,
+              },
+            ],
+          },
+          prismaClientTransaction,
+        );
+
+        await this.internshipProcessService.updateInternshipProcess(
+          {
+            id: internshipProcessId,
+            status: InternshipProcessStatus.IN_PROGRESS,
+            movement: InternshipProcessMovement.STAGE_START,
+          },
+          prismaClientTransaction,
+        );
+
+        await this.internshipProcessHistoryService.updateLatestHistory(
+          {
+            endDate: new Date(),
+            idInternshipProcess: internshipProcessId,
+          },
+          prismaClientTransaction,
+        );
+
+        await this.termCommitmentRepository.update(
+          internshipProcessId,
+          updateTermInfoDto,
+          prismaClientTransaction,
+        );
+      });
+    } catch (error) {
+      if (this.termCommitmentFileId) {
+        try {
+          await this.fileStorageService.deletePdfFile(
+            this.termCommitmentFileId,
+          );
+        } catch (deleteError) {
+          console.error('Erro ao deletar arquivo:', deleteError);
+        }
+      }
+
+      throw error;
+    }
   }
 
   async isValidWeeklyWorkloadLimit(

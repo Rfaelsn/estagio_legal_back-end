@@ -28,7 +28,7 @@ export class termCommitmentController {
 
   @Roles(Role.STUDENT)
   @Post('create')
-  async createIntershipProcess(
+  async createInternshipProcess(
     @Body() createTermCommitmentDTO: CreateTermCommitmentDTO,
     @User('sub') userId,
   ) {
@@ -85,16 +85,17 @@ export class termCommitmentController {
       linkTermCommitmentFilePathDTO,
     );
   }
-
-  @IsPublic()
+  @Roles(Role.STUDENT, Role.ADMINISTRATOR, Role.EMPLOYEE)
   @Patch('update/:id')
-  async updateTermInfo(
-    @Param('id') idTerm: string,
+  async updateTermByInternshipProcessId(
+    @Param('id') internshipProcessId: string,
     @Body() updateTermInfoDto: UpdateTermInfoDto,
-  ): Promise<any> {
+    @User('sub') userId,
+  ): Promise<void> {
     try {
-      return await this.termCommitmentService.updateTermInfo(
-        idTerm,
+      await this.termCommitmentService.updateTermInfo(
+        internshipProcessId,
+        userId,
         updateTermInfoDto,
       );
     } catch (error) {

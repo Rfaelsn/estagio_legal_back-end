@@ -31,7 +31,7 @@ export class CreateTermCommitmentDTO {
   @IsDate()
   @Transform(({ value }) => new Date(value))
   @IsNotEmpty()
-  internshipStartDate: any;
+  internshipStartDate: Date;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
