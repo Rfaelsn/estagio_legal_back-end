@@ -151,57 +151,96 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
     const filePaths: RegisterFilePathDto[] = [];
 
-    for (const file of files) {
-      const fileType = this.getFileType(file.originalname);
-      const filePath = await this.fileStorageService.uploadPdfFile(
-        file.buffer,
-        fileType,
-      );
-      filePaths.push({
-        filePath,
-        fileType,
-        isAssigned: true,
-      });
+    if (files.length !== 0) {
+      for (const file of files) {
+        const fileType = this.getFileType(file.originalname);
+        const filePath = await this.fileStorageService.uploadPdfFile(
+          file.buffer,
+          fileType,
+        );
+        filePaths.push({
+          filePath,
+          fileType,
+          isAssigned: true,
+        });
+      }
     }
 
     try {
       await this.prismaService.$transaction(async (prismaClientTransaction) => {
-        const registeredFiles = await this.fileService.registerFilePathsProcess(
-          filePaths,
-          prismaClientTransaction,
-        );
-
-        const newHistory = this.getNewInternshipProcessHistoryByUserRole(
-          user.role,
-          registeredFiles,
-          registerEndInternshipProcessDto,
-        );
-
-        const updatedInternshipProcessStateData =
-          this.getNewInternshipProcessStateDataByUserRole(
+        if (
+          filePaths.length === 0 &&
+          !registerEndInternshipProcessDto.validate &&
+          (user.role === Role.EMPLOYEE || user.role === Role.ADMINISTRATOR)
+        ) {
+          const newHistory = this.getNewInternshipProcessHistoryByUserRole(
             user.role,
+            [],
             registerEndInternshipProcessDto,
           );
 
-        await this.updateInternshipProcess(
-          updatedInternshipProcessStateData,
-          prismaClientTransaction,
-        );
+          const updatedInternshipProcessStateData =
+            this.getNewInternshipProcessStateDataByUserRole(
+              user.role,
+              registerEndInternshipProcessDto,
+            );
 
-        //atualizar para pegar att a end date do ultimo registro
-        await this.internshipProcessHistoryService.updateLatestHistory(
-          {
-            endDate: new Date(),
-            idInternshipProcess:
-              registerEndInternshipProcessDto.internshipProcessId,
-          },
-          prismaClientTransaction,
-        );
+          await this.updateInternshipProcess(
+            updatedInternshipProcessStateData,
+            prismaClientTransaction,
+          );
 
-        await this.internshipProcessHistoryService.registerHistory(
-          newHistory,
-          prismaClientTransaction,
-        );
+          await this.internshipProcessHistoryService.updateLatestHistory(
+            {
+              endDate: new Date(),
+              idInternshipProcess:
+                registerEndInternshipProcessDto.internshipProcessId,
+            },
+            prismaClientTransaction,
+          );
+
+          await this.internshipProcessHistoryService.registerHistory(
+            newHistory,
+            prismaClientTransaction,
+          );
+        } else {
+          const registeredFiles =
+            await this.fileService.registerFilePathsProcess(
+              filePaths,
+              prismaClientTransaction,
+            );
+
+          const newHistory = this.getNewInternshipProcessHistoryByUserRole(
+            user.role,
+            registeredFiles,
+            registerEndInternshipProcessDto,
+          );
+
+          const updatedInternshipProcessStateData =
+            this.getNewInternshipProcessStateDataByUserRole(
+              user.role,
+              registerEndInternshipProcessDto,
+            );
+
+          await this.updateInternshipProcess(
+            updatedInternshipProcessStateData,
+            prismaClientTransaction,
+          );
+
+          await this.internshipProcessHistoryService.updateLatestHistory(
+            {
+              endDate: new Date(),
+              idInternshipProcess:
+                registerEndInternshipProcessDto.internshipProcessId,
+            },
+            prismaClientTransaction,
+          );
+
+          await this.internshipProcessHistoryService.registerHistory(
+            newHistory,
+            prismaClientTransaction,
+          );
+        }
       });
     } catch (error) {
       if (filePaths.length > 0) {

@@ -12,6 +12,7 @@ export interface INotificationServicePort {
 
   findLatestNotificationsByUserId(
     findLatestNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
+    userId: string,
   );
 
   setReadNotification(notificationId: string): Promise<void>;

@@ -21,15 +21,17 @@ export class NotificationsRepository implements INotificationRepository {
 
   async findNotificationsByUserId(
     findNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
-  ): Promise<any[]> {
-    const { page, pageSize, id_user } = findNotificationsByUserIdDTO;
+    userId: string,
+  ): Promise<{ data: any[]; totalPages: number }> {
+    const { page, pageSize } = findNotificationsByUserIdDTO;
 
     const take: number = pageSize || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
+    // Busca as notificações paginadas
     const notifications = await this.prisma.notification.findMany({
       where: {
-        id_user,
+        id_user: userId,
       },
       take,
       skip,
@@ -38,7 +40,20 @@ export class NotificationsRepository implements INotificationRepository {
       },
     });
 
-    return notifications;
+    // Conta o total de notificações para o usuário
+    const totalCount = await this.prisma.notification.count({
+      where: {
+        id_user: userId,
+      },
+    });
+
+    // Calcula o total de páginas
+    const totalPages = Math.ceil(totalCount / take);
+
+    return {
+      data: notifications,
+      totalPages,
+    };
   }
 
   async setReadNotification(notificationId: string): Promise<void> {

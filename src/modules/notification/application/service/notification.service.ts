@@ -65,12 +65,14 @@ export class NotificationService implements INotificationServicePort {
 
   async findLatestNotificationsByUserId(
     findLatestNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
+    userId: string,
   ) {
     const findLatestNotificationsByUserIdUsecase =
       new FindLatestNotificationsByUserIdUsecase(this.notificationRepository);
 
     const notifications = findLatestNotificationsByUserIdUsecase.handle(
       findLatestNotificationsByUserIdDTO,
+      userId,
     );
 
     return notifications;
