@@ -3,11 +3,11 @@ import { INotificationRepository } from '../port/notificationRepository.port';
 
 export class CreateNotificationUsecase {
   constructor(
-    private readonly intershipProcessRepository: INotificationRepository,
+    private readonly notificationRepository: INotificationRepository,
   ) {}
 
   async handle(createNotificationDTO: CreateNotificationDTO) {
-    const createdNotification = await this.intershipProcessRepository.create(
+    const createdNotification = await this.notificationRepository.create(
       createNotificationDTO,
     );
 

@@ -12,6 +12,8 @@ export class NotificationsRepository implements INotificationRepository {
     const notification = await this.prisma.notification.create({
       data: {
         id_user: createNotificationDTO.idUser,
+        userRole: createNotificationDTO.userRole,
+        id_internshipProcess: createNotificationDTO.internshipProcessId,
         message: createNotificationDTO.message,
       },
     });
@@ -65,5 +67,38 @@ export class NotificationsRepository implements INotificationRepository {
         read: true,
       },
     });
+  }
+
+  async findNotificationsByRole(
+    role: string,
+    page: number,
+    pageSize: number,
+  ): Promise<any> {
+    const take: number = pageSize || 10;
+    const skip: number = page ? (page - 1) * take : 0;
+
+    const notifications = await this.prisma.notification.findMany({
+      where: {
+        userRole: role,
+      },
+      take,
+      skip,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const totalCount = await this.prisma.notification.count({
+      where: {
+        userRole: role,
+      },
+    });
+
+    const totalPages = Math.ceil(totalCount / take);
+
+    return {
+      data: notifications,
+      totalPages,
+    };
   }
 }

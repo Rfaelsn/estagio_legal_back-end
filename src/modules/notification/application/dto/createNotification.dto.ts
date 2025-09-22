@@ -7,5 +7,8 @@ export class CreateNotificationDTO {
   userRole?: string;
 
   @IsString()
+  internshipProcessId?: string;
+
+  @IsString()
   message: string;
 }

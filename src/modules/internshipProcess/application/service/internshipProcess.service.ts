@@ -72,11 +72,6 @@ export class InternshipProcessService implements InternshipProcessServicePort {
       prismaClientTransaction,
     );
 
-    this.notificationService.sendNotification(
-      idUser,
-      'created new internship process',
-    );
-
     return internshipProcess;
   }
 
@@ -401,11 +396,17 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     }
   }
 
-  async findById(id: string): Promise<InternshipProcessEntity> {
+  async findById(
+    id: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ): Promise<InternshipProcessEntity> {
     const filterInternshipProcessUsecase = new FindInternshipProcessByIdUsecase(
       this.internshipProcessRepository,
     );
-    const internshipProcess = await filterInternshipProcessUsecase.handle(id);
+    const internshipProcess = await filterInternshipProcessUsecase.handle(
+      id,
+      prismaClientTransaction,
+    );
     return internshipProcess;
   }
 }

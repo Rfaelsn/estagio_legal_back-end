@@ -9,6 +9,7 @@ import { InternshipProcessModule } from '../internshipProcess/intershipProcess.m
 import { FileStorageModule } from '../file-storage/file-storage.module';
 import { GeneratePdfModule } from '../generate-pdf/generate-pdf.module';
 import { UserModule } from '../user/user.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   controllers: [termCommitmentController],
@@ -21,6 +22,7 @@ import { UserModule } from '../user/user.module';
     FileStorageModule,
     GeneratePdfModule,
     UserModule,
+    NotificationModule,
   ],
   exports: [TermCommitmentService],
 })

@@ -56,6 +56,8 @@ var NotificationsRepository = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.prisma.notification.create({
                             data: {
                                 id_user: createNotificationDTO.idUser,
+                                userRole: createNotificationDTO.userRole,
+                                id_internshipProcess: createNotificationDTO.internshipProcessId,
                                 message: createNotificationDTO.message
                             }
                         })];
@@ -118,6 +120,42 @@ var NotificationsRepository = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
+                }
+            });
+        });
+    };
+    NotificationsRepository.prototype.findNotificationsByRole = function (role, page, pageSize) {
+        return __awaiter(this, void 0, Promise, function () {
+            var take, skip, notifications, totalCount, totalPages;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        take = pageSize || 10;
+                        skip = page ? (page - 1) * take : 0;
+                        return [4 /*yield*/, this.prisma.notification.findMany({
+                                where: {
+                                    userRole: role
+                                },
+                                take: take,
+                                skip: skip,
+                                orderBy: {
+                                    createdAt: 'desc'
+                                }
+                            })];
+                    case 1:
+                        notifications = _a.sent();
+                        return [4 /*yield*/, this.prisma.notification.count({
+                                where: {
+                                    userRole: role
+                                }
+                            })];
+                    case 2:
+                        totalCount = _a.sent();
+                        totalPages = Math.ceil(totalCount / take);
+                        return [2 /*return*/, {
+                                data: notifications,
+                                totalPages: totalPages
+                            }];
                 }
             });
         });

@@ -163,8 +163,12 @@ export class InternshipProcessRepository
     return !!internshipProcess;
   }
 
-  async findById(id: string): Promise<InternshipProcessEntity> {
-    const internshipProcess = await this.prisma.internshipProcess.findFirst({
+  async findById(
+    id: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ): Promise<InternshipProcessEntity> {
+    const prisma = prismaClientTransaction || this.prisma;
+    const internshipProcess = await prisma.internshipProcess.findFirst({
       where: {
         id,
       },

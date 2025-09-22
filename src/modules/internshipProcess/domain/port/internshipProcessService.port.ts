@@ -40,5 +40,8 @@ export interface InternshipProcessServicePort {
     validateAssignEndInternshipProcessDto: ValidateAssignEndInternshipProcessDto,
   );
 
-  findById(id: string): Promise<InternshipProcessEntity>;
+  findById(
+    id: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ): Promise<InternshipProcessEntity>;
 }

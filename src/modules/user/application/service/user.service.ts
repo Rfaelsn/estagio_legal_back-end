@@ -16,6 +16,11 @@ export class UserService {
     return aluno;
   }
 
+  async getUsersByRole(role: string): Promise<UserEntity[]> {
+    const users = await this.userRepository.findByRole(role);
+    return users;
+  }
+
   async getUserById(id: string): Promise<UserEntity> {
     const findUserUsecase = new FindUserByIdUsecase(this.userRepository);
     const user = await findUserUsecase.handle(id);

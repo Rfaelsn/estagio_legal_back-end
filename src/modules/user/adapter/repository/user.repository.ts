@@ -59,4 +59,11 @@ export class UserRepository implements IUserRepository {
   updateById(user: UserEntity): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
+  async findByRole(role: string): Promise<UserEntity[]> {
+    const users = await this.prisma.user.findMany({
+      where: { role },
+    });
+    return users;
+  }
 }

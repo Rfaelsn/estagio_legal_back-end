@@ -30,7 +30,10 @@ export interface InternshipProcessRepositoryPort {
     pageSize: number,
   );
 
-  findById(id: string): Promise<InternshipProcessEntity>;
+  findById(
+    id: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ): Promise<InternshipProcessEntity>;
 
   isElegibleForCompletion(
     internshipProcessId: string,

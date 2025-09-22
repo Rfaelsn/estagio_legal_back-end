@@ -36,12 +36,15 @@ model User {
 }
 
 model Notification {
-  id        String   @id @default(uuid())
-  id_user   String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation("userNotification", fields: [id_user], references: [id])
+  id                   String             @id @default(uuid())
+  id_user              String?
+  userRole             String?
+  message              String
+  read                 Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  user                 User?              @relation("userNotification", fields: [id_user], references: [id])
+  id_internshipProcess String?
+  internshipProcess    InternshipProcess? @relation(fields: [id_internshipProcess], references: [id])
 
   @@map("tb_notifications")
 }
@@ -127,6 +130,7 @@ model InternshipProcess {
   user    User   @relation("studentInternshipProcess", fields: [id_user], references: [id])
 
   statusHistory InternshipProcessHistory[] @relation("statusHistory_process")
+  Notification  Notification[]
 
   @@map("tb_internshipProcess")
 }

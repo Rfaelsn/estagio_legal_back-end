@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
 export class FindInternshipProcessByIdUsecase {
@@ -5,10 +6,12 @@ export class FindInternshipProcessByIdUsecase {
     private readonly intershipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
-  async handle(id: string) {
+  async handle(id: string, prismaClientTransaction?: Prisma.TransactionClient) {
     try {
-      const intershipProcess =
-        await this.intershipProcessRepository.findById(id);
+      const intershipProcess = await this.intershipProcessRepository.findById(
+        id,
+        prismaClientTransaction,
+      );
 
       return intershipProcess;
     } catch (error) {

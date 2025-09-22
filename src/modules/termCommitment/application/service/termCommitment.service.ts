@@ -19,8 +19,8 @@ import { FileStorageService } from '@/modules/file-storage/application/services/
 import { PrismaService } from '@/config/prisma/prisma.service';
 import { CreateTermCommitmentUseCase } from '../../domain/usecase/createTermCommitment.usecase';
 import { UserService } from '@/modules/user/application/service/user.service';
-import { UserFromJwt } from '@/auth/models/UserFromJwt';
 import { Role } from '@/modules/user/domain/entities/user.entity';
+import { NotificationService } from '@/modules/notification/application/service/notification.service';
 
 @Injectable()
 export class TermCommitmentService implements ITermCommitmentService {
@@ -34,6 +34,7 @@ export class TermCommitmentService implements ITermCommitmentService {
     private readonly fileStorageService: FileStorageService,
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   private termCommitmentFileId: string;
@@ -134,7 +135,7 @@ export class TermCommitmentService implements ITermCommitmentService {
   async assign(
     validateAssignTermDto: ValidateAssignTermDto,
     file: Express.Multer.File,
-    user: UserFromJwt,
+    user: any,
   ): Promise<void> {
     let termCommitmentFilePathId: string = '';
     try {
@@ -189,6 +190,20 @@ export class TermCommitmentService implements ITermCommitmentService {
           newHistory,
           prismaClientTransaction,
         );
+
+        const internshipProcess = await this.internshipProcessService.findById(
+          validateAssignTermDto.internshipProcessId,
+          prismaClientTransaction,
+        );
+
+        //o id do usuario tem que ser o id do aluno
+        await this.sendNotificationByTermStatus(
+          internshipProcess.id_user,
+          internshipProcess.id,
+          user.role,
+          updatedInternshipProcessStateData.status,
+          updatedInternshipProcessStateData.movement,
+        );
       });
     } catch (error) {
       if (termCommitmentFilePathId) {
@@ -200,6 +215,37 @@ export class TermCommitmentService implements ITermCommitmentService {
       }
 
       throw error;
+    }
+  }
+
+  private async sendNotificationByTermStatus(
+    userId?: string,
+    internshipProcessId?: string,
+    userRole?: Role | string,
+    currentStatus?: InternshipProcessStatus,
+    currentMovement?: InternshipProcessMovement,
+  ) {
+    if (
+      userRole === Role.STUDENT &&
+      currentStatus === InternshipProcessStatus.UNDER_REVIEW &&
+      currentMovement === InternshipProcessMovement.STAGE_START
+    ) {
+      await this.notificationService.sendNotificationToEmployees(
+        'Novo termo de compromisso enviado para análise.',
+        internshipProcessId,
+      );
+    }
+
+    if (
+      (userRole === Role.ADMINISTRATOR || userRole === Role.EMPLOYEE) &&
+      currentStatus === InternshipProcessStatus.COMPLETED &&
+      currentMovement === InternshipProcessMovement.STAGE_START
+    ) {
+      await this.notificationService.sendNotificationToStudent(
+        userId,
+        'Seu termo de compromisso foi aprovado.',
+        internshipProcessId,
+      );
     }
   }
 
