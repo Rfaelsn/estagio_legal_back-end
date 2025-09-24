@@ -319,16 +319,16 @@ var InternshipProcessService = /** @class */ (function () {
         }
     };
     InternshipProcessService.prototype.getFileType = function (fileName) {
-        if (fileName === 'auto_avaliacao_estagiario.pdf') {
+        if (fileName === 'AutoAvaliacaoEstagiario.pdf') {
             return file_entity_1.FileType.STUDENT_SELF_EVALUATION;
         }
-        else if (fileName === 'avaliacao_concedente.pdf') {
+        else if (fileName === 'AvaliacaoConcedente.pdf') {
             return file_entity_1.FileType.INTERNSHIP_GRANTOR_EVALUATION;
         }
-        else if (fileName === 'avaliacao_professor_orientador.pdf') {
+        else if (fileName === 'AvaliacaoProfessorOrientador.pdf') {
             return file_entity_1.FileType.SUPERVISOR_EVALUATION;
         }
-        else if (fileName === 'certificado_conclusao_estagio.pdf') {
+        else if (fileName === 'CertificadoConclusaoEstagio.pdf') {
             return file_entity_1.FileType.INTERNSHIP_CERTIFICATE;
         }
         else {

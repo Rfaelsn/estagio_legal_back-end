@@ -381,13 +381,13 @@ export class InternshipProcessService implements InternshipProcessServicePort {
   }
 
   private getFileType(fileName: string): FileType {
-    if (fileName === 'auto_avaliacao_estagiario.pdf') {
+    if (fileName === 'AutoAvaliacaoEstagiario.pdf') {
       return FileType.STUDENT_SELF_EVALUATION;
-    } else if (fileName === 'avaliacao_concedente.pdf') {
+    } else if (fileName === 'AvaliacaoConcedente.pdf') {
       return FileType.INTERNSHIP_GRANTOR_EVALUATION;
-    } else if (fileName === 'avaliacao_professor_orientador.pdf') {
+    } else if (fileName === 'AvaliacaoProfessorOrientador.pdf') {
       return FileType.SUPERVISOR_EVALUATION;
-    } else if (fileName === 'certificado_conclusao_estagio.pdf') {
+    } else if (fileName === 'CertificadoConclusaoEstagio.pdf') {
       return FileType.INTERNSHIP_CERTIFICATE;
     } else {
       console.log(fileName);
