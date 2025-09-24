@@ -160,13 +160,13 @@ var InternshipProcessService = /** @class */ (function () {
                     case 5:
                         _a.trys.push([5, 7, , 8]);
                         return [4 /*yield*/, this.prismaService.$transaction(function (prismaClientTransaction) { return __awaiter(_this, void 0, void 0, function () {
-                                var newHistory, updatedInternshipProcessStateData, registeredFiles, newHistory, updatedInternshipProcessStateData;
+                                var newHistory, updatedInternshipProcessStateData, internshipProcess, registeredFiles, newHistory, updatedInternshipProcessStateData, internshipProcess;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
                                         case 0:
                                             if (!(filePaths.length === 0 &&
                                                 !registerEndInternshipProcessDto.validate &&
-                                                (user.role === user_entity_1.Role.EMPLOYEE || user.role === user_entity_1.Role.ADMINISTRATOR))) return [3 /*break*/, 4];
+                                                (user.role === user_entity_1.Role.EMPLOYEE || user.role === user_entity_1.Role.ADMINISTRATOR))) return [3 /*break*/, 6];
                                             newHistory = this.getNewInternshipProcessHistoryByUserRole(user.role, [], registerEndInternshipProcessDto);
                                             updatedInternshipProcessStateData = this.getNewInternshipProcessStateDataByUserRole(user.role, registerEndInternshipProcessDto);
                                             return [4 /*yield*/, this.updateInternshipProcess(updatedInternshipProcessStateData, prismaClientTransaction)];
@@ -181,26 +181,38 @@ var InternshipProcessService = /** @class */ (function () {
                                             return [4 /*yield*/, this.internshipProcessHistoryService.registerHistory(newHistory, prismaClientTransaction)];
                                         case 3:
                                             _a.sent();
-                                            return [3 /*break*/, 9];
-                                        case 4: return [4 /*yield*/, this.fileService.registerFilePathsProcess(filePaths, prismaClientTransaction)];
+                                            return [4 /*yield*/, this.findById(registerEndInternshipProcessDto.internshipProcessId, prismaClientTransaction)];
+                                        case 4:
+                                            internshipProcess = _a.sent();
+                                            return [4 /*yield*/, this.sendNotificationByCurrentAssignHistory(internshipProcess.id_user, internshipProcess.id, user.role, updatedInternshipProcessStateData.status, updatedInternshipProcessStateData.movement)];
                                         case 5:
+                                            _a.sent();
+                                            return [3 /*break*/, 13];
+                                        case 6: return [4 /*yield*/, this.fileService.registerFilePathsProcess(filePaths, prismaClientTransaction)];
+                                        case 7:
                                             registeredFiles = _a.sent();
                                             newHistory = this.getNewInternshipProcessHistoryByUserRole(user.role, registeredFiles, registerEndInternshipProcessDto);
                                             updatedInternshipProcessStateData = this.getNewInternshipProcessStateDataByUserRole(user.role, registerEndInternshipProcessDto);
                                             return [4 /*yield*/, this.updateInternshipProcess(updatedInternshipProcessStateData, prismaClientTransaction)];
-                                        case 6:
+                                        case 8:
                                             _a.sent();
                                             return [4 /*yield*/, this.internshipProcessHistoryService.updateLatestHistory({
                                                     endDate: new Date(),
                                                     idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId
                                                 }, prismaClientTransaction)];
-                                        case 7:
+                                        case 9:
                                             _a.sent();
                                             return [4 /*yield*/, this.internshipProcessHistoryService.registerHistory(newHistory, prismaClientTransaction)];
-                                        case 8:
+                                        case 10:
                                             _a.sent();
-                                            _a.label = 9;
-                                        case 9: return [2 /*return*/];
+                                            return [4 /*yield*/, this.findById(registerEndInternshipProcessDto.internshipProcessId, prismaClientTransaction)];
+                                        case 11:
+                                            internshipProcess = _a.sent();
+                                            return [4 /*yield*/, this.sendNotificationByCurrentAssignHistory(internshipProcess.id_user, internshipProcess.id, user.role, updatedInternshipProcessStateData.status, updatedInternshipProcessStateData.movement)];
+                                        case 12:
+                                            _a.sent();
+                                            _a.label = 13;
+                                        case 13: return [2 /*return*/];
                                     }
                                 });
                             }); })];
@@ -217,6 +229,39 @@ var InternshipProcessService = /** @class */ (function () {
                         console.error('Erro ao deletar arquivo:', error_1);
                         return [3 /*break*/, 8];
                     case 8: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    InternshipProcessService.prototype.sendNotificationByCurrentAssignHistory = function (userId, internshipProcessId, userRole, currentStatus, currentMovement) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(userRole === user_entity_1.Role.STUDENT &&
+                            currentStatus === internshipProcess_entity_1.InternshipProcessStatus.UNDER_REVIEW &&
+                            currentMovement === internshipProcess_entity_1.InternshipProcessMovement.STAGE_END)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.notificationService.sendNotificationToEmployees('Nova solicitação de finalização de estágio.', internshipProcessId)];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        if (!((userRole === user_entity_1.Role.ADMINISTRATOR || userRole === user_entity_1.Role.EMPLOYEE) &&
+                            currentStatus === internshipProcess_entity_1.InternshipProcessStatus.COMPLETED &&
+                            currentMovement === internshipProcess_entity_1.InternshipProcessMovement.STAGE_END)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.notificationService.sendNotificationToStudent(userId, 'Atestado de Estágio emitido.', internshipProcessId)];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4:
+                        if (!((userRole === user_entity_1.Role.ADMINISTRATOR || userRole === user_entity_1.Role.EMPLOYEE) &&
+                            currentStatus === internshipProcess_entity_1.InternshipProcessStatus.REJECTED &&
+                            currentMovement === internshipProcess_entity_1.InternshipProcessMovement.STAGE_END)) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.notificationService.sendNotificationToStudent(userId, 'Solicitação de finalização de estágio recusada.', internshipProcessId)];
+                    case 5:
+                        _a.sent();
+                        _a.label = 6;
+                    case 6: return [2 /*return*/];
                 }
             });
         });

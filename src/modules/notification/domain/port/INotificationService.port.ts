@@ -8,9 +8,16 @@ export interface INotificationServicePort {
 
   handleDisconnect(client: Socket): void;
 
-  sendNotificationToStudent(userId: string, message: string): Promise<void>;
+  sendNotificationToStudent(
+    userId: string,
+    message: string,
+    internshipProcessId?: string,
+  ): Promise<void>;
 
-  sendNotificationToEmployees(message: string): Promise<void>;
+  sendNotificationToEmployees(
+    message: string,
+    internshipProcessId: string,
+  ): Promise<void>;
 
   findLatestNotificationsByUserId(
     findLatestNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,

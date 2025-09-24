@@ -247,6 +247,18 @@ export class TermCommitmentService implements ITermCommitmentService {
         internshipProcessId,
       );
     }
+
+    if (
+      (userRole === Role.ADMINISTRATOR || userRole === Role.EMPLOYEE) &&
+      currentStatus === InternshipProcessStatus.REJECTED &&
+      currentMovement === InternshipProcessMovement.STAGE_START
+    ) {
+      await this.notificationService.sendNotificationToStudent(
+        userId,
+        'Termo de compromisso recusado.',
+        internshipProcessId,
+      );
+    }
   }
 
   private getNewInternshipProcessHistoryByUserRole(

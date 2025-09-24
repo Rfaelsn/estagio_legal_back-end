@@ -198,6 +198,19 @@ export class InternshipProcessService implements InternshipProcessServicePort {
             newHistory,
             prismaClientTransaction,
           );
+
+          const internshipProcess = await this.findById(
+            registerEndInternshipProcessDto.internshipProcessId,
+            prismaClientTransaction,
+          );
+
+          await this.sendNotificationByCurrentAssignHistory(
+            internshipProcess.id_user,
+            internshipProcess.id,
+            user.role,
+            updatedInternshipProcessStateData.status,
+            updatedInternshipProcessStateData.movement,
+          );
         } else {
           const registeredFiles =
             await this.fileService.registerFilePathsProcess(
@@ -235,6 +248,19 @@ export class InternshipProcessService implements InternshipProcessServicePort {
             newHistory,
             prismaClientTransaction,
           );
+
+          const internshipProcess = await this.findById(
+            registerEndInternshipProcessDto.internshipProcessId,
+            prismaClientTransaction,
+          );
+
+          await this.sendNotificationByCurrentAssignHistory(
+            internshipProcess.id_user,
+            internshipProcess.id,
+            user.role,
+            updatedInternshipProcessStateData.status,
+            updatedInternshipProcessStateData.movement,
+          );
         }
       });
     } catch (error) {
@@ -244,6 +270,49 @@ export class InternshipProcessService implements InternshipProcessServicePort {
         });
       }
       console.error('Erro ao deletar arquivo:', error);
+    }
+  }
+
+  private async sendNotificationByCurrentAssignHistory(
+    userId?: string,
+    internshipProcessId?: string,
+    userRole?: Role | string,
+    currentStatus?: InternshipProcessStatus,
+    currentMovement?: InternshipProcessMovement,
+  ): Promise<void> {
+    if (
+      userRole === Role.STUDENT &&
+      currentStatus === InternshipProcessStatus.UNDER_REVIEW &&
+      currentMovement === InternshipProcessMovement.STAGE_END
+    ) {
+      await this.notificationService.sendNotificationToEmployees(
+        'Nova solicitação de finalização de estágio.',
+        internshipProcessId,
+      );
+    }
+
+    if (
+      (userRole === Role.ADMINISTRATOR || userRole === Role.EMPLOYEE) &&
+      currentStatus === InternshipProcessStatus.COMPLETED &&
+      currentMovement === InternshipProcessMovement.STAGE_END
+    ) {
+      await this.notificationService.sendNotificationToStudent(
+        userId,
+        'Atestado de Estágio emitido.',
+        internshipProcessId,
+      );
+    }
+
+    if (
+      (userRole === Role.ADMINISTRATOR || userRole === Role.EMPLOYEE) &&
+      currentStatus === InternshipProcessStatus.REJECTED &&
+      currentMovement === InternshipProcessMovement.STAGE_END
+    ) {
+      await this.notificationService.sendNotificationToStudent(
+        userId,
+        'Solicitação de finalização de estágio recusada.',
+        internshipProcessId,
+      );
     }
   }
 
