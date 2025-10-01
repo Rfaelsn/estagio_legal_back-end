@@ -11,10 +11,13 @@ import {
   Get,
   Query,
   Request,
+  ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateEmployeeDTO } from '@/modules/user/application/dto/createEmployee';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { User } from '@/auth/decorators/user.decorator';
+import { Prisma } from '@prisma/client';
 
 @Controller('user')
 export class UserController {
@@ -23,7 +26,24 @@ export class UserController {
   @IsPublic()
   @Post('student')
   async createStudent(@Body() createStudentDTO: CreateStudentDTO) {
-    return this.userService.create(createStudentDTO);
+    try {
+      return await this.userService.create(createStudentDTO);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        const target = error.meta?.target as string[] | undefined;
+        if (target?.includes('email')) {
+          throw new ConflictException('E-mail já cadastrado.');
+        }
+        if (target?.includes('cpf')) {
+          throw new ConflictException('CPF já cadastrado.');
+        }
+        throw new ConflictException('Já existe um registro com esses dados.');
+      }
+      throw new InternalServerErrorException('Erro ao criar estudante.');
+    }
   }
 
   @Get('findByEmail')

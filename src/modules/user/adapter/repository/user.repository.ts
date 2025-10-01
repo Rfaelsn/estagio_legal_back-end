@@ -4,7 +4,7 @@ import { PrismaService } from 'src/config/prisma/prisma.service';
 import { IUserRepository } from '../../domain/port/user-repository.port';
 import { CreateStudentDTO } from '../../application/dto/createStudent.dto';
 import { CreateEmployeeDTO } from '../../application/dto/createEmployee';
-import { UserEntity } from '../../domain/entities/user.entity';
+import { Role, UserEntity } from '../../domain/entities/user.entity';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -16,10 +16,15 @@ export class UserRepository implements IUserRepository {
   }
 
   async create(CreateStudentDTO: CreateStudentDTO): Promise<UserEntity> {
+    const institution = await this.prisma.institution.findFirst({
+      where: { cnpj: { contains: '10.763.998/0003-00' } },
+    });
     const data: Prisma.UserCreateInput = {
       ...CreateStudentDTO,
-      TermsCommitment: {},
-      internshipProcess: {},
+      role: Role.STUDENT,
+      institution: {
+        connect: { id: institution.id },
+      },
     };
     const newUser = await this.prisma.user.create({
       data,

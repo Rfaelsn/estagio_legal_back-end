@@ -2,7 +2,7 @@ import { IUserRepository } from '../port/user-repository.port';
 import { CreateStudentDTO } from '../../application/dto/createStudent.dto';
 import * as bcrypt from 'bcrypt';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { UserEntity } from '../entities/user.entity';
+import { Role } from '../entities/user.entity';
 
 export class CreateUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -27,14 +27,13 @@ export class CreateUserUseCase {
       ) {
         const data = {
           ...inputUserStudentDTO,
+          role: Role.STUDENT,
           password: await bcrypt.hash(
             inputUserStudentDTO.password,
             await bcrypt.genSalt(),
           ),
         };
-        const user = new UserEntity(data);
-        await this.userRepository.create(user);
-        return user;
+        return this.userRepository.create(data);
       } else {
         return new HttpException(
           {

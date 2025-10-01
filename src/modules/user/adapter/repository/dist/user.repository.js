@@ -55,6 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.UserRepository = void 0;
 var common_1 = require("@nestjs/common");
+var user_entity_1 = require("../../domain/entities/user.entity");
 var UserRepository = /** @class */ (function () {
     function UserRepository(prisma) {
         this.prisma = prisma;
@@ -74,15 +75,21 @@ var UserRepository = /** @class */ (function () {
     };
     UserRepository.prototype.create = function (CreateStudentDTO) {
         return __awaiter(this, void 0, Promise, function () {
-            var data, newUser;
+            var institution, data, newUser;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        data = __assign(__assign({}, CreateStudentDTO), { TermsCommitment: {}, internshipProcess: {} });
+                    case 0: return [4 /*yield*/, this.prisma.institution.findFirst({
+                            where: { cnpj: { contains: '10.763.998/0003-00' } }
+                        })];
+                    case 1:
+                        institution = _a.sent();
+                        data = __assign(__assign({}, CreateStudentDTO), { role: user_entity_1.Role.STUDENT, institution: {
+                                connect: { id: institution.id }
+                            } });
                         return [4 /*yield*/, this.prisma.user.create({
                                 data: data
                             })];
-                    case 1:
+                    case 2:
                         newUser = _a.sent();
                         return [2 /*return*/, newUser];
                 }
