@@ -253,7 +253,7 @@ var InternshipProcessRepository = /** @class */ (function () {
         });
     };
     InternshipProcessRepository.prototype.constructFilterWhere = function (internshipProcessFilterByStudentDto, userId) {
-        var termCommitment = internshipProcessFilterByStudentDto.termCommitment, movement = internshipProcessFilterByStudentDto.movement, status = internshipProcessFilterByStudentDto.status, startDateProcessRangeStart = internshipProcessFilterByStudentDto.startDateProcessRangeStart, startDateProcessRangeEnd = internshipProcessFilterByStudentDto.startDateProcessRangeEnd, endDateProcessRangeStart = internshipProcessFilterByStudentDto.endDateProcessRangeStart, endDateProcessRangeEnd = internshipProcessFilterByStudentDto.endDateProcessRangeEnd, internshipGrantor = internshipProcessFilterByStudentDto.internshipGrantor;
+        var termCommitment = internshipProcessFilterByStudentDto.termCommitment, user = internshipProcessFilterByStudentDto.user, movement = internshipProcessFilterByStudentDto.movement, status = internshipProcessFilterByStudentDto.status, startDateProcessRangeStart = internshipProcessFilterByStudentDto.startDateProcessRangeStart, startDateProcessRangeEnd = internshipProcessFilterByStudentDto.startDateProcessRangeEnd, endDateProcessRangeStart = internshipProcessFilterByStudentDto.endDateProcessRangeStart, endDateProcessRangeEnd = internshipProcessFilterByStudentDto.endDateProcessRangeEnd, internshipGrantor = internshipProcessFilterByStudentDto.internshipGrantor;
         var where = {};
         if (startDateProcessRangeStart != null ||
             startDateProcessRangeEnd != null) {
@@ -277,6 +277,13 @@ var InternshipProcessRepository = /** @class */ (function () {
             where.status = status;
         }
         where.user = { id: userId };
+        if ((user === null || user === void 0 ? void 0 : user.name) != null) {
+            // Busca parcial e case-insensitive pelo nome do usuário/aluno
+            where.user.name = {
+                contains: user.name,
+                mode: 'insensitive'
+            };
+        }
         if ((termCommitment === null || termCommitment === void 0 ? void 0 : termCommitment.courseStudy) != null) {
             where.user.courseStudy = termCommitment.courseStudy;
         }
@@ -286,7 +293,11 @@ var InternshipProcessRepository = /** @class */ (function () {
                 termCommitmentWhere.grantingCompanyCNPJ = internshipGrantor.cnpj;
             }
             if (internshipGrantor.name != null) {
-                termCommitmentWhere.grantingCompanyName = internshipGrantor.name;
+                // Troca igualdade por contains (busca parcial, case-insensitive)
+                termCommitmentWhere.grantingCompanyName = {
+                    contains: internshipGrantor.name,
+                    mode: 'insensitive'
+                };
             }
         }
         if (termCommitment) {

@@ -192,6 +192,7 @@ export class InternshipProcessRepository
   ): any {
     const {
       termCommitment,
+      user,
       movement,
       status,
       startDateProcessRangeStart,
@@ -237,6 +238,14 @@ export class InternshipProcessRepository
 
     where.user = { id: userId };
 
+    if (user?.name != null) {
+      // Busca parcial e case-insensitive pelo nome do usuário/aluno
+      where.user.name = {
+        contains: user.name,
+        mode: 'insensitive',
+      };
+    }
+
     if (termCommitment?.courseStudy != null) {
       where.user.courseStudy = termCommitment.courseStudy;
     }
@@ -248,7 +257,11 @@ export class InternshipProcessRepository
         termCommitmentWhere.grantingCompanyCNPJ = internshipGrantor.cnpj;
       }
       if (internshipGrantor.name != null) {
-        termCommitmentWhere.grantingCompanyName = internshipGrantor.name;
+        // Troca igualdade por contains (busca parcial, case-insensitive)
+        termCommitmentWhere.grantingCompanyName = {
+          contains: internshipGrantor.name,
+          mode: 'insensitive', // para busca sem diferenciar maiúsculas/minúsculas
+        };
       }
     }
 
