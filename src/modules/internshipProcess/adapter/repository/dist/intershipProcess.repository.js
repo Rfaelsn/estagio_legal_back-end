@@ -213,8 +213,16 @@ var InternshipProcessRepository = /** @class */ (function () {
                             where: {
                                 id: internshipProcessId,
                                 user: { id: userId },
-                                movement: internshipProcess_entity_1.InternshipProcessMovement.STAGE_START,
-                                status: internshipProcess_entity_1.InternshipProcessStatus.COMPLETED
+                                OR: [
+                                    {
+                                        status: internshipProcess_entity_1.InternshipProcessStatus.COMPLETED,
+                                        movement: internshipProcess_entity_1.InternshipProcessMovement.STAGE_START
+                                    },
+                                    {
+                                        status: internshipProcess_entity_1.InternshipProcessStatus.REJECTED,
+                                        movement: internshipProcess_entity_1.InternshipProcessMovement.STAGE_END
+                                    },
+                                ]
                             }
                         })];
                     case 1:
@@ -278,7 +286,6 @@ var InternshipProcessRepository = /** @class */ (function () {
         }
         where.user = { id: userId };
         if ((user === null || user === void 0 ? void 0 : user.name) != null) {
-            // Busca parcial e case-insensitive pelo nome do usuário/aluno
             where.user.name = {
                 contains: user.name,
                 mode: 'insensitive'

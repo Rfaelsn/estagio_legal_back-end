@@ -155,8 +155,16 @@ export class InternshipProcessRepository
       where: {
         id: internshipProcessId,
         user: { id: userId },
-        movement: InternshipProcessMovement.STAGE_START,
-        status: InternshipProcessStatus.COMPLETED,
+        OR: [
+          {
+            status: InternshipProcessStatus.COMPLETED,
+            movement: InternshipProcessMovement.STAGE_START,
+          },
+          {
+            status: InternshipProcessStatus.REJECTED,
+            movement: InternshipProcessMovement.STAGE_END,
+          },
+        ],
       },
     });
 
@@ -239,7 +247,6 @@ export class InternshipProcessRepository
     where.user = { id: userId };
 
     if (user?.name != null) {
-      // Busca parcial e case-insensitive pelo nome do usuário/aluno
       where.user.name = {
         contains: user.name,
         mode: 'insensitive',
