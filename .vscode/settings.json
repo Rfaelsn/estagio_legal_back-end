@@ -7,6 +7,5 @@
     "source.fixAll.eslint": "explicit",
     "source.fixAll": "explicit"
   },
-  "cSpell.words": ["datasource"],
-  "compile-hero.disable-compile-files-on-did-save-code": false
+  "cSpell.words": ["datasource"]
 }
