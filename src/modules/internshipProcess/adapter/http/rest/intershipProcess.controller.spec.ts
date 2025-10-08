@@ -3,7 +3,6 @@ import { CreateInternshipProcessDTO } from 'src/modules/intershipProcess/applica
 import { InternshipProcessFilterByEmployeeDTO } from 'src/modules/intershipProcess/application/dto/internshipProcessFilterByEmployee.dto';
 import { InternshipProcessService } from 'src/modules/intershipProcess/application/service/intershipProcess.service';
 import { InternshipProcessEntity } from 'src/modules/intershipProcess/domain/entities/internshipProcess.entity';
-import { IInternshipProcessRepository } from 'src/modules/intershipProcess/domain/port/intershipProcessRepository.port';
 import { TermCommitmentService } from 'src/modules/termCommitment/application/service/termCommitment.service';
 import { InternshipProcessController } from './intershipProcess.controller';
 import { TermCommitmentRepository } from 'src/modules/termCommitment/adapter/repository/termCommitment.repository';

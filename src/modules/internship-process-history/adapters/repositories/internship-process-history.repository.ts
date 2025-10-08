@@ -5,6 +5,7 @@ import { InternshipProcessHistoryRepositoryInterface } from '../../domain/ports/
 import { UpdateInternshipProcessHistoryDto } from '../../application/dtos/update-internship-process-history.dto';
 import { CreateHistoryWithFileDto } from '../../application/dtos/create-history-with-file.dto';
 import { RegisterFileInHistoryDto } from '../../application/dtos/register-file-history.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class InternshipProcessHistoryRepository
@@ -14,14 +15,16 @@ export class InternshipProcessHistoryRepository
 
   async registerHistory(
     createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
+    const prisma = prismaClientTransaction || this.prisma;
     const {
       idInternshipProcess,
       fileIds: fileIds,
       ...rest
     } = createInternshipProcessHistoryDto;
 
-    await this.prisma.internshipProcessHistory.create({
+    await prisma.internshipProcessHistory.create({
       data: {
         ...rest,
         internshipProcess: {
@@ -40,10 +43,12 @@ export class InternshipProcessHistoryRepository
 
   async registerHistoryWithFile(
     createHistoryWithFileDto: CreateHistoryWithFileDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
+    const prisma = prismaClientTransaction || this.prisma;
     const { idInternshipProcess, files, ...rest } = createHistoryWithFileDto;
 
-    await this.prisma.internshipProcessHistory.create({
+    await prisma.internshipProcessHistory.create({
       data: {
         ...rest,
         internshipProcess: {
@@ -53,29 +58,36 @@ export class InternshipProcessHistoryRepository
         },
 
         files: {
-          connectOrCreate: files.map((file) => ({
-            where: {
-              filePath: file.fileId,
-            },
-            create: {
-              filePath: file.fileId,
-              fileType: file.fileType,
-            },
-          })),
+          connect: files.map((file) => ({ id: file.fileId })),
         },
       },
     });
   }
 
-  async updateHistory(
+  async updateLatestHistory(
     updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
-    await this.prisma.internshipProcessHistory.updateMany({
+    const prisma = prismaClientTransaction || this.prisma;
+
+    await prisma.internshipProcessHistory.updateMany({
       where: {
         idInternshipProcess:
           updateInternshipProcessHistoryDto.idInternshipProcess,
+        endDate: null,
       },
       data: updateInternshipProcessHistoryDto,
+    });
+  }
+
+  async getHistoriesByInternshipProcessId(internshipProcessId: string) {
+    return this.prisma.internshipProcessHistory.findMany({
+      where: {
+        idInternshipProcess: internshipProcessId,
+      },
+      include: {
+        files: true,
+      },
     });
   }
 

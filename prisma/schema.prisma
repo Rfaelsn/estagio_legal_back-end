@@ -8,33 +8,43 @@ datasource db {
 }
 
 model User {
-  id                String              @id @default(uuid())
-  name              String              @db.VarChar(63)
-  cpf               String              @unique @db.VarChar(127)
-  registration      String?             @unique @db.VarChar(127)
-  email             String              @unique @db.VarChar(127)
-  telefone          String              @db.VarChar(127)
-  courseStudy       String?             @db.VarChar(127)
-  password          String              @db.VarChar(127)
-  role              String              @db.VarChar(127)
-  createdAt         DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt         DateTime            @default(now()) @db.Timestamp(0)
-  id_institution    String?
-  institution       Institution?        @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
-  TermsCommitment   TermCommitment[]    @relation("userTerm")
-  internshipProcess InternshipProcess[] @relation("alunoProcessoEstagio")
-  Notifications     Notification[]      @relation("userNotification")
+  id                       String              @id @default(uuid())
+  name                     String              @db.VarChar(63)
+  cpf                      String              @unique @db.VarChar(127)
+  rg                       String              @db.VarChar(127)
+  academicRegistrationCode String?             @unique @db.VarChar(127)
+  birthDate                DateTime            @db.Date
+  email                    String              @unique @db.VarChar(127)
+  telephone                String              @db.VarChar(127)
+  courseStudy              String?             @db.VarChar(127)
+  password                 String              @db.VarChar(127)
+  role                     String              @db.VarChar(127)
+  UF                       String?             @db.VarChar(127)
+  city                     String?             @db.VarChar(127)
+  district                 String?             @db.VarChar(127)
+  address                  String?             @db.VarChar(127)
+  postalCode               String?             @db.VarChar(127)
+  createdAt                DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt                DateTime            @default(now()) @db.Timestamp(0)
+  id_institution           String?
+  institution              Institution?        @relation("userInstitution", fields: [id_institution], references: [id], map: "tb_institution")
+  TermsCommitment          TermCommitment[]    @relation("userTerm")
+  internshipProcess        InternshipProcess[] @relation("studentInternshipProcess")
+  Notifications            Notification[]      @relation("userNotification")
 
   @@map("tb_users")
 }
 
 model Notification {
-  id        String   @id @default(uuid())
-  id_user   String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation("userNotification", fields: [id_user], references: [id])
+  id                   String             @id @default(uuid())
+  id_user              String?
+  userRole             String?
+  message              String
+  read                 Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  user                 User?              @relation("userNotification", fields: [id_user], references: [id])
+  id_internshipProcess String?
+  internshipProcess    InternshipProcess? @relation(fields: [id_internshipProcess], references: [id])
 
   @@map("tb_notifications")
 }
@@ -43,51 +53,59 @@ model File {
   id                         String                     @id @default(uuid())
   filePath                   String                     @unique
   fileType                   String                     @db.VarChar(255)
+  isAssigned                 Boolean                    @default(false)
   internshipProcessHistories InternshipProcessHistory[] @relation("ProcessHistoryFiles")
 
   @@map("tb_internship_process_files")
 }
 
 model Institution {
-  id        String   @id @default(uuid())
-  name      String   @db.VarChar(63)
-  campus    String   @db.VarChar(127)
-  cnpj      String   @db.VarChar(127)
-  UF        String   @db.VarChar(127)
-  createdAt DateTime @default(now()) @db.Timestamp(0)
-  updatedAt DateTime @default(now()) @db.Timestamp(0)
-  users     User[]   @relation("userInstitution")
+  id                      String    @id @default(uuid())
+  name                    String    @db.VarChar(63)
+  campus                  String    @db.VarChar(127)
+  cnpj                    String    @db.VarChar(127)
+  UF                      String    @db.VarChar(127)
+  city                    String    @db.VarChar(127)
+  district                String    @db.VarChar(127)
+  address                 String    @db.VarChar(127)
+  telephone               String    @db.VarChar(127)
+  postalCode              String    @db.VarChar(127)
+  legalRepresentative     String    @db.VarChar(127)
+  legalRepresentativeRole String    @db.VarChar(127)
+  createdAt               DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt               DateTime? @default(now()) @db.Timestamp(0)
+  users                   User[]    @relation("userInstitution")
 
   @@map("tb_institution")
 }
 
 model TermCommitment {
   id                                 String              @id @default(uuid())
-  numApoliceSeguro                   String?             @db.VarChar(63)
-  nomeSeguradora                     String?             @db.VarChar(127)
-  profOrientador                     String?             @db.VarChar(127)
-  codSiape                           String?             @db.VarChar(127)
-  dataInicioEstagio                  DateTime            @db.Date
-  dataFimEstagio                     DateTime            @db.Date
-  horaInicioEstagio                  DateTime            @db.Time(0)
-  horaFimEstagio                     DateTime            @db.Time(0)
-  jornadaSemanal                     Float
-  isObrigatorio                      Boolean
-  bolsaAuxilio                       Float
-  auxilioTransporte                  Float
-  planoAtividadesEstagio             String              @db.Text()
-  razaoSocialConcedente              String              @db.VarChar(127)
-  cnpjConcedente                     String              @db.VarChar(14)
-  cepConcedente                      String              @db.VarChar(63)
-  bairroConcedente                   String              @db.VarChar(127)
-  cidadeConcedente                   String              @db.VarChar(127)
-  ufConcedente                       String              @db.VarChar(127)
-  enderecoConcedente                 String              @db.VarChar(127)
-  emailConcedente                    String              @db.VarChar(127)
-  representanteLegalConcedente       String              @db.VarChar(127)
-  funcaoRepresentanteLegalConcedente String              @db.VarChar(127)
+  insurancePolicyNumber              String?             @db.VarChar(63)
+  insuranceCompanyName               String?             @db.VarChar(127)
+  advisorProfessor                   String?             @db.VarChar(127)
+  siapeCode                          String?             @db.VarChar(127)
+  internshipStartDate                DateTime            @db.Date
+  internshipEndDate                  DateTime            @db.Date
+  internshipStartTime                DateTime            @db.Time(0)
+  internshipEndTime                  DateTime            @db.Time(0)
+  weeklyWorkload                     Float
+  isMandatory                        Boolean
+  internshipGrant                    Float
+  transportationAllowance            Float
+  internshipActivityPlan             String              @db.Text()
+  grantingCompanyName                String              @db.VarChar(127)
+  grantingCompanyCNPJ                String              @db.VarChar(14)
+  grantingCompanyPostalCode          String              @db.VarChar(63)
+  grantingCompanyDistrict            String              @db.VarChar(127)
+  grantingCompanyCity                String              @db.VarChar(127)
+  grantingCompanyState               String              @db.VarChar(127)
+  grantingCompanyAddress             String              @db.VarChar(127)
+  grantingCompanyEmail               String              @db.VarChar(127)
+  grantingCompanyLegalRepresentative String              @db.VarChar(127)
+  legalRepresentativeRole            String              @db.VarChar(127)
   supervisor                         String              @db.VarChar(127)
-  cargoSupervisor                    String              @db.VarChar(127)
+  supervisorPosition                 String              @db.VarChar(127)
   filePath                           String?             @db.VarChar(255)
   id_user                            String
   user                               User                @relation("userTerm", fields: [id_user], references: [id])
@@ -109,11 +127,10 @@ model InternshipProcess {
   updatedAt         DateTime        @default(now()) @db.Timestamp(0)
 
   id_user String
-  user    User   @relation("alunoProcessoEstagio", fields: [id_user], references: [id])
+  user    User   @relation("studentInternshipProcess", fields: [id_user], references: [id])
 
-  internshipEvaluation InternshipEvaluation[] @relation("processoEstagioAvaliacao")
-
-  statusHistory InternshipProcessHistory[] @relation("historicoStatusProcesso")
+  statusHistory InternshipProcessHistory[] @relation("statusHistory_process")
+  Notification  Notification[]
 
   @@map("tb_internshipProcess")
 }
@@ -125,24 +142,11 @@ model InternshipProcessHistory {
   status              String            @db.VarChar(127)
   movement            String            @db.VarChar(127)
   description         String?           @db.Text()
-  observacoes         String?           @db.Text()
+  observations        String?           @db.Text()
   files               File[]            @relation("ProcessHistoryFiles")
   idInternshipProcess String
-  internshipProcess   InternshipProcess @relation("historicoStatusProcesso", fields: [idInternshipProcess], references: [id])
+  internshipProcess   InternshipProcess @relation("statusHistory_process", fields: [idInternshipProcess], references: [id])
+  createdAt           DateTime          @default(now()) @db.Timestamp(0)
 
   @@map("tb_internshipProcessStatusHistory")
-}
-
-model InternshipEvaluation {
-  id                                String            @id @default(uuid())
-  atividadesEstagio                 String            @db.VarChar(63)
-  componentesCurricularesUtilizados String            @db.VarChar(127)
-  aplicacaoDeConhecimentosCurso     String            @db.VarChar(127)
-  startDateProcess                  DateTime          @default(now()) @db.Timestamp(0)
-  endDateProcess                    DateTime          @db.Timestamp(0)
-  id_user                           String
-  id_internshipProcess              String
-  internshipProcess                 InternshipProcess @relation("processoEstagioAvaliacao", fields: [id_internshipProcess], references: [id])
-
-  @@map("tb_internshipEvaluation")
 }

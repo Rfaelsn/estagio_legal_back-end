@@ -1,9 +1,6 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class FindLatestNotificationsByUserIdDTO {
-  @IsString()
-  id_user: string;
-
   @IsNumber()
   page: number;
 

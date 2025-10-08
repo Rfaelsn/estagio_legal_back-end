@@ -6,6 +6,7 @@ import { InternshipProcessHistoryRepository } from '../../adapters/repositories/
 import { UpdateInternshipProcessHistoryDto } from '../dtos/update-internship-process-history.dto';
 import { CreateHistoryWithFileDto } from '../dtos/create-history-with-file.dto';
 import { RegisterFileInHistoryDto } from '../dtos/register-file-history.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class InternshipProcessHistoryService
@@ -17,10 +18,12 @@ export class InternshipProcessHistoryService
 
   async registerHistory(
     createInternshipProcessHistoryDto: CreateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
     try {
       await this.internshipProcessHistoryRepository.registerHistory(
         createInternshipProcessHistoryDto,
+        prismaClientTransaction,
       );
     } catch (error) {
       console.error(error);
@@ -29,22 +32,26 @@ export class InternshipProcessHistoryService
 
   async registerHistoryWithFile(
     createHistoryWithFileDto: CreateHistoryWithFileDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
     try {
       await this.internshipProcessHistoryRepository.registerHistoryWithFile(
         createHistoryWithFileDto,
+        prismaClientTransaction,
       );
     } catch (error) {
       console.error(error);
     }
   }
 
-  async updateHistory(
+  async updateLatestHistory(
     updateInternshipProcessHistoryDto: UpdateInternshipProcessHistoryDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<void> {
     try {
-      await this.internshipProcessHistoryRepository.updateHistory(
+      await this.internshipProcessHistoryRepository.updateLatestHistory(
         updateInternshipProcessHistoryDto,
+        prismaClientTransaction,
       );
     } catch (error) {
       console.error(error);
@@ -55,5 +62,15 @@ export class InternshipProcessHistoryService
     registerFileInHistoryDto: RegisterFileInHistoryDto,
   ) {
     return;
+  }
+
+  async getHistoriesByInternshipProcessId(internshipProcessId: string) {
+    try {
+      return this.internshipProcessHistoryRepository.getHistoriesByInternshipProcessId(
+        internshipProcessId,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

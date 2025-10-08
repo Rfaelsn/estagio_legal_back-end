@@ -3,15 +3,17 @@ import { INotificationRepository } from '../port/notificationRepository.port';
 
 export class FindLatestNotificationsByUserIdUsecase {
   constructor(
-    private readonly intershipProcessRepository: INotificationRepository,
+    private readonly internshipProcessRepository: INotificationRepository,
   ) {}
 
   async handle(
     findNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
+    userId: string,
   ) {
     const notifications =
-      await this.intershipProcessRepository.findNotificationsByUserId(
+      await this.internshipProcessRepository.findNotificationsByUserId(
         findNotificationsByUserIdDTO,
+        userId,
       );
 
     return notifications;

@@ -1,19 +1,33 @@
-import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
+import { Role } from '@/modules/user/domain/entities/user.entity';
+import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
 import { InternshipProcessRepositoryPort } from '../port/internshipProcessRepository.port';
 
 export class FilterInternshipProcessUseCase {
   constructor(
-    private readonly intershipProcessRepository: InternshipProcessRepositoryPort,
+    private readonly internshipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
   async handle(
-    intershipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    internshipProcessFilterDTO: InternshipProcessFilterDto,
+    userId: string,
+    userRole: string,
   ) {
     try {
-      const filteredIntershipProcess =
-        await this.intershipProcessRepository.filter(intershipProcessFilterDTO);
+      let filteredInternshipProcess = [];
+      if (userRole === Role.ADMINISTRATOR || userRole === Role.EMPLOYEE) {
+        filteredInternshipProcess =
+          await this.internshipProcessRepository.filter(
+            internshipProcessFilterDTO,
+          );
+      } else if (userRole === Role.STUDENT) {
+        filteredInternshipProcess =
+          await this.internshipProcessRepository.filterByStudent(
+            internshipProcessFilterDTO,
+            userId,
+          );
+      }
 
-      return filteredIntershipProcess;
+      return filteredInternshipProcess;
     } catch (error) {
       console.error(error);
     }

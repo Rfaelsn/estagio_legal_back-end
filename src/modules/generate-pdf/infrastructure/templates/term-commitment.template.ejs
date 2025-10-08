@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Termo de Compromisso de Estágio</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        line-height: 1.3;
+        color: #000;
+        background: #fff;
+        padding: 0;
+        margin: 0;
+      }
+
+      @page {
+        size: A4;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 5mm 5mm 5mm 5mm;
+        page-break-after: always;
+        position: relative;
+      }
+
+      /* Header com brasão e informações */
+      .header {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .brasao {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+      }
+
+      .government-info {
+        font-size: 10px;
+        line-height: 1.2;
+        text-align: left;
+      }
+
+      .government-info div {
+        margin-bottom: 1px;
+      }
+
+      /* Título principal */
+      .main-title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 10px 0 5px 0;
+        letter-spacing: 0.5px;
+      }
+
+      .subtitle {
+        text-align: center;
+        font-size: 10px;
+        margin-bottom: 15px;
+      }
+
+      /* Linha horizontal */
+      .divider {
+        border-bottom: 1px solid #000;
+        margin: 5px 0;
+      }
+
+      /* Texto introdutório */
+      .intro-text {
+        text-align: justify;
+        margin-bottom: 10px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      /* Seções de informações */
+      .section {
+        margin-bottom: 10px;
+      }
+
+      .section-title {
+        font-weight: bold;
+        font-size: 12px;
+        margin-bottom: 5px;
+      }
+
+      /* Grid de informações */
+      .info-grid {
+        display: table;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      .info-row {
+        display: table-row;
+      }
+
+      .info-cell {
+        display: table-cell;
+        padding: 2px 5px 2px 0;
+        vertical-align: top;
+        font-size: 12px;
+      }
+
+      .info-cell.col1 {
+        width: 40%;
+      }
+
+      .info-cell.col2 {
+        width: 30%;
+      }
+
+      .info-cell.col3 {
+        width: 30%;
+      }
+
+      .label {
+        font-weight: bold;
+        display: inline;
+      }
+
+      .value {
+        display: inline;
+      }
+
+      /* Condições do estágio */
+      .conditions-grid {
+        margin-bottom: 10px;
+      }
+
+      /* Plano de atividades */
+      .activities-section {
+        margin-top: 10px;
+      }
+
+      .activities-list {
+        margin-left: 15px;
+        padding-left: 5px;
+      }
+
+      .activities-list li {
+        margin-bottom: 3px;
+        text-align: justify;
+        font-size: 12px;
+      }
+
+      /* Cláusulas */
+      .clause {
+        margin-bottom: 5px;
+        text-align: justify;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .clause-title {
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+
+      .clause-content {
+        margin-left: 0;
+      }
+
+      .clause-content p {
+        margin-bottom: 5px;
+      }
+
+      /* Assinaturas */
+      .signature-section {
+        margin-top: 40px;
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+      }
+
+      .signature-block {
+        width: 30%;
+        font-size: 10px;
+      }
+
+      .signature-line {
+        border-top: 1px solid #000;
+        margin-top: 40px;
+        padding-top: 5px;
+      }
+
+      /* Marca d'água */
+      .watermark {
+        opacity: 0.12;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 100px;
+        color: rgba(0, 0, 0, 0.02);
+        font-weight: bold;
+        z-index: -1;
+        white-space: nowrap;
+      }
+
+      @media print {
+        .page {
+          page-break-after: always;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Primeira Página -->
+    <div class="page">
+      <img src="<%= backgroundLogo %>" alt="Brasão" class="watermark" />
+      <div class="header">
+        <img src="<%= pdfLogo %>" alt="Brasão" class="brasao" />
+        <div class="government-info">
+          <div>GOVERNO FEDERAL</div>
+          <div>MINISTÉRIO DA EDUCAÇÃO</div>
+          <div>INSTITUTO FEDERAL DO PARÁ - CAMPUS BELÉM</div>
+          <div>
+            DIRETORIA DE EXTENSÃO (DEX)/DIVISÃO DE INTEGRAÇÃO CAMPUS EMPRESAS
+            DICAE
+          </div>
+        </div>
+      </div>
+
+      <div class="main-title">TERMO DE COMPROMISSO DE ESTÁGIO</div>
+      <div class="subtitle">
+        (INSTRUMENTO JURÍDICO PREVISTO NA LEI Nº 11.788/08)
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="intro-text">
+        Em <%= internshipStartDate %>, na cidade de Belém, as partes a seguir
+        qualificadas, resolvem celebrar o Termo de Compromisso de Estágio
+        obrigatório, conforme a Lei nº 11.788/08 (LEI DE ESTÁGIO)
+      </div>
+
+      <div class="section">
+        <div class="section-title">INSTITUIÇÃO DE ENSINO</div>
+        <div class="info-grid">
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Razão Social:</span>
+              <span class="value"
+                >INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO
+                PARÁ</span
+              >
+            </div>
+            <div class="info-cell col2"></div>
+            <div class="info-cell col3"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">CNPJ:</span>
+              <span class="value">10.763.998/0003-00</span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Cidade:</span>
+              <span class="value">Belém</span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">UF:</span>
+              <span class="value">PA</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Endereço:</span>
+              <span class="value">Av. Almirante Barroso, 1155</span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Bairro:</span>
+              <span class="value">Marco</span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Fone:</span>
+              <span class="value">91 3201-1763/1712</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Representante legal:</span>
+              <span class="value">Jair Alcindo Lobo de Melo</span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Função:</span>
+              <span class="value">Diretor de Extensão</span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">CEP:</span>
+              <span class="value">66093-032</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Professor Orientador:</span>
+              <span class="value">_________________________</span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">SIAPE:</span>
+              <span class="value">_________________________</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">CONCEDENTE</div>
+        <div class="info-grid">
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Razão Social:</span>
+              <span class="value"><%= grantingCompanyName %></span>
+            </div>
+            <div class="info-cell col2"></div>
+            <div class="info-cell col3"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">CNPJ:</span>
+              <span class="value"><%= grantingCompanyCNPJ %></span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Cidade:</span>
+              <span class="value"><%= grantingCompanyCity %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">UF:</span>
+              <span class="value"><%= grantingCompanyState %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Endereço:</span>
+              <span class="value"><%= grantingCompanyAddress %></span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Bairro:</span>
+              <span class="value"><%= grantingCompanyDistrict %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Fone:</span>
+              <span class="value"><%= grantingCompanyEmail %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Representante legal:</span>
+              <span class="value"
+                ><%= grantingCompanyLegalRepresentative %></span
+              >
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Cargo:</span>
+              <span class="value"><%= legalRepresentativeRole %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Cep:</span>
+              <span class="value"><%= grantingCompanyPostalCode %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Supervisor:</span>
+              <span class="value"><%= supervisor %></span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Cargo:</span>
+              <span class="value"><%= supervisorPosition %></span>
+            </div>
+            <div class="info-cell col3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">ESTAGIÁRIO</div>
+        <div class="info-grid">
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Nome:</span>
+              <span class="value"><%= user.name %></span>
+            </div>
+            <div class="info-cell col2"></div>
+            <div class="info-cell col3">
+              <span class="label">Matrícula:</span>
+              <span class="value"><%= user.registration %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Curso:</span>
+              <span class="value"><%= user.courseStudy %></span>
+            </div>
+            <div class="info-cell col2"></div>
+            <div class="info-cell col3">
+              <span class="label">Email:</span>
+              <span class="value"><%= user.email %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">CPF:</span>
+              <span class="value"><%= user.cpf %></span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">RG:</span>
+              <span class="value"><%= user.rg %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Data Nasc:</span>
+              <span class="value"><%= user.birthDate %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Endereço:</span>
+              <span class="value"><%= user.address %></span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Cidade:</span>
+              <span class="value"><%= user.city %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Celular:</span>
+              <span class="value"><%= user.telephone %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Bairro:</span>
+              <span class="value"><%= user.district %></span>
+            </div>
+            <div class="info-cell col2">
+              <span class="label">CEP:</span>
+              <span class="value"><%= user.postalCode %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">UF:</span>
+              <span class="value"><%= user.UF %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">CONDIÇÕES DO ESTÁGIO:</div>
+        <div class="conditions-grid info-grid">
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Período (dia/mês/ano):</span>
+              <span class="value"
+                ><%= internshipStartDate %> a <%= internshipEndDate %></span
+              >
+            </div>
+            <div class="info-cell col2">
+              <span class="label">Horário (hora e minuto):</span>
+              <span class="value"
+                ><%= internshipStartTime %> a <%= internshipEndTime %></span
+              >
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Jornada semanal (hora):</span>
+              <span class="value"><%= weeklyWorkload %></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
+              <span class="label">Bolsa auxílio (R$):</span>
+              <span class="value"><%= internshipGrant %></span>
+            </div>
+            <div class="info-cell col2"></div>
+            <div class="info-cell col3">
+              <span class="label">Auxílio Transporte (R$):</span>
+              <span class="value"><%= transportationAllowance %></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="activities-section">
+          <div class="label">Plano de Atividade de Estágio:</div>
+          <ol class="activities-list">
+            <li><%= internshipActivityPlan[0] %></li>
+            <li><%= internshipActivityPlan[1] %></li>
+            <li><%= internshipActivityPlan[2] %></li>
+            <li><%= internshipActivityPlan[3] %></li>
+            <li><%= internshipActivityPlan[4] %></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="clause">
+        Celebram entre si este TERMO DE COMPROMISSO DE ESTÁGIO, convencionando
+        as cláusulas seguintes:
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">Cláusula 1ª -</div>
+        <div class="clause-content">
+          <p>
+            Este instrumento tem por objetivo formalizar as condições para
+            realização de ESTÁGIO DE ESTUDANTE e particularizar a relação
+            jurídica especial existente entre o ESTAGIÁRIO, a CONCEDENTE e o
+            IFPA caracterizando a não vinculação empregatícia, nos termos da
+            legislação vigente, bem como, certifique-se que as atividades a
+            serem realizadas pelo aluno estão previstas na proposta pedagógica
+            do Curso como forma de contextualização do currículo, em termos de
+            educação para o trabalho e a cidadania.
+          </p>
+        </div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">Cláusula 2ª -</div>
+        <div class="clause-content">
+          <p>
+            O ESTÁGIO DE ESTUDANTES, obrigatório ou não obrigatório, está em
+            conformidade com o próprio pedagógico do curso, nos termos da Lei nº
+            11.788/08.
+          </p>
+        </div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">Cláusula 3ª - Cabe ao IFPA:</div>
+        <div class="clause-content">
+          <p>
+            a) Aprovar o Estágio de que trata o presente instrumento,
+            considerando as condições de sua adequação à proposta pedagógica do
+            curso, a etapa e modalidade de formação escolar do Estagiário e ao
+            horário e calendário escolar;
+          </p>
+          <p>
+            b) Aprovar o plano de atividades do Estágio que consubstancie as
+            condições/requisitos suficientes à exigência legal de adequação à
+            etapa e modalidade de formação escolar do Estagiário;
+          </p>
+          <p>
+            c) Avaliar as instalações da Concedente através dos instrumentos
+            próprios;
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segunda Página -->
+    <div class="page">
+      <div class="watermark">IFPA</div>
+      <div class="clause">
+        <div class="clause-title">Cláusula 3ª - Cabe ao IFPA:</div>
+        <div class="clause-content">
+          <p>
+            d) Indicar professor orientador, da área a ser desenvolvida no
+            Estágio, como responsável pelo acompanhamento e avaliação do
+            relatório das atividades do Estagiário;
+          </p>
+          <p>
+            e) Comunicar à parte concedente do Estágio, no início do período
+            letivo, as datas de realização de avaliações escolares ou
+            acadêmicas.
+          </p>
+        </div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">Cláusula 4ª - Cabe à Concedente:</div>
+        <div class="clause-content">
+          <p>a) Zelar pelo cumprimento do presente Termo de Compromisso;</p>
+          <p>
+            b) Proporcionar ao Estagiário condições de exercícios de atividades
+            práticas compatíveis com o Plano de atividades de estágio;
+          </p>
+          <p>
+            c) Designar um supervisor que seja funcionário de seu quadro de
+            pessoal, com formação ou experiência profissional na área de
+            conhecimento desenvolvida no curso do Estagiário, para orientá-lo e
+            acompanhá-lo no desenvolvimento das atividades do estágio;
+          </p>
+          <p>
+            d) Solicitar ao Estagiário, a qualquer tempo, documentos
+            comprobatórios da regularidade da situação escolar, uma vez que
+            trancamento de matrícula, abandono, conclusão do curso ou
+            transferência de Instituição de Ensino constituem motivos de
+            imediata rescisão;
+          </p>
+          <p>
+            e) Conceder bolsa estágio e auxílio transporte no caso do estágio
+            não obrigatório, sendo que o pagamento destes valores deverá ser
+            feito diretamente ao estagiário;
+          </p>
+          <p>
+            f) No caso do estágio obrigatório, se houver a concessão da bolsa
+            auxílio e do auxílio transporte, ou de um dos dois, o pagamento
+            deverá ser feito diretamente ao estagiário;
+          </p>
+          <p>
+            g) Assegurar ao Estagiário recesso nos termos da Lei 11.788/08, bem
+            como, remunerá-lo conforme haja pagamento de bolsa auxílio;
+          </p>
+          <p>
+            h) Reduzir as jornadas de estágio nos períodos de avaliação,
+            previamente informados pelo Estagiário;
+          </p>
+          <p>
+            i) Encaminhar para o IFPA o relatório individual de atividades,
+            assinado pelo supervisor, com periodicidade mínima de 06 meses, com
+            vista obrigatória do Estagiário;
+          </p>
+          <p>
+            j) Entregar, por ocasião de desligamento, termo de realização do
+            estágio com indicação resumida das atividades desenvolvidas, dos
+            períodos e da avaliação de desempenho;
+          </p>
+          <p>
+            k) Manter em arquivo a disposição da fiscalização os documentos
+            firmados que comprovem a relação de estágio;
+          </p>
+          <p>
+            l) Informar ao IFPA (DICAE/DEX) a rescisão antecipada deste
+            instrumento, para as devidas providências administrativas que se
+            fizerem necessárias;
+          </p>
+          <p>
+            m) Permitir o início das atividades de estágio apenas após o
+            recebimento das 03 vias deste instrumento assinada pelas três partes
+            signatárias.
+          </p>
+        </div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">Cláusula 5ª - Cabe ao Estagiário:</div>
+        <div class="clause-content">
+          <p>
+            a) Cumprir, com todo empenho e interesse, toda programação
+            estabelecida para seu Estágio;
+          </p>
+          <p>
+            b) Observar, obedecer e cumprir as normas internas da Concedente,
+            preservando o sigilo e a confidencialidade das informações que tiver
+            acesso;
+          </p>
+          <p>
+            c) Apresentar documentos comprobatórios da regularidade da sua
+            situação escolar, sempre que solicitado pela Concedente;
+          </p>
+          <p>
+            d) Manter rigorosamente atualizados seus dados cadastrais e
+            escolares, junto à Concedente;
+          </p>
+          <p>
+            e) Informar de imediato, qualquer alteração na sua situação escolar,
+            tais como: trancamento de matrícula, abandono, conclusão de curso ou
+            transferência de Instituição de Ensino;
+          </p>
+          <p>
+            f) Entregar, obrigatoriamente, ao IFPA e à Concedente uma via do
+            presente instrumento, devidamente assinada pelas partes;
+          </p>
+          <p>
+            g) Informar previamente à Concedente os períodos de avaliação no
+            IFPA, para fins de redução da jornada de estágio;
+          </p>
+          <p>
+            h) Preencher os relatórios de estágio a fim de subsidiar o IFPA com
+            informações sobre seu estágio.
+          </p>
+        </div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">Cláusula 6ª - Alterações e Rescisão:</div>
+        <div class="clause-content">
+          <p>
+            O presente instrumento e o Plano de Atividades de Estágio serão
+            alterados ou prorrogados através de Termos Aditivos.
+          </p>
+          <p>
+            Parágrafo Primeiro - O presente Termo de Compromisso de Estágio pode
+            ser rescindido ou denunciado, a qualquer tempo, mediante comunicação
+            escrita, pelo IFPA, pela Concedente ou pelo Estagiário, sendo a
+            vontade deste último, a comunicação para rescisão deverá ocorrer
+            pelos menos 15 (quinze) dias antes do desligamento efetivo.
+          </p>
+          <p>
+            Parágrafo Segundo - O Não cumprimento de quaisquer cláusulas do
+            presente Termo de Compromisso de Estágio constitui motivo de
+            imediata rescisão.
+          </p>
+        </div>
+      </div>
+
+      <div class="clause">
+        <div class="clause-title">Cláusula 7ª - Seguro:</div>
+        <div class="clause-content">
+          <p>
+            O Estagiário durante a vigência do presente Termo de Compromisso de
+            Estágio estará segurado contra acidentes pessoais conforme apólice
+            nº 666999, da seguradora Teste de Seguradora.
+          </p>
+        </div>
+      </div>
+
+      <div class="clause">
+        <p>
+          <strong
+            >E, por estarem de inteiro e comum acordo com o Plano de Atividades
+            de Estágio e com as demais condições estabelecidas neste Termo de
+            Compromisso de Estágio, as partes assinam em 04 vias de igual
+            teor.</strong
+          >
+        </p>
+      </div>
+
+      <div class="signature-section">
+        <div class="signature-block">
+          <div class="signature-line">ESTAGIÁRIO</div>
+        </div>
+        <div class="signature-block">
+          <div class="signature-line">SUPERVISOR (com CARIMBO)</div>
+        </div>
+        <div class="signature-block">
+          <div class="signature-line">IFPA - COORDENADOR DO CURSO</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -17,6 +17,10 @@ export class CreateHistoryWithFileDto {
 
   @IsString()
   @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
   observacoes?: string;
 
   @IsString()
@@ -24,5 +28,5 @@ export class CreateHistoryWithFileDto {
 
   @IsArray()
   @IsOptional()
-  files?: [{ fileId: string; fileType: string }];
+  files?: [{ fileId: string }];
 }

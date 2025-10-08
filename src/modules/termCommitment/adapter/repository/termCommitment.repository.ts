@@ -13,41 +13,29 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
 
   async create(
     createTermCommitmentDTO: CreateTermCommitmentDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<TermCommitmentEntity> {
+    const prisma = prismaClientTransaction || this.prisma;
     const { id_user, ...restTermCommitment } = createTermCommitmentDTO;
     const filteredTermCommitment = restTermCommitment;
     const data: Prisma.TermCommitmentCreateInput = {
       ...filteredTermCommitment,
-      planoAtividadesEstagio: JSON.stringify(
-        filteredTermCommitment.planoAtividadesEstagio,
+      internshipActivityPlan: JSON.stringify(
+        filteredTermCommitment.internshipActivityPlan,
       ),
       user: {
         connect: {
           id: createTermCommitmentDTO.id_user,
         },
       },
-      // internshipGrantor: {
-      //   connect: {
-      //     id: createTermCommitmentDTO.id_internshipGrantor,
-      //   },
-      // },
     };
 
-    const newTermCommitment = await this.prisma.termCommitment.create({
+    const newTermCommitment = await prisma.termCommitment.create({
       data,
       include: {
         user: true,
       },
     });
-
-    // const newTermCommitment = await this.prisma.termCommitment.create({
-    //   data,
-    //   include: {
-    //     user: true,
-    //     //internshipGrantor: true,
-    //     //internshipProcess: true,
-    //   },
-    // });
 
     return newTermCommitment;
   }
@@ -61,14 +49,32 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
     });
   }
 
-  async update(idTerm: string, updateTermInfoDto: UpdateTermInfoDto) {
-    const { internshipProcessId, ...rest } = updateTermInfoDto;
+  async update(
+    internshipProcessId: string,
+    updateTermInfoDto: UpdateTermInfoDto,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ) {
+    const prisma = prismaClientTransaction || this.prisma;
+    const internshipProcess = await prisma.internshipProcess.findUnique({
+      where: { id: internshipProcessId },
+      select: { id_termCommitment: true },
+    });
+
+    if (!internshipProcess?.id_termCommitment) {
+      throw new Error(
+        'Termo de compromisso não encontrado para este processo.',
+      );
+    }
+
     const data = {
-      ...rest,
-      planoAtividadesEstagio: JSON.stringify(rest.planoAtividadesEstagio),
+      ...updateTermInfoDto,
+      internshipActivityPlan: JSON.stringify(
+        updateTermInfoDto.internshipActivityPlan,
+      ),
     };
-    return await this.prisma.termCommitment.update({
-      where: { id: idTerm },
+
+    return await prisma.termCommitment.update({
+      where: { id: internshipProcess.id_termCommitment },
       data,
       include: {
         user: true,
@@ -86,12 +92,12 @@ export class TermCommitmentRepository implements ITermCommitmentRepository {
         id_user: idUser,
         AND: [
           {
-            dataInicioEstagio: {
+            internshipStartDate: {
               lte: endDate,
             },
           },
           {
-            dataFimEstagio: {
+            internshipEndDate: {
               gte: startDate,
             },
           },

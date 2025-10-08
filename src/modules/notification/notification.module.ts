@@ -4,6 +4,7 @@ import { NotificationService } from './application/service/notification.service'
 import { NotificationsRepository } from './adapter/repository/notification.repository';
 import { PrismaModule } from 'src/config/prisma/prisma.module';
 import { NotificationController } from './adapter/http/rest/notification.controller';
+import { UserModule } from '../user/user.module';
 
 @Module({
   controllers: [NotificationController],
@@ -12,7 +13,7 @@ import { NotificationController } from './adapter/http/rest/notification.control
     NotificationService,
     NotificationsRepository,
   ],
-  imports: [PrismaModule],
+  imports: [PrismaModule, UserModule],
   exports: [NotificationService, NotificationGateway],
 })
 export class NotificationModule {}

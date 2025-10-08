@@ -7,11 +7,14 @@ import { FindLatestNotificationsByUserIdDTO } from '../dto/findLatestNotificatio
 import { FindLatestNotificationsByUserIdUsecase } from '../../domain/usecase/findLatestNotificationsByUserId.usecase';
 import { SetReadNotificationUsecase } from '../../domain/usecase/setReadNotification.usecase';
 import { INotificationServicePort } from '../../domain/port/INotificationService.port';
+import { Role } from '@/modules/user/domain/entities/user.entity';
+import { UserService } from '@/modules/user/application/service/user.service';
 
 @Injectable()
 export class NotificationService implements INotificationServicePort {
   constructor(
     private readonly notificationRepository: NotificationsRepository,
+    private readonly userService: UserService,
   ) {}
 
   @WebSocketServer()
@@ -39,10 +42,18 @@ export class NotificationService implements INotificationServicePort {
     console.log(`Usuário ${userId} registrado com socket ${client.id}`);
   }
 
-  async sendNotification(userId: string, message: string) {
+  async sendNotificationToStudent(
+    userId: string,
+    message: string,
+    internshipProcessId?: string,
+  ) {
     const socketId = this.userSocketMap.get(userId);
 
-    const notification = await this.saveNotificationToDatabase(userId, message);
+    const notification = await this.saveNotificationToDatabase(
+      userId,
+      message,
+      internshipProcessId,
+    );
 
     if (socketId) {
       this.server.to(socketId).emit('notification', notification);
@@ -50,7 +61,33 @@ export class NotificationService implements INotificationServicePort {
     }
   }
 
-  private async saveNotificationToDatabase(userId: string, message: string) {
+  async sendNotificationToEmployees(
+    message: string,
+    internshipProcessId?: string,
+  ) {
+    const notification = await this.saveNotificationToEmployeeDatabase(
+      message,
+      internshipProcessId,
+    );
+
+    const employees = await this.userService.getUsersByRole(Role.ADMINISTRATOR);
+
+    for (const employee of employees) {
+      const socketId = this.userSocketMap.get(employee.id);
+      if (socketId) {
+        this.server.to(socketId).emit('notification', notification);
+        console.log(
+          `Notificação enviada para o funcionário ${employee.id} via WebSocket`,
+        );
+      }
+    }
+  }
+
+  private async saveNotificationToDatabase(
+    userId: string,
+    message: string,
+    internshipProcessId?: string,
+  ) {
     const createNotificationUsecase = new CreateNotificationUsecase(
       this.notificationRepository,
     );
@@ -58,19 +95,42 @@ export class NotificationService implements INotificationServicePort {
     const notification = await createNotificationUsecase.handle({
       idUser: userId,
       message: message,
+      userRole: Role.STUDENT,
+      internshipProcessId: internshipProcessId,
     });
 
     return notification;
   }
 
+  private async saveNotificationToEmployeeDatabase(
+    message: string,
+    internshipProcessId?: string,
+  ): Promise<any> {
+    return this.notificationRepository.create({
+      userRole: Role.EMPLOYEE,
+      message: message,
+      internshipProcessId: internshipProcessId,
+    });
+  }
+
+  async getNotificationToEmployees(page: number, pageSize: number) {
+    return this.notificationRepository.findNotificationsByRole(
+      Role.EMPLOYEE,
+      page,
+      pageSize,
+    );
+  }
+
   async findLatestNotificationsByUserId(
     findLatestNotificationsByUserIdDTO: FindLatestNotificationsByUserIdDTO,
+    userId: string,
   ) {
     const findLatestNotificationsByUserIdUsecase =
       new FindLatestNotificationsByUserIdUsecase(this.notificationRepository);
 
     const notifications = findLatestNotificationsByUserIdUsecase.handle(
       findLatestNotificationsByUserIdDTO,
+      userId,
     );
 
     return notifications;

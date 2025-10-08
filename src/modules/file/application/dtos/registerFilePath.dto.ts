@@ -1,4 +1,4 @@
-import { IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { FileType } from '../../domain/entities/file.entity';
 
 export class RegisterFilePathDto {
@@ -7,4 +7,8 @@ export class RegisterFilePathDto {
 
   @IsEnum(FileType)
   fileType;
+
+  @IsOptional()
+  @IsBoolean()
+  isAssigned?: boolean;
 }

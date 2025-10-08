@@ -1,25 +1,27 @@
 import { CreateInternshipProcessDTO } from '../../application/dto/input/internshipProcess.dto';
-import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
+import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
 import { InternshipProcessEntity } from '../entities/internshipProcess.entity';
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
-import { InternshipProcessFilterByStudentDTO } from '../../application/dto/internshipProcessFilterByStudent.dto';
+import { Prisma } from '@prisma/client';
 
 export interface InternshipProcessRepositoryPort {
   create(
     createInternshipProcessDTO: CreateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<InternshipProcessEntity>;
 
   updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<boolean>;
 
   filter(
-    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    internshipProcessFilterDTO: InternshipProcessFilterDto,
   ): Promise<InternshipProcessEntity[]>;
 
   filterByStudent(
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
+    internshipProcessFilterByStudentDto: InternshipProcessFilterDto,
+    userId: string,
   ): Promise<InternshipProcessEntity[]>;
 
   findEligibleProcessesForCompletion(
@@ -28,9 +30,13 @@ export interface InternshipProcessRepositoryPort {
     pageSize: number,
   );
 
-  findByQuery(
-    findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcessEntity[]>;
+  findById(
+    id: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ): Promise<InternshipProcessEntity>;
 
-  findById(id: string): Promise<InternshipProcessEntity>;
+  isElegibleForCompletion(
+    internshipProcessId: string,
+    userId: string,
+  ): Promise<boolean>;
 }

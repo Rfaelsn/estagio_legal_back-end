@@ -9,10 +9,8 @@ import {
 } from '../../domain/entities/internshipProcess.entity';
 import { InternshipProcessRepositoryPort } from '../../domain/port/internshipProcessRepository.port';
 
-import { FindInternshipProcessByQueryDTO } from '../../application/dto/findInternshipProcessByQuery.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '../../application/dto/internshipProcessFilterByEmployee.dto';
+import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
-import { InternshipProcessFilterByStudentDTO } from '../../application/dto/internshipProcessFilterByStudent.dto';
 
 @Injectable()
 export class InternshipProcessRepository
@@ -22,8 +20,10 @@ export class InternshipProcessRepository
 
   async create(
     createInternshipProcessDTO: CreateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<InternshipProcessEntity> {
-    const newInternshipProcess = await this.prisma.internshipProcess.create({
+    const prisma = prismaClientTransaction || this.prisma;
+    const newInternshipProcess = await prisma.internshipProcess.create({
       data: {
         movement: createInternshipProcessDTO.movement,
         status: createInternshipProcessDTO.status,
@@ -42,7 +42,9 @@ export class InternshipProcessRepository
 
   async updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<boolean> {
+    const prisma = prismaClientTransaction || this.prisma;
     let prismaData: Prisma.InternshipProcessUpdateInput;
     if (updateInternshipProcessStatusDTO.status === 'CONCLUÍDO') {
       prismaData = {
@@ -56,7 +58,7 @@ export class InternshipProcessRepository
         movement: updateInternshipProcessStatusDTO.movement,
       };
     }
-    await this.prisma.internshipProcess.update({
+    await prisma.internshipProcess.update({
       where: { id: updateInternshipProcessStatusDTO.id },
       data: prismaData,
     });
@@ -65,37 +67,17 @@ export class InternshipProcessRepository
   }
 
   async filter(
-    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    internshipProcessFilterDTO: InternshipProcessFilterDto,
   ): Promise<InternshipProcessEntity[]> {
-    const {
-      user,
-      termCommitment,
-      page,
-      pageSize,
-      startDateProcessRangeStart,
-      startDateProcessRangeEnd,
-      endDateProcessRangeStart,
-      endDateProcessRangeEnd,
-      ...rest
-    } = internshipProcessFilterDTO;
+    const { page, perPage } = internshipProcessFilterDTO;
 
-    const take: number = pageSize || 10;
+    const where = this.constructFilterWhere(internshipProcessFilterDTO);
+
+    const take: number = perPage || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
     const internshipProcess = await this.prisma.internshipProcess.findMany({
-      where: {
-        ...rest,
-        startDateProcess: {
-          gte: startDateProcessRangeStart,
-          lte: startDateProcessRangeEnd,
-        },
-        endDateProcess: {
-          gte: endDateProcessRangeStart,
-          lte: endDateProcessRangeEnd,
-        },
-        user: { ...user },
-        termCommitment: { ...termCommitment },
-      },
+      where,
       orderBy: {
         createdAt: 'desc',
       },
@@ -111,37 +93,21 @@ export class InternshipProcessRepository
   }
 
   async filterByStudent(
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
+    internshipProcessFilterByStudentDto: InternshipProcessFilterDto,
+    userId: string,
   ): Promise<InternshipProcessEntity[]> {
-    const {
-      idUser,
-      termCommitment,
-      page,
-      pageSize,
-      startDateProcessRangeStart,
-      startDateProcessRangeEnd,
-      endDateProcessRangeStart,
-      endDateProcessRangeEnd,
-      ...rest
-    } = internshipProcessFilterByStudentDto;
+    const { page, perPage } = internshipProcessFilterByStudentDto;
 
-    const take: number = pageSize || 10;
+    const where = this.constructFilterWhere(
+      internshipProcessFilterByStudentDto,
+      userId,
+    );
+
+    const take: number = perPage || 10;
     const skip: number = page ? (page - 1) * take : 0;
 
     const internshipProcess = await this.prisma.internshipProcess.findMany({
-      where: {
-        ...rest,
-        startDateProcess: {
-          gte: startDateProcessRangeStart,
-          lte: startDateProcessRangeEnd,
-        },
-        endDateProcess: {
-          gte: endDateProcessRangeStart,
-          lte: endDateProcessRangeEnd,
-        },
-        user: { id: idUser },
-        termCommitment: { ...termCommitment },
-      },
+      where,
       include: {
         user: true,
         termCommitment: true,
@@ -167,8 +133,8 @@ export class InternshipProcessRepository
     const internshipProcess = await this.prisma.internshipProcess.findMany({
       where: {
         user: { id: userId },
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
-        status: InternshipProcessStatus.CONCLUIDO,
+        movement: InternshipProcessMovement.STAGE_START,
+        status: InternshipProcessStatus.COMPLETED,
       },
       include: {
         user: true,
@@ -181,38 +147,36 @@ export class InternshipProcessRepository
     return internshipProcess;
   }
 
-  async findByQuery(
-    findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcessEntity[]> {
-    const { query, page, pageSize } = findInternshipProcessByQueryDTO;
-
-    // Lógica de paginação
-    const take: number = pageSize || 10;
-    const skip: number = page ? (page - 1) * take : 0;
-
-    const internshipProcess = await this.prisma.internshipProcess.findMany({
+  async isElegibleForCompletion(
+    internshipProcessId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const internshipProcess = await this.prisma.internshipProcess.findFirst({
       where: {
+        id: internshipProcessId,
+        user: { id: userId },
         OR: [
-          { movement: { contains: query } },
-          { status: { contains: query } },
-          { user: { name: { contains: query } } },
-          { user: { registration: { contains: query } } },
-          { user: { courseStudy: { contains: query } } },
+          {
+            status: InternshipProcessStatus.COMPLETED,
+            movement: InternshipProcessMovement.STAGE_START,
+          },
+          {
+            status: InternshipProcessStatus.REJECTED,
+            movement: InternshipProcessMovement.STAGE_END,
+          },
         ],
       },
-      include: {
-        user: true,
-        termCommitment: true,
-      },
-      take,
-      skip,
     });
 
-    return internshipProcess;
+    return !!internshipProcess;
   }
 
-  async findById(id: string): Promise<InternshipProcessEntity> {
-    const internshipProcess = await this.prisma.internshipProcess.findFirst({
+  async findById(
+    id: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ): Promise<InternshipProcessEntity> {
+    const prisma = prismaClientTransaction || this.prisma;
+    const internshipProcess = await prisma.internshipProcess.findFirst({
       where: {
         id,
       },
@@ -228,5 +192,124 @@ export class InternshipProcessRepository
     });
 
     return internshipProcess;
+  }
+
+  private constructFilterWhere(
+    internshipProcessFilterByStudentDto: InternshipProcessFilterDto,
+    userId?: string,
+  ): any {
+    const {
+      termCommitment,
+      user,
+      movement,
+      status,
+      startDateProcessRangeStart,
+      startDateProcessRangeEnd,
+      endDateProcessRangeStart,
+      endDateProcessRangeEnd,
+      internshipGrantor,
+    } = internshipProcessFilterByStudentDto;
+    const where: any = {};
+
+    if (
+      startDateProcessRangeStart != null ||
+      startDateProcessRangeEnd != null
+    ) {
+      where.startDateProcess = {
+        ...(startDateProcessRangeStart != null && {
+          gte: new Date(startDateProcessRangeStart),
+        }),
+        ...(startDateProcessRangeEnd != null && {
+          lte: new Date(startDateProcessRangeEnd),
+        }),
+      };
+    }
+
+    if (endDateProcessRangeStart != null || endDateProcessRangeEnd != null) {
+      where.endDateProcess = {
+        ...(endDateProcessRangeStart != null && {
+          gte: new Date(endDateProcessRangeStart),
+        }),
+        ...(endDateProcessRangeEnd != null && {
+          lte: new Date(endDateProcessRangeEnd),
+        }),
+      };
+    }
+
+    if (movement != null) {
+      where.movement = movement;
+    }
+
+    if (status != null) {
+      where.status = status;
+    }
+
+    where.user = { id: userId };
+
+    if (user?.name != null) {
+      where.user.name = {
+        contains: user.name,
+        mode: 'insensitive',
+      };
+    }
+
+    if (termCommitment?.courseStudy != null) {
+      where.user.courseStudy = termCommitment.courseStudy;
+    }
+
+    const termCommitmentWhere: any = {};
+
+    if (internshipGrantor) {
+      if (internshipGrantor.cnpj != null) {
+        termCommitmentWhere.grantingCompanyCNPJ = internshipGrantor.cnpj;
+      }
+      if (internshipGrantor.name != null) {
+        // Troca igualdade por contains (busca parcial, case-insensitive)
+        termCommitmentWhere.grantingCompanyName = {
+          contains: internshipGrantor.name,
+          mode: 'insensitive', // para busca sem diferenciar maiúsculas/minúsculas
+        };
+      }
+    }
+
+    if (termCommitment) {
+      if (
+        termCommitment.startDateInitialSearchInterval != null ||
+        termCommitment.startDateFinalSearchInterval != null
+      ) {
+        termCommitmentWhere.internshipStartDate = {
+          ...(termCommitment.startDateInitialSearchInterval != null && {
+            gte: new Date(termCommitment.startDateInitialSearchInterval),
+          }),
+          ...(termCommitment.startDateFinalSearchInterval != null && {
+            lte: new Date(termCommitment.startDateFinalSearchInterval),
+          }),
+        };
+      }
+
+      if (
+        termCommitment.endDateInitialSearchInterval != null ||
+        termCommitment.endDateFinalSearchInterval != null
+      ) {
+        termCommitmentWhere.internshipEndDate = {
+          ...(termCommitment.endDateInitialSearchInterval != null && {
+            gte: new Date(termCommitment.endDateInitialSearchInterval),
+          }),
+          ...(termCommitment.endDateFinalSearchInterval != null && {
+            lte: new Date(termCommitment.endDateFinalSearchInterval),
+          }),
+        };
+      }
+
+      if (termCommitment.isMandatory != null) {
+        termCommitmentWhere.isMandatory = termCommitment.isMandatory;
+      }
+    }
+
+    if (Object.keys(termCommitmentWhere).length > 0) {
+      where.termCommitment = termCommitmentWhere;
+    }
+
+    return where;
   }
 }

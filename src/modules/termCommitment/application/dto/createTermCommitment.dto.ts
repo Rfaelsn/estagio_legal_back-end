@@ -22,93 +22,101 @@ export class CreateTermCommitmentDTO {
 
   @IsString()
   @IsOptional()
-  numApoliceSeguro?: string;
+  insurancePolicyNumber?: string;
 
   @IsString()
   @IsOptional()
-  nomeSeguradora?: string;
+  insuranceCompanyName?: string;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
   @IsNotEmpty()
-  dataInicioEstagio: any;
+  internshipStartDate: Date;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
   @IsNotEmpty()
-  dataFimEstagio: Date;
+  internshipEndDate: Date;
 
   @IsNotEmpty()
   @IsTime('toDate')
-  horaInicioEstagio: Date;
+  internshipStartTime: Date;
 
   @IsNotEmpty()
   @IsTime('toDate')
-  horaFimEstagio: Date;
+  internshipEndTime: Date;
 
   @IsNotEmpty()
   @IsNumber()
-  jornadaSemanal: number;
+  weeklyWorkload: number;
 
   @IsBoolean()
   @IsNotEmpty()
-  isObrigatorio: boolean;
+  isMandatory: boolean;
 
   @IsNumber()
-  bolsaAuxilio: number;
+  internshipGrant: number;
 
   @IsNumber()
-  auxilioTransporte: number;
+  transportationAllowance: number;
 
   @IsArray()
-  @ArrayMinSize(5, { message: 'Você deve enviar exatamente 5 atividades' })
-  @ArrayMaxSize(5, { message: 'Você deve enviar exatamente 5 atividades' })
-  @IsString({ each: true, message: 'Cada atividade deve ser uma string' })
+  @ArrayMinSize(5, {
+    message: 'internshipActivityPlan must contain exactly 5 activities',
+  })
+  @ArrayMaxSize(5, {
+    message: 'internshipActivityPlan must contain exactly 5 activities',
+  })
+  @IsString({
+    each: true,
+    message: 'Each activity in internshipActivityPlan must be a string',
+  })
   @MaxLength(200, {
     each: true,
-    message: 'Cada atividade deve ter no máximo 200 caracteres',
+    message:
+      'Each activity in internshipActivityPlan must be no more than 200 characters',
   })
-  planoAtividadesEstagio: string[];
+  internshipActivityPlan: string[];
 
   @IsString()
   @IsNotEmpty()
-  razaoSocialConcedente: string;
+  grantingCompanyName: string;
 
   @IsCNPJ()
   @IsNotEmpty()
-  cnpjConcedente: string;
+  grantingCompanyCNPJ: string;
 
   @IsString()
   @IsNotEmpty()
-  cepConcedente: string;
+  grantingCompanyPostalCode: string;
 
   @IsString()
   @IsNotEmpty()
-  bairroConcedente: string;
+  grantingCompanyDistrict: string;
 
   @IsString()
   @IsNotEmpty()
-  cidadeConcedente: string;
+  grantingCompanyCity: string;
 
   @IsString()
   @IsNotEmpty()
-  ufConcedente: string;
+  grantingCompanyState: string;
 
   @IsString()
   @IsNotEmpty()
-  enderecoConcedente: string;
+  grantingCompanyAddress: string;
 
   @IsEmail()
   @IsNotEmpty()
-  emailConcedente: string;
+  grantingCompanyEmail: string;
 
   @IsString()
   @IsNotEmpty()
-  representanteLegalConcedente: string;
+  grantingCompanyLegalRepresentative: string;
 
   @IsString()
   @IsNotEmpty()
-  funcaoRepresentanteLegalConcedente: string;
+  legalRepresentativeRole: string;
 
   @IsString()
   @IsNotEmpty()
@@ -116,16 +124,13 @@ export class CreateTermCommitmentDTO {
 
   @IsString()
   @IsNotEmpty()
-  cargoSupervisor: string;
+  supervisorPosition: string;
 
   @IsString()
-  @IsNotEmpty()
-  id_user: string;
+  @IsOptional()
+  id_user?: string;
 
   @IsString()
   @IsOptional()
   termFilePathId?: string;
-
-  // @IsString()
-  // id_internshipGrantor: string;
 }

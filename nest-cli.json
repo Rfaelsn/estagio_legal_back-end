@@ -3,6 +3,16 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "modules/generate-pdf/infrastructure/templates/**/*.ejs",
+        "outDir": "dist/src"
+      },
+      {
+        "include": "modules/generate-pdf/infrastructure/templates/**/*.png",
+        "outDir": "dist/src"
+      }
+    ]
   }
 }

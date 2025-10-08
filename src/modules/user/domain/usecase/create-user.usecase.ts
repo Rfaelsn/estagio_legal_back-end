@@ -1,14 +1,13 @@
 import { IUserRepository } from '../port/user-repository.port';
-import { CreateAlunoDTO } from '../../application/dto/createAluno.dto';
+import { CreateStudentDTO } from '../../application/dto/createStudent.dto';
 import * as bcrypt from 'bcrypt';
-import axios from 'axios';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { User } from '../entities/user.entity';
+import { Role } from '../entities/user.entity';
 
-export class CreateUserUsecase {
+export class CreateUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async handle(inputUserAlunoDTO: CreateAlunoDTO) {
+  async handle(inputUserStudentDTO: CreateStudentDTO) {
     try {
       // const response = await axios.get(
       //   'http://localhost:3000/aluno/findByMatricula',
@@ -27,15 +26,14 @@ export class CreateUserUsecase {
         // inputUserAlunoDTO.registration === response.data.registration
       ) {
         const data = {
-          ...inputUserAlunoDTO,
+          ...inputUserStudentDTO,
+          role: Role.STUDENT,
           password: await bcrypt.hash(
-            inputUserAlunoDTO.password,
+            inputUserStudentDTO.password,
             await bcrypt.genSalt(),
           ),
         };
-        const user = new User(data);
-        await this.userRepository.create(user);
-        return user;
+        return this.userRepository.create(data);
       } else {
         return new HttpException(
           {

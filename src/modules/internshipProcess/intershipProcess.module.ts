@@ -10,6 +10,8 @@ import { PrismaService } from '@/config/prisma/prisma.service';
 import { FileService } from '../file/application/services/file.service';
 import { NotificationService } from '../notification/application/service/notification.service';
 import { InternshipProcessHistoryService } from '../internship-process-history/application/services/internship-process-history.service';
+import { FileStorageService } from '../file-storage/application/services/file-storage.service';
+import { FileStorageModule } from '../file-storage/file-storage.module';
 
 @Module({
   controllers: [InternshipProcessController],
@@ -32,6 +34,10 @@ import { InternshipProcessHistoryService } from '../internship-process-history/a
       useExisting: InternshipProcessHistoryService,
     },
     {
+      provide: 'FileStorageService',
+      useExisting: FileStorageService,
+    },
+    {
       provide: 'InternshipProcessRepository',
       useFactory: (prismaService: PrismaService) => {
         return new InternshipProcessRepository(prismaService);
@@ -39,7 +45,12 @@ import { InternshipProcessHistoryService } from '../internship-process-history/a
       inject: ['PrismaService'],
     },
   ],
-  imports: [FileModule, NotificationModule, InternshipProcessHistoryModule],
+  imports: [
+    FileModule,
+    NotificationModule,
+    InternshipProcessHistoryModule,
+    FileStorageModule,
+  ],
   exports: [InternshipProcessService],
 })
 export class InternshipProcessModule {}

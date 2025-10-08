@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpCode, Inject, Injectable } from '@nestjs/common';
 import {
   InternshipProcessEntity,
   InternshipProcessMovement,
@@ -7,12 +7,9 @@ import {
 import { CreateInternshipProcessUseCase } from '../../domain/usecase/creatIntershipProcess.usecase';
 import { FilterInternshipProcessUseCase } from '../../domain/usecase/filterInternshipProcess.usecase';
 import { FindInternshipProcessByIdUsecase } from '../../domain/usecase/findByIdInternshipProcess.usecase';
-import { FindInternshipProcessByQueryUsecase } from '../../domain/usecase/findInternshipProcessByQuery.usecase';
-import { FindInternshipProcessByQueryDTO } from '../dto/findInternshipProcessByQuery.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '../dto/internshipProcessFilterByEmployee.dto';
+import { InternshipProcessFilterDto } from '../dto/internshipProcessFilter.dto';
 import { UpdateInternshipProcessDTO } from '../dto/updateInternshipProcess.dto';
 import { InternshipProcessHistoryService } from 'src/modules/internship-process-history/application/services/internship-process-history.service';
-import { InternshipProcessFilterByStudentDTO } from '../dto/internshipProcessFilterByStudent.dto';
 import { RegisterEndInternshipProcessDto } from '../dto/registerEndInternshipProcess.dto';
 import { CreateInternshipProcessHistoryDto } from '@/modules/internship-process-history/application/dtos/create-internship-process-history.dto';
 import { ValidateAssignEndInternshipProcessDto } from '../dto/validateAssignEndInternshipProcess.dto';
@@ -20,6 +17,16 @@ import { InternshipProcessRepositoryPort } from '../../domain/port/internshipPro
 import { IFileServicePort } from '@/modules/file/domain/ports/IFileService.port';
 import { INotificationServicePort } from '@/modules/notification/domain/port/INotificationService.port';
 import { InternshipProcessServicePort } from '../../domain/port/internshipProcessService.port';
+import { Prisma } from '@prisma/client';
+import { UserFromJwt } from '@/auth/models/UserFromJwt';
+import { FileStorageService } from '@/modules/file-storage/application/services/file-storage.service';
+import {
+  FileEntity,
+  FileType,
+} from '@/modules/file/domain/entities/file.entity';
+import { RegisterFilePathDto } from '@/modules/file/application/dtos/registerFilePath.dto';
+import { PrismaService } from '@/config/prisma/prisma.service';
+import { Role } from '@/modules/user/domain/entities/user.entity';
 
 @Injectable()
 export class InternshipProcessService implements InternshipProcessServicePort {
@@ -35,11 +42,25 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
     @Inject('InternshipProcessHistoryService')
     private readonly internshipProcessHistoryService: InternshipProcessHistoryService,
+
+    @Inject('FileStorageService')
+    private readonly fileStorageService: FileStorageService,
+
+    @Inject('PrismaService')
+    private readonly prismaService: PrismaService,
   ) {}
+  registerEndInternshipProcess(
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+    file: Express.Multer.File[],
+    user: UserFromJwt,
+  ) {
+    console.log('teste');
+  }
 
   async create(
     idTermCommitment: string,
     idUser: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<InternshipProcessEntity> {
     const createInternshipProcessUseCase = new CreateInternshipProcessUseCase(
       this.internshipProcessRepository,
@@ -48,11 +69,7 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     const internshipProcess = await createInternshipProcessUseCase.handle(
       idTermCommitment,
       idUser,
-    );
-
-    this.notificationService.sendNotification(
-      idUser,
-      'created new internship process',
+      prismaClientTransaction,
     );
 
     return internshipProcess;
@@ -60,14 +77,19 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
   async updateInternshipProcess(
     updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
+    prismaClientTransaction?: Prisma.TransactionClient,
   ): Promise<boolean> {
     return await this.internshipProcessRepository.updateInternshipProcess(
       updateInternshipProcessStatusDTO,
+      prismaClientTransaction,
     );
   }
 
-  async filterByEmployee(
-    internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+  @HttpCode(200)
+  async filter(
+    internshipProcessFilterDTO: InternshipProcessFilterDto,
+    userId: string,
+    userRole: string,
   ): Promise<InternshipProcessEntity[]> {
     const filterInternshipProcessUseCase = new FilterInternshipProcessUseCase(
       this.internshipProcessRepository,
@@ -75,17 +97,9 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
     const internshipProcess = await filterInternshipProcessUseCase.handle(
       internshipProcessFilterDTO,
+      userId,
+      userRole,
     );
-    return internshipProcess;
-  }
-
-  async filterByStudent(
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
-  ): Promise<InternshipProcessEntity[]> {
-    const internshipProcess =
-      await this.internshipProcessRepository.filterByStudent(
-        internshipProcessFilterByStudentDto,
-      );
     return internshipProcess;
   }
 
@@ -103,45 +117,292 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     return internshipProcess;
   }
 
-  async registerEndInternshipProcess(
+  async assignEndInternshipProcess(
     registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+    files: Express.Multer.File[],
+    user: UserFromJwt,
   ) {
-    // const formatFilePaths =
-    //   registerEndInternshipProcessDto.internshipEvaluationFilesPaths.map(
-    //     (filePath) => {
-    //       if (filePath) {
-    //         return {
-    //           filePath,
-    //           fileType: FileType.EVALUATION,
-    //         };
-    //       }
-    //     },
-    //   );
-    const registeredFiles = await this.fileService.registerFilePathsProcess(
-      registerEndInternshipProcessDto.internshipEvaluationFilesPaths,
+    if (
+      user.role !== Role.EMPLOYEE &&
+      user.role !== Role.ADMINISTRATOR &&
+      (registerEndInternshipProcessDto.validate ||
+        registerEndInternshipProcessDto.remark)
+    ) {
+      throw new Error(
+        'Apenas o funcionário ou administrador pode validar o processo de estágio.',
+      );
+    }
+
+    const isElegible = await this.isElegibleForCompletion(
+      registerEndInternshipProcessDto.internshipProcessId,
+      user.id,
     );
 
-    await this.updateInternshipProcess({
-      id: registerEndInternshipProcessDto.internshipProcessId,
-      status: InternshipProcessStatus.EM_ANALISE,
-      movement: InternshipProcessMovement.FIM_ESTAGIO,
-    });
+    if (!isElegible && user.role === Role.STUDENT) {
+      throw new Error(
+        'O processo de estágio não está elegível para ser concluído. precisa estar no estágio de início de estágio concluído.',
+      );
+    }
 
-    const newHistory: CreateInternshipProcessHistoryDto = {
-      movement: InternshipProcessMovement.FIM_ESTAGIO,
-      status: InternshipProcessStatus.EM_ANALISE,
-      idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
-      fileIds: registeredFiles.map((registeredFile) => {
-        return registeredFile.id;
-      }),
-    };
+    const filePaths: RegisterFilePathDto[] = [];
 
-    // await this.internshipProcessHistoryService.updateHistory({
-    //   endDate: new Date(),
-    //   idInternshipProcess: registerEndInternshipProcessDto.internshipProcessId,
-    // });
+    if (files.length !== 0) {
+      for (const file of files) {
+        const fileType = this.getFileType(file.originalname);
+        const filePath = await this.fileStorageService.uploadPdfFile(
+          file.buffer,
+          fileType,
+        );
+        filePaths.push({
+          filePath,
+          fileType,
+          isAssigned: true,
+        });
+      }
+    }
 
-    await this.internshipProcessHistoryService.registerHistory(newHistory);
+    try {
+      await this.prismaService.$transaction(async (prismaClientTransaction) => {
+        if (
+          filePaths.length === 0 &&
+          !registerEndInternshipProcessDto.validate &&
+          (user.role === Role.EMPLOYEE || user.role === Role.ADMINISTRATOR)
+        ) {
+          const newHistory = this.getNewInternshipProcessHistoryByUserRole(
+            user.role,
+            [],
+            registerEndInternshipProcessDto,
+          );
+
+          const updatedInternshipProcessStateData =
+            this.getNewInternshipProcessStateDataByUserRole(
+              user.role,
+              registerEndInternshipProcessDto,
+            );
+
+          await this.updateInternshipProcess(
+            updatedInternshipProcessStateData,
+            prismaClientTransaction,
+          );
+
+          await this.internshipProcessHistoryService.updateLatestHistory(
+            {
+              endDate: new Date(),
+              idInternshipProcess:
+                registerEndInternshipProcessDto.internshipProcessId,
+            },
+            prismaClientTransaction,
+          );
+
+          await this.internshipProcessHistoryService.registerHistory(
+            newHistory,
+            prismaClientTransaction,
+          );
+
+          const internshipProcess = await this.findById(
+            registerEndInternshipProcessDto.internshipProcessId,
+            prismaClientTransaction,
+          );
+
+          await this.sendNotificationByCurrentAssignHistory(
+            internshipProcess.id_user,
+            internshipProcess.id,
+            user.role,
+            updatedInternshipProcessStateData.status,
+            updatedInternshipProcessStateData.movement,
+          );
+        } else {
+          const registeredFiles =
+            await this.fileService.registerFilePathsProcess(
+              filePaths,
+              prismaClientTransaction,
+            );
+
+          const newHistory = this.getNewInternshipProcessHistoryByUserRole(
+            user.role,
+            registeredFiles,
+            registerEndInternshipProcessDto,
+          );
+
+          const updatedInternshipProcessStateData =
+            this.getNewInternshipProcessStateDataByUserRole(
+              user.role,
+              registerEndInternshipProcessDto,
+            );
+
+          await this.updateInternshipProcess(
+            updatedInternshipProcessStateData,
+            prismaClientTransaction,
+          );
+
+          await this.internshipProcessHistoryService.updateLatestHistory(
+            {
+              endDate: new Date(),
+              idInternshipProcess:
+                registerEndInternshipProcessDto.internshipProcessId,
+            },
+            prismaClientTransaction,
+          );
+
+          await this.internshipProcessHistoryService.registerHistory(
+            newHistory,
+            prismaClientTransaction,
+          );
+
+          const internshipProcess = await this.findById(
+            registerEndInternshipProcessDto.internshipProcessId,
+            prismaClientTransaction,
+          );
+
+          await this.sendNotificationByCurrentAssignHistory(
+            internshipProcess.id_user,
+            internshipProcess.id,
+            user.role,
+            updatedInternshipProcessStateData.status,
+            updatedInternshipProcessStateData.movement,
+          );
+        }
+      });
+    } catch (error) {
+      if (filePaths.length > 0) {
+        filePaths.forEach((filePath) => {
+          this.fileStorageService.deletePdfFile(filePath.filePath);
+        });
+      }
+      console.error('Erro ao deletar arquivo:', error);
+    }
+  }
+
+  private async sendNotificationByCurrentAssignHistory(
+    userId?: string,
+    internshipProcessId?: string,
+    userRole?: Role | string,
+    currentStatus?: InternshipProcessStatus,
+    currentMovement?: InternshipProcessMovement,
+  ): Promise<void> {
+    if (
+      userRole === Role.STUDENT &&
+      currentStatus === InternshipProcessStatus.UNDER_REVIEW &&
+      currentMovement === InternshipProcessMovement.STAGE_END
+    ) {
+      await this.notificationService.sendNotificationToEmployees(
+        'Nova solicitação de finalização de estágio.',
+        internshipProcessId,
+      );
+    }
+
+    if (
+      (userRole === Role.ADMINISTRATOR || userRole === Role.EMPLOYEE) &&
+      currentStatus === InternshipProcessStatus.COMPLETED &&
+      currentMovement === InternshipProcessMovement.STAGE_END
+    ) {
+      await this.notificationService.sendNotificationToStudent(
+        userId,
+        'Atestado de Estágio emitido.',
+        internshipProcessId,
+      );
+    }
+
+    if (
+      (userRole === Role.ADMINISTRATOR || userRole === Role.EMPLOYEE) &&
+      currentStatus === InternshipProcessStatus.REJECTED &&
+      currentMovement === InternshipProcessMovement.STAGE_END
+    ) {
+      await this.notificationService.sendNotificationToStudent(
+        userId,
+        'Solicitação de finalização de estágio recusada.',
+        internshipProcessId,
+      );
+    }
+  }
+
+  private getNewInternshipProcessHistoryByUserRole(
+    userRole: Role | string,
+    registeredFiles: FileEntity[],
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+  ) {
+    if (userRole === Role.STUDENT) {
+      return {
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.UNDER_REVIEW,
+        idInternshipProcess:
+          registerEndInternshipProcessDto.internshipProcessId,
+        fileIds: registeredFiles.map((file) => file.id),
+      };
+    } else if (
+      registerEndInternshipProcessDto.validate &&
+      (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR)
+    ) {
+      return {
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.COMPLETED,
+        endDate: new Date(),
+        idInternshipProcess:
+          registerEndInternshipProcessDto.internshipProcessId,
+        fileIds: registeredFiles.map((file) => file.id),
+      };
+    } else if (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR) {
+      return {
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.REJECTED,
+        idInternshipProcess:
+          registerEndInternshipProcessDto.internshipProcessId,
+        observations: registerEndInternshipProcessDto.remark,
+      };
+    }
+  }
+
+  private getNewInternshipProcessStateDataByUserRole(
+    userRole: Role | string,
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+  ) {
+    if (userRole === Role.STUDENT) {
+      return {
+        id: registerEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.UNDER_REVIEW,
+        movement: InternshipProcessMovement.STAGE_END,
+      };
+    } else if (
+      registerEndInternshipProcessDto.validate &&
+      (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR)
+    ) {
+      return {
+        id: registerEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.COMPLETED,
+        movement: InternshipProcessMovement.STAGE_END,
+      };
+    } else if (userRole === Role.EMPLOYEE || userRole === Role.ADMINISTRATOR) {
+      return {
+        id: registerEndInternshipProcessDto.internshipProcessId,
+        status: InternshipProcessStatus.REJECTED,
+        movement: InternshipProcessMovement.STAGE_END,
+      };
+    }
+  }
+
+  private getFileType(fileName: string): FileType {
+    if (fileName === 'AutoAvaliacaoEstagiario.pdf') {
+      return FileType.STUDENT_SELF_EVALUATION;
+    } else if (fileName === 'AvaliacaoConcedente.pdf') {
+      return FileType.INTERNSHIP_GRANTOR_EVALUATION;
+    } else if (fileName === 'AvaliacaoProfessorOrientador.pdf') {
+      return FileType.SUPERVISOR_EVALUATION;
+    } else if (fileName === 'CertificadoConclusaoEstagio.pdf') {
+      return FileType.INTERNSHIP_CERTIFICATE;
+    } else {
+      console.log(fileName);
+      throw new Error(`Tipo de arquivo desconhecido ${fileName}`);
+    }
+  }
+
+  private async isElegibleForCompletion(
+    internshipProcessId: string,
+    userId: string,
+  ): Promise<boolean> {
+    return this.internshipProcessRepository.isElegibleForCompletion(
+      internshipProcessId,
+      userId,
+    );
   }
 
   async validateAssignEndInternshipProcess(
@@ -159,20 +420,20 @@ export class InternshipProcessService implements InternshipProcessServicePort {
 
       this.updateInternshipProcess({
         id: validateAssignEndInternshipProcessDto.internshipProcessId,
-        status: InternshipProcessStatus.CONCLUIDO,
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
+        status: InternshipProcessStatus.COMPLETED,
+        movement: InternshipProcessMovement.STAGE_END,
       });
 
       const newHistory: CreateInternshipProcessHistoryDto = {
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
-        status: InternshipProcessStatus.CONCLUIDO,
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.COMPLETED,
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
         fileIds: [registeredFiles.id],
       };
 
       //ajustar para determinar a data apenas da ultima movimentação
-      this.internshipProcessHistoryService.updateHistory({
+      this.internshipProcessHistoryService.updateLatestHistory({
         endDate: new Date(),
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
@@ -182,44 +443,39 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     } else {
       this.updateInternshipProcess({
         id: validateAssignEndInternshipProcessDto.internshipProcessId,
-        status: InternshipProcessStatus.RECUSADO,
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
+        status: InternshipProcessStatus.REJECTED,
+        movement: InternshipProcessMovement.STAGE_END,
       });
 
-      this.internshipProcessHistoryService.updateHistory({
+      this.internshipProcessHistoryService.updateLatestHistory({
         endDate: new Date(),
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
       });
 
       const newHistory: CreateInternshipProcessHistoryDto = {
-        movement: InternshipProcessMovement.FIM_ESTAGIO,
-        status: InternshipProcessStatus.RECUSADO,
+        movement: InternshipProcessMovement.STAGE_END,
+        status: InternshipProcessStatus.REJECTED,
         idInternshipProcess:
           validateAssignEndInternshipProcessDto.internshipProcessId,
-        observacoes: validateAssignEndInternshipProcessDto.remark,
+        observations: validateAssignEndInternshipProcessDto.remark,
       };
 
       this.internshipProcessHistoryService.registerHistory(newHistory);
     }
   }
 
-  async findByQuery(
-    findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ): Promise<InternshipProcessEntity[]> {
-    const filterInternshipProcessUsecase =
-      new FindInternshipProcessByQueryUsecase(this.internshipProcessRepository);
-    const internshipProcess = await filterInternshipProcessUsecase.handle(
-      findInternshipProcessByQueryDTO,
-    );
-    return internshipProcess;
-  }
-
-  async findById(id: string): Promise<InternshipProcessEntity> {
+  async findById(
+    id: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ): Promise<InternshipProcessEntity> {
     const filterInternshipProcessUsecase = new FindInternshipProcessByIdUsecase(
       this.internshipProcessRepository,
     );
-    const internshipProcess = await filterInternshipProcessUsecase.handle(id);
+    const internshipProcess = await filterInternshipProcessUsecase.handle(
+      id,
+      prismaClientTransaction,
+    );
     return internshipProcess;
   }
 }

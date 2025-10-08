@@ -13,7 +13,7 @@ export class CreateInternshipProcessHistoryDto {
 
   @IsString()
   @IsOptional()
-  observacoes?: string;
+  observations?: string;
 
   @IsString()
   idInternshipProcess: string;

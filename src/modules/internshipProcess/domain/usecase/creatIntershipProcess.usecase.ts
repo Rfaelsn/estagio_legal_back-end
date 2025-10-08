@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { CreateInternshipProcessDTO } from '../../application/dto/input/internshipProcess.dto';
 import {
   InternshipProcessMovement,
@@ -7,20 +8,25 @@ import { InternshipProcessRepositoryPort } from '../port/internshipProcessReposi
 
 export class CreateInternshipProcessUseCase {
   constructor(
-    private readonly interNshipProcessRepository: InternshipProcessRepositoryPort,
+    private readonly internshipProcessRepository: InternshipProcessRepositoryPort,
   ) {}
 
-  async handle(idTermCommitment: string, idUser: string) {
+  async handle(
+    idTermCommitment: string,
+    idUser: string,
+    prismaClientTransaction?: Prisma.TransactionClient,
+  ) {
     try {
       const createInternshipProcessDTO: CreateInternshipProcessDTO = {
-        movement: InternshipProcessMovement.INICIO_ESTAGIO,
-        status: InternshipProcessStatus.EM_ANDAMENTO,
+        movement: InternshipProcessMovement.STAGE_START,
+        status: InternshipProcessStatus.IN_PROGRESS,
         id_user: idUser,
         id_termCommitment: idTermCommitment,
       };
       const createIntershipProcess =
-        await this.interNshipProcessRepository.create(
+        await this.internshipProcessRepository.create(
           createInternshipProcessDTO,
+          prismaClientTransaction,
         );
 
       return createIntershipProcess;

@@ -1,32 +1,27 @@
-import { IsEmail, IsString, IsEnum, IsOptional } from 'class-validator';
-import { Role } from '../../domain/entities/user.entity';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UserFilterDTO {
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  name: string;
+  name?: string | null;
 
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  cpf: string;
+  cpf?: string | null;
 
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  registration: string;
+  registration?: string | null;
 
-  @IsEmail()
   @IsOptional()
-  email: string;
-
   @IsString()
-  @IsOptional()
-  telefone: string;
+  email?: string | null;
 
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  courseStudy: string;
+  telephone?: string | null;
 
-  @IsEnum(Role)
   @IsOptional()
-  role: string;
+  @IsString()
+  courseStudy?: string | null;
 }

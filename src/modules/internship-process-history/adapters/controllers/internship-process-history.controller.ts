@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { InternshipProcessHistoryService } from '../../application/services/internship-process-history.service';
 import { CreateHistoryWithFileDto } from '../../application/dtos/create-history-with-file.dto';
 import { IsPublic } from '@/auth/decorators/is-public.decorator';
@@ -36,5 +36,14 @@ export class InternshipProcessHistoryController {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  @Get('/by-internship-process/:internshipProcessId')
+  async getHistoriesByInternshipProcessId(
+    @Param('internshipProcessId') internshipProcessId: string,
+  ) {
+    return this.internshipProcessHistoryService.getHistoriesByInternshipProcessId(
+      internshipProcessId,
+    );
   }
 }

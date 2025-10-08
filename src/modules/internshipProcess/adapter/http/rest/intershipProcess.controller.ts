@@ -11,6 +11,8 @@ import {
   Post,
   HttpException,
   HttpStatus,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 
@@ -23,10 +25,13 @@ import { InternshipProcessService } from '@/modules/internshipProcess/applicatio
 import { UpdateInternshipProcessDTO } from '@/modules/internshipProcess/application/dto/updateInternshipProcess.dto';
 import { ValidateAssignEndInternshipProcessDto } from '@/modules/internshipProcess/application/dto/validateAssignEndInternshipProcess.dto';
 import { RegisterEndInternshipProcessDto } from '@/modules/internshipProcess/application/dto/registerEndInternshipProcess.dto';
-import { InternshipProcessFilterByStudentDTO } from '@/modules/internshipProcess/application/dto/internshipProcessFilterByStudent.dto';
-import { InternshipProcessFilterByEmployeeDTO } from '@/modules/internshipProcess/application/dto/internshipProcessFilterByEmployee.dto';
-import { FindInternshipProcessByQueryDTO } from '@/modules/internshipProcess/application/dto/findInternshipProcessByQuery.dto';
+import { InternshipProcessFilterDto } from '@/modules/internshipProcess/application/dto/internshipProcessFilter.dto';
 import { InternshipProcessControllerPort } from '@/modules/internshipProcess/domain/port/internshipProcessController.port';
+import {
+  configFileInterceptor,
+  filePipe,
+} from '@/modules/file/adapter/interceptors/config-file-interceptor';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('processo/estagio')
 @UseGuards(RoleGuard)
@@ -36,7 +41,7 @@ export class InternshipProcessController
   constructor(
     private readonly internshipProcessService: InternshipProcessService,
   ) {}
-  @IsPublic()
+
   @Patch('update/status')
   async updateInternshipProcess(
     @Body() updateInternshipProcessStatusDTO: UpdateInternshipProcessDTO,
@@ -55,17 +60,24 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ALUNO)
-  @Post('register/assign-end-internship')
-  async registerEndInternshipByStudent(
-    @Body() registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+  @Roles(Role.STUDENT, Role.ADMINISTRATOR, Role.EMPLOYEE)
+  @UseInterceptors(FilesInterceptor('file', 3, configFileInterceptor))
+  @Post('assign-end-internship-process')
+  async assignEndInternshipProcess(
+    @Body()
+    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
+    @User() user: UserFromJwt,
+    @UploadedFiles(filePipe)
+    files?: Express.Multer.File[],
   ) {
-    await this.internshipProcessService.registerEndInternshipProcess(
+    await this.internshipProcessService.assignEndInternshipProcess(
       registerEndInternshipProcessDto,
+      files,
+      user,
     );
   }
 
-  @Roles(Role.ADMINISTRADOR, Role.FUNCIONARIO)
+  @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE)
   @Post('validate/assign-end-internship')
   async validateAssignEndInternshipProcess(
     @Body()
@@ -73,7 +85,7 @@ export class InternshipProcessController
     @User() user: UserFromJwt,
   ) {
     if (
-      user.role === Role.ADMINISTRADOR &&
+      user.role === Role.ADMINISTRATOR &&
       !validateAssignEndInternshipProcessDto.remark &&
       !validateAssignEndInternshipProcessDto.validate
     ) {
@@ -84,31 +96,20 @@ export class InternshipProcessController
     );
   }
 
-  @Roles(Role.ADMINISTRADOR)
-  @Get('filter')
+  @Roles(Role.ADMINISTRATOR, Role.EMPLOYEE, Role.STUDENT)
+  @Post('filter')
   async internshipProcessFilter(
-    @Query() internshipProcessFilterDTO: InternshipProcessFilterByEmployeeDTO,
+    @Body() internshipProcessFilterDTO: InternshipProcessFilterDto,
+    @User() user: UserFromJwt & { sub: string },
   ) {
-    console.log('oi');
-    return this.internshipProcessService.filterByEmployee(
+    return this.internshipProcessService.filter(
       internshipProcessFilterDTO,
+      user.sub,
+      user.role,
     );
   }
 
-  @Roles(Role.ALUNO)
-  @Get('filter/my-process')
-  async internshipProcessFilterByStudent(
-    @Query()
-    internshipProcessFilterByStudentDto: InternshipProcessFilterByStudentDTO,
-    @Request() req,
-  ) {
-    internshipProcessFilterByStudentDto.idUser = req.user.id;
-    return await this.internshipProcessService.filterByStudent(
-      internshipProcessFilterByStudentDto,
-    );
-  }
-
-  @Roles(Role.ALUNO)
+  @Roles(Role.STUDENT)
   @Get('elegible-for-completation')
   async findEligibleProcessesForCompletion(
     @Request() req,
@@ -120,16 +121,6 @@ export class InternshipProcessController
       userId,
       page,
       pageSize,
-    );
-  }
-
-  @IsPublic()
-  @Get('findBy')
-  async findByQuery(
-    @Query() findInternshipProcessByQueryDTO: FindInternshipProcessByQueryDTO,
-  ) {
-    return this.internshipProcessService.findByQuery(
-      findInternshipProcessByQueryDTO,
     );
   }
 

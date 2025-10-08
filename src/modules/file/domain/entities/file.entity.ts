@@ -4,6 +4,7 @@ export class FileEntity implements File {
   id: string;
   filePath: string;
   fileType: string;
+  isAssigned: boolean;
 }
 
 export enum FileType {
@@ -14,3 +15,12 @@ export enum FileType {
   RENEWAL_DOCUMENT = 'RENEWAL_DOCUMENT',
   INTERNSHIP_CERTIFICATE = 'INTERNSHIP_CERTIFICATE',
 }
+
+export const FileTypeToFileName: Record<FileType, string> = {
+  [FileType.TERM_COMMITMENT]: 'TermoCompromisso',
+  [FileType.STUDENT_SELF_EVALUATION]: 'AutoAvaliacaoEstudante',
+  [FileType.INTERNSHIP_GRANTOR_EVALUATION]: 'AvaliacaoConcedente',
+  [FileType.SUPERVISOR_EVALUATION]: 'AvaliacaoSupervisor',
+  [FileType.RENEWAL_DOCUMENT]: 'DocumentoRenovacao',
+  [FileType.INTERNSHIP_CERTIFICATE]: 'CertificadoEstagio',
+};
