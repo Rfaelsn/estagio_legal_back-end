@@ -5,7 +5,7 @@ import axios from 'axios';
 @Injectable()
 export class FileStorageProvider {
   private controllerUrl = '/file';
-  private baseUrl = 'http://localhost:4001';
+  private baseUrl = process.env.FILE_API_URL;
 
   constructor() {}
 
@@ -14,7 +14,9 @@ export class FileStorageProvider {
     fileType: FileType,
   ): Promise<string> {
     try {
-      const pdfBlob = new Blob([pdfFileBuffer], { type: 'application/pdf' });
+      const pdfBlob = new Blob([new Uint8Array(pdfFileBuffer)], {
+        type: 'application/pdf',
+      });
 
       const formData = new FormData();
       formData.append('file', pdfBlob);
