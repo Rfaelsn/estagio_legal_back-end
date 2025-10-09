@@ -8,7 +8,7 @@
   "scripts": {
     "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/main",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -21,8 +21,7 @@
     "test:mutation": "stryker run",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "vercel-build": "npx prisma migrate deploy && npx prisma generate && npm run build",
-    "postinstall": "prisma generate"
+    "postinstall": "npx prisma generate"
   },
   "_moduleAliases": {
     "@": "dist/src"
