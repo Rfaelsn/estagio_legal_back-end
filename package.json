@@ -24,7 +24,7 @@
     "vercel-build": "npx prisma migrate deploy && npx prisma generate && npm run build"
   },
   "_moduleAliases": {
-    "@": "dist"
+    "@": "dist/src"
   },
   "dependencies": {
     "module-alias": "^2.2.3",
