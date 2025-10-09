@@ -11,7 +11,7 @@
     "start": "nest start",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node -r tsconfig-paths/register dist/main",
+    "start:prod": "node -r module-alias/register dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:unit": "jest",
@@ -23,7 +23,11 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "vercel-build": "npx prisma migrate deploy && npx prisma generate && npm run build"
   },
+  "_moduleAliases": {
+    "@": "dist"
+  },
   "dependencies": {
+    "module-alias": "^2.2.3",
     "@nestjs/axios": "^3.0.3",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
