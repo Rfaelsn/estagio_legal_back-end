@@ -6,11 +6,15 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const origins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  console.log('CORS_ORIGIN:', origins);
+
   app.enableCors({
-    origin: (process.env.CORS_ORIGIN || '')
-      .split(',')
-      .map((origin) => origin.trim())
-      .filter(Boolean),
+    origin: origins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
     credentials: true,
