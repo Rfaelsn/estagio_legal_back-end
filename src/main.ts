@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: '*',
+    origin: 'https://front-a1tcjzaro-estagio-legal.vercel.app',
     allowedHeaders: [
       'Origin',
       'X-Requested',
