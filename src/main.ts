@@ -16,6 +16,7 @@ async function bootstrap() {
       'Authorization',
     ],
     methods: ['POST', 'PUT', 'PATCH', 'GET', 'DELETE', 'OPTIONS'],
+    credentials: true,
   });
 
   app.useGlobalPipes(
