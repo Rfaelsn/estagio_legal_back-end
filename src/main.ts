@@ -8,11 +8,14 @@ async function bootstrap() {
 
   app.enableCors({
     origin: ['https://front-a1tcjzaro-estagio-legal.vercel.app'],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'X-Requested-With',
+    ],
     credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
   });
 
   app.useGlobalPipes(
