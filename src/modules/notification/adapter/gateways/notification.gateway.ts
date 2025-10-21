@@ -8,7 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { NotificationService } from '../../application/service/notification.service';
 
-@WebSocketGateway(3002, {
+@WebSocketGateway({
   cors: {
     origin: (process.env.CORS_ORIGIN || '')
       .split(',')
