@@ -4,11 +4,18 @@ import { Prisma } from '@prisma/client';
 export async function seedInstitution(
   prismaTransaction: Prisma.TransactionClient,
 ) {
+  const cnpj = '10.763.998/0003-00 ';
+  const existing = await prismaTransaction.institution.findFirst({
+    where: { cnpj },
+  });
+  if (existing) {
+    return existing;
+  }
   return prismaTransaction.institution.create({
     data: {
       name: 'Instituto Federal de Educação, Ciência e Tecnologia do Pará',
       campus: 'Belém',
-      cnpj: '10.763.998/0003-00 ',
+      cnpj,
       UF: 'PA',
       city: 'Belém',
       district: 'Marco',
