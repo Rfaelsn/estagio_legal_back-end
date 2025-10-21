@@ -10,7 +10,19 @@ import { NotificationService } from '../../application/service/notification.serv
 
 @WebSocketGateway(3002, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: (process.env.CORS_ORIGIN || '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter((origin) => origin),
+    allowedHeaders: [
+      'Origin',
+      'X-Requested',
+      'Content-Type',
+      'Accept',
+      'Authorization',
+    ],
+    methods: ['POST', 'PUT', 'PATCH', 'GET', 'DELETE', 'OPTIONS'],
+    credentials: true,
   },
 })
 export class NotificationGateway
