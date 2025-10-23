@@ -72,7 +72,10 @@ export class GeneratePdfService {
   }
 
   private async generatePdf(html: string): Promise<Uint8Array> {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
 
     try {
       const page = await browser.newPage();
