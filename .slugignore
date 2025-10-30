@@ -1,0 +1,29 @@
+# Ignora arquivos e pastas desnecessários para produção no Heroku
+*.md
+*.log
+*.ts
+*.map
+*.env
+*.env.*
+
+# Pastas de testes e seeds
+test/
+prisma/seeds/
+
+# Pastas de código fonte TypeScript (apenas dist/ é necessário no deploy)
+src/
+
+# Configurações e arquivos locais
+.vscode/
+.idea/
+
+# Arquivos de configuração de ferramentas de desenvolvimento
+stryker.config.json
+jest.config.ts
+tsconfig.json
+tsconfig.build.json
+
+# Outros arquivos que não precisam ir para produção
+Dockerfile
+docker-compose.yaml
+README.md
