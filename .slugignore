@@ -10,7 +10,6 @@ _.env.\*
 # Pastas de testes e seeds
 
 test/
-prisma/seeds/
 
 # Pastas de código fonte TypeScript (apenas dist/ é necessário no deploy)
 
