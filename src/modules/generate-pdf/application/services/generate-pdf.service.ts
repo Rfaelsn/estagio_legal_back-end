@@ -74,7 +74,7 @@ export class GeneratePdfService {
   private async generatePdf(html: string): Promise<Uint8Array> {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: process.env.GOOGLE_CHROME_BIN || undefined,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
     });
 
     try {
