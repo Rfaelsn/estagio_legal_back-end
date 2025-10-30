@@ -10,5 +10,4 @@ if [[ ! -d "$puppeteer_cache_dir" ]]; then
     npm install puppeteer
 fi
 
-echo "Running script now..."
-npm run my_puppeteer_routine_here
+echo "Puppeteer postbuild finalizado."
