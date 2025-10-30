@@ -1,60 +1,27 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "tb_users" (
+    "id" TEXT NOT NULL,
+    "name" VARCHAR(63) NOT NULL,
+    "cpf" VARCHAR(127) NOT NULL,
+    "rg" VARCHAR(127) NOT NULL,
+    "academicRegistrationCode" VARCHAR(127),
+    "birthDate" DATE NOT NULL,
+    "email" VARCHAR(127) NOT NULL,
+    "telephone" VARCHAR(127) NOT NULL,
+    "courseStudy" VARCHAR(127),
+    "password" VARCHAR(127) NOT NULL,
+    "role" VARCHAR(127) NOT NULL,
+    "UF" VARCHAR(127),
+    "city" VARCHAR(127),
+    "district" VARCHAR(127),
+    "address" VARCHAR(127),
+    "postalCode" VARCHAR(127),
+    "createdAt" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id_institution" TEXT,
 
-  - You are about to drop the column `curso` on the `tb_users` table. All the data in the column will be lost.
-  - You are about to drop the column `id_instituicao` on the `tb_users` table. All the data in the column will be lost.
-  - You are about to drop the column `matricula` on the `tb_users` table. All the data in the column will be lost.
-  - You are about to drop the column `telefone` on the `tb_users` table. All the data in the column will be lost.
-  - You are about to drop the `tb_concedentes` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `tb_instituicao` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `tb_termo_compromisso` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `tb_token` table. If the table is not empty, all the data it contains will be lost.
-  - A unique constraint covering the columns `[academicRegistrationCode]` on the table `tb_users` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `birthDate` to the `tb_users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `rg` to the `tb_users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `telephone` to the `tb_users` table without a default value. This is not possible if the table is not empty.
-
-*/
--- DropForeignKey
-ALTER TABLE "tb_termo_compromisso" DROP CONSTRAINT "tb_alunos";
-
--- DropForeignKey
-ALTER TABLE "tb_termo_compromisso" DROP CONSTRAINT "tb_concedentes";
-
--- DropForeignKey
-ALTER TABLE "tb_users" DROP CONSTRAINT "tb_instituicao";
-
--- DropIndex
-DROP INDEX "tb_users_matricula_key";
-
--- AlterTable
-ALTER TABLE "tb_users" DROP COLUMN "curso",
-DROP COLUMN "id_instituicao",
-DROP COLUMN "matricula",
-DROP COLUMN "telefone",
-ADD COLUMN     "UF" VARCHAR(127),
-ADD COLUMN     "academicRegistrationCode" VARCHAR(127),
-ADD COLUMN     "address" VARCHAR(127),
-ADD COLUMN     "birthDate" DATE NOT NULL,
-ADD COLUMN     "city" VARCHAR(127),
-ADD COLUMN     "courseStudy" VARCHAR(127),
-ADD COLUMN     "district" VARCHAR(127),
-ADD COLUMN     "id_institution" TEXT,
-ADD COLUMN     "postalCode" VARCHAR(127),
-ADD COLUMN     "rg" VARCHAR(127) NOT NULL,
-ADD COLUMN     "telephone" VARCHAR(127) NOT NULL;
-
--- DropTable
-DROP TABLE "tb_concedentes";
-
--- DropTable
-DROP TABLE "tb_instituicao";
-
--- DropTable
-DROP TABLE "tb_termo_compromisso";
-
--- DropTable
-DROP TABLE "tb_token";
+    CONSTRAINT "tb_users_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "tb_notifications" (
@@ -172,6 +139,15 @@ CREATE TABLE "_ProcessHistoryFiles" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "tb_users_cpf_key" ON "tb_users"("cpf");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tb_users_academicRegistrationCode_key" ON "tb_users"("academicRegistrationCode");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tb_users_email_key" ON "tb_users"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "tb_internship_process_files_filePath_key" ON "tb_internship_process_files"("filePath");
 
 -- CreateIndex
@@ -179,9 +155,6 @@ CREATE UNIQUE INDEX "tb_internshipProcess_id_termCommitment_key" ON "tb_internsh
 
 -- CreateIndex
 CREATE INDEX "_ProcessHistoryFiles_B_index" ON "_ProcessHistoryFiles"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "tb_users_academicRegistrationCode_key" ON "tb_users"("academicRegistrationCode");
 
 -- AddForeignKey
 ALTER TABLE "tb_users" ADD CONSTRAINT "tb_institution" FOREIGN KEY ("id_institution") REFERENCES "tb_institution"("id") ON DELETE SET NULL ON UPDATE CASCADE;
