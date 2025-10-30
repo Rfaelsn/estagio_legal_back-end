@@ -16,5 +16,3 @@ else
 fi
 
 echo "Going back to original directory and running script now..."
-cd
-npm run my_puppeteer_routine_here
