@@ -93,5 +93,8 @@
   },
   "prisma": {
     "seed": "node dist/prisma/seed.js"
+  },
+  "engines": {
+    "node": "22.16.0"
   }
 }
