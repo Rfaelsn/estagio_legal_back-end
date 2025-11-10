@@ -1,81 +1,31 @@
 version: '3.8'
-networks:
-  postgresql-network:
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.enable_icc: "true"
 services:
-  postgresql:
+  db:
     image: postgres:14
-    container_name: dockerpostgresql
+    container_name: estagio_legal_db
     restart: always
-    networks:
-      - postgresql-network
     environment:
-      - POSTGRES_USER=${__YOUR_DATABASE_USER__}
-      - POSTGRES_PASSWORD=${__YOUR_DATABASE_PASSWORD__}
+      POSTGRES_USER: estagio_user
+      POSTGRES_PASSWORD: estagio_pass
+      POSTGRES_DB: estagio_db
+    ports:
+      - "5432:5432"
     volumes:
-      - data-postgresql:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    expose:
-      - '5432'
-    mem_limit: 512m
-  prisma:
-    container_name: dockerprisma
-    build: 
-      context: ./
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 3000:3000
-    networks:
-      - postgresql-network
-    command: >
-      bash -c '
-        npx prisma db push --schema prisma/schema.prisma
-        npm start
-      '
-    depends_on:
-      - postgresql
-    environment:
-      PRISMA_CONFIG: |
-        managementApiSecret: ${__YOUR_MANAGEMENT_API_SECRET__}
-        port: ${__YOUR_PRISMA_SERVER_PORT__}
-        databases:
-          default:
-            connector: ${__YOUR_DATABASE_CONNECTOR__}
-            host: ${__YOUR_DATABASE_HOST__}
-            port: ${__YOUR_DATABASE_PORT__}
-            user: ${__YOUR_DATABASE_USER__}
-            password: ${__YOUR_DATABASE_PASSWORD__}
-            connectionLimit: ${__YOUR_CONNECTION_LIMIT__}
-    mem_limit: 512m
-volumes:
-  data-prisma:
-  data-postgresql:
+      - pgdata:/var/lib/postgresql/data
 
-# version: '3'
-# services:
-#   app:
-#     container_name: estagio_legal_back
-#     build: .
-#     depends_on:
-#       - database
-#     ports:
-#       - ${DOCKER_PORT}:${API_PORT}
-#     environment:
-#       DATABASE_URL: ${DATABASE_URL}
-#   database:
-#     container_name: estagio_legal_db
-#     image: postgres
-#     environment:
-#       POSTGRES_DB: ${DB_NAME}
-#       POSTGRES_USER: ${DB_USERNAME}
-#       POSTGRES_PASSWORD: ${DB_PASSWORD}
-#     ports:
-#     - ${DB_PORT}:5432
-#     volumes:
-#       - pgdata:/var/lib/postgresql/data
-# volumes:
-#   pgdata:
+  app:
+    build: .
+    container_name: estagio_legal_back
+    depends_on:
+      - db
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: postgres://estagio_user:estagio_pass@db:5432/estagio_db
+      JWT_SECRET: secret_jwt
+      JWT_REFRESH_SECRET: refresh_secret
+      CORS_ORIGIN: http://localhost:5173
+    command: npm run start:prod
+
+volumes:
+  pgdata:

@@ -1,14 +1,13 @@
-FROM node:18
+FROM node:24
 
-ENV WORKDIR=/usr/estagio_legal_back
+WORKDIR /usr/estagio_legal_back
 
-WORKDIR ${WORKDIR}
-
-#Copiando os arquivos de dependencias para o contêiner
-COPY . . 
+COPY . .
 
 RUN npm ci
 
-CMD ["npm", "run", "start:prod"]
-# #porta exposta
+RUN npm run build
+
 EXPOSE 3000
+
+CMD npx prisma migrate deploy && npx prisma generate && npm run start:prod
