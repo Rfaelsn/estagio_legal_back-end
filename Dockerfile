@@ -2,6 +2,7 @@ FROM node:24
 
 WORKDIR /usr/estagio_legal_back
 
+COPY .env .env
 COPY . .
 
 RUN npm ci

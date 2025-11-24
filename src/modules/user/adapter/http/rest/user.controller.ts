@@ -36,6 +36,9 @@ export class UserController {
         if (target?.includes('cpf')) {
           throw new ConflictException('CPF já cadastrado.');
         }
+        if (target?.includes('academicRegistrationCode')) {
+          throw new ConflictException('Matrícula já cadastrada.');
+        }
         throw new ConflictException('Já existe um registro com esses dados.');
       }
       throw new InternalServerErrorException('Erro ao criar estudante.');

@@ -1,5 +1,6 @@
 # environment config
 .env
+nginx.conf
 
 # compiled output
 /dist
