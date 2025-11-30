@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { TermCommitmentRepository } from '../../adapter/repository/termCommitment.repository';
 import { CreateTermCommitmentDTO } from '../dto/createTermCommitment.dto';
 import { LinkTermCommitmentFilePathDTO } from '../dto/LinkTermCommitmentFilePath.dto';
@@ -40,96 +46,96 @@ export class TermCommitmentService implements ITermCommitmentService {
   private termCommitmentFileId: string;
 
   async create(createTermCommitmentDTO: CreateTermCommitmentDTO) {
-    // if (
-    //   await this.isValidWeeklyWorkloadLimit(
-    //     createTermCommitmentDTO.id_user,
-    //     createTermCommitmentDTO.weeklyWorkload,
-    //     createTermCommitmentDTO.internshipStartDate,
-    //     createTermCommitmentDTO.internshipEndDate,
-    //   )
-    // ) {
-    try {
-      const userData = await this.userService.getUserById(
+    if (
+      await this.isValidWeeklyWorkloadLimit(
         createTermCommitmentDTO.id_user,
-      );
+        createTermCommitmentDTO.weeklyWorkload,
+        createTermCommitmentDTO.internshipStartDate,
+        createTermCommitmentDTO.internshipEndDate,
+      )
+    ) {
+      try {
+        const userData = await this.userService.getUserById(
+          createTermCommitmentDTO.id_user,
+        );
 
-      const pdf = await this.generatePdfService.createTermCommitmentPdf({
-        ...createTermCommitmentDTO,
-        user: {
-          ...userData,
-        },
-        institution: {
-          ...userData.institution,
-        },
-      });
+        const pdf = await this.generatePdfService.createTermCommitmentPdf({
+          ...createTermCommitmentDTO,
+          user: {
+            ...userData,
+          },
+          institution: {
+            ...userData.institution,
+          },
+        });
 
-      this.termCommitmentFileId = await this.fileStorageService.uploadPdfFile(
-        pdf,
-        FileType.TERM_COMMITMENT,
-      );
+        this.termCommitmentFileId = await this.fileStorageService.uploadPdfFile(
+          pdf,
+          FileType.TERM_COMMITMENT,
+        );
 
-      const result = await this.prismaService.$transaction(
-        async (prismaClientTransaction) => {
-          const createTermCommitmentUseCase = new CreateTermCommitmentUseCase(
-            this.termCommitmentRepository,
-          );
-          const termCommitment = await createTermCommitmentUseCase.handle(
-            createTermCommitmentDTO,
-            prismaClientTransaction,
-          );
-          const { id } = await this.internshipProcessService.create(
-            termCommitment.id,
-            termCommitment.id_user,
-            prismaClientTransaction,
-          );
+        const result = await this.prismaService.$transaction(
+          async (prismaClientTransaction) => {
+            const createTermCommitmentUseCase = new CreateTermCommitmentUseCase(
+              this.termCommitmentRepository,
+            );
+            const termCommitment = await createTermCommitmentUseCase.handle(
+              createTermCommitmentDTO,
+              prismaClientTransaction,
+            );
+            const { id } = await this.internshipProcessService.create(
+              termCommitment.id,
+              termCommitment.id_user,
+              prismaClientTransaction,
+            );
 
-          const { id: termCommitmentEntityFileId } =
-            await this.fileService.registerFilePathProcess({
-              filePath: this.termCommitmentFileId,
-              fileType: FileType.TERM_COMMITMENT,
-            });
+            const { id: termCommitmentEntityFileId } =
+              await this.fileService.registerFilePathProcess({
+                filePath: this.termCommitmentFileId,
+                fileType: FileType.TERM_COMMITMENT,
+              });
 
-          await this.internshipProcessHistoryService.registerHistoryWithFile(
-            {
-              status: InternshipProcessStatus.IN_PROGRESS,
-              movement: InternshipProcessMovement.STAGE_START,
-              description: 'processo iniciado pelo aluno',
-              idInternshipProcess: id,
-              files: [
-                {
-                  fileId: termCommitmentEntityFileId,
-                },
-              ],
-            },
-            prismaClientTransaction,
-          );
-          return { id, termCommitment, termCommitmentEntityFileId };
-        },
-      );
+            await this.internshipProcessHistoryService.registerHistoryWithFile(
+              {
+                status: InternshipProcessStatus.IN_PROGRESS,
+                movement: InternshipProcessMovement.STAGE_START,
+                description: 'processo iniciado pelo aluno',
+                idInternshipProcess: id,
+                files: [
+                  {
+                    fileId: termCommitmentEntityFileId,
+                  },
+                ],
+              },
+              prismaClientTransaction,
+            );
+            return { id, termCommitment, termCommitmentEntityFileId };
+          },
+        );
 
-      return {
-        termFilePathId: result.termCommitmentEntityFileId,
-        internshipProcessId: result.id,
-      };
-    } catch (error) {
-      if (this.termCommitmentFileId) {
-        try {
-          await this.fileStorageService.deletePdfFile(
-            this.termCommitmentFileId,
-          );
-        } catch (deleteError) {
-          console.error('Erro ao deletar arquivo:', deleteError);
+        return {
+          termFilePathId: result.termCommitmentEntityFileId,
+          internshipProcessId: result.id,
+        };
+      } catch (error) {
+        if (this.termCommitmentFileId) {
+          try {
+            await this.fileStorageService.deletePdfFile(
+              this.termCommitmentFileId,
+            );
+          } catch (deleteError) {
+            console.error('Erro ao deletar arquivo:', deleteError);
+          }
         }
-      }
 
-      throw error;
+        throw error;
+      }
+    } else {
+      throw new HttpException(
+        'período de criação de termo inválido. limite de carga horária 30hrs semanais (verifique outros termos criados nesse período)',
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    // } else {
-    //   throw new HttpException(
-    //     'período de criação de termo inválido (limite de carga horária 30hrs semanais)',
-    //     HttpStatus.BAD_REQUEST,
-    //   );
-    // }
   }
 
   async assign(

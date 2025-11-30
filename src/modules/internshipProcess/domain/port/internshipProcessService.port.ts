@@ -1,10 +1,8 @@
 import { Prisma } from '@prisma/client';
 import { InternshipProcessFilterDto } from '../../application/dto/internshipProcessFilter.dto';
-import { RegisterEndInternshipProcessDto } from '../../application/dto/registerEndInternshipProcess.dto';
 import { UpdateInternshipProcessDTO } from '../../application/dto/updateInternshipProcess.dto';
 import { ValidateAssignEndInternshipProcessDto } from '../../application/dto/validateAssignEndInternshipProcess.dto';
 import { InternshipProcessEntity } from '../entities/internshipProcess.entity';
-import { UserFromJwt } from '@/auth/models/UserFromJwt';
 
 export interface InternshipProcessServicePort {
   create(
@@ -28,12 +26,6 @@ export interface InternshipProcessServicePort {
     userId: string,
     page: number,
     pageSize: number,
-  );
-
-  registerEndInternshipProcess(
-    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
-    file: Express.Multer.File[],
-    user: UserFromJwt,
   );
 
   validateAssignEndInternshipProcess(

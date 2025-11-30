@@ -49,13 +49,6 @@ export class InternshipProcessService implements InternshipProcessServicePort {
     @Inject('PrismaService')
     private readonly prismaService: PrismaService,
   ) {}
-  registerEndInternshipProcess(
-    registerEndInternshipProcessDto: RegisterEndInternshipProcessDto,
-    file: Express.Multer.File[],
-    user: UserFromJwt,
-  ) {
-    console.log('teste');
-  }
 
   async create(
     idTermCommitment: string,
