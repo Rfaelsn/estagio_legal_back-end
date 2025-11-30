@@ -33,6 +33,10 @@
         position: relative;
       }
 
+      .info-cell.cpf-cell {
+        width: 25% !important;
+      }
+
       /* Header com brasão e informações */
       .header {
         display: flex;
@@ -122,6 +126,10 @@
         width: 30%;
       }
 
+      .course-study {
+        width: 70%;
+      }
+
       .info-cell.col3 {
         width: 30%;
       }
@@ -208,6 +216,20 @@
         font-weight: bold;
         z-index: -1;
         white-space: nowrap;
+      }
+
+      .cpf-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 10px;
+      }
+      .cpf-row .info-cell {
+        flex: 1 1 0;
+        max-width: 25%;
+        min-width: 0;
+        padding-right: 5px;
       }
 
       @media print {
@@ -351,7 +373,7 @@
               <span class="value"><%= grantingCompanyDistrict %></span>
             </div>
             <div class="info-cell col3">
-              <span class="label">Fone:</span>
+              <span class="label">Email:</span>
               <span class="value"><%= grantingCompanyEmail %></span>
             </div>
           </div>
@@ -393,63 +415,37 @@
               <span class="label">Nome:</span>
               <span class="value"><%= user.name %></span>
             </div>
-            <div class="info-cell col2"></div>
             <div class="info-cell col3">
               <span class="label">Matrícula:</span>
-              <span class="value"><%= user.registration %></span>
+              <span class="value"><%= user.academicRegistrationCode %></span>
             </div>
           </div>
           <div class="info-row">
-            <div class="info-cell col1">
+            <div class="info-cell course-study">
               <span class="label">Curso:</span>
               <span class="value"><%= user.courseStudy %></span>
             </div>
-            <div class="info-cell col2"></div>
             <div class="info-cell col3">
               <span class="label">Email:</span>
               <span class="value"><%= user.email %></span>
             </div>
           </div>
-          <div class="info-row">
-            <div class="info-cell col1">
+          <div class="info-row cpf-row">
+            <div class="info-cell">
               <span class="label">CPF:</span>
               <span class="value"><%= user.cpf %></span>
             </div>
-            <div class="info-cell col2">
+            <div class="info-cell">
               <span class="label">RG:</span>
               <span class="value"><%= user.rg %></span>
             </div>
-            <div class="info-cell col3">
+            <div class="info-cell">
               <span class="label">Data Nasc:</span>
               <span class="value"><%= user.birthDate %></span>
             </div>
-          </div>
-          <div class="info-row">
-            <div class="info-cell col1">
-              <span class="label">Endereço:</span>
-              <span class="value"><%= user.address %></span>
-            </div>
-            <div class="info-cell col2">
-              <span class="label">Cidade:</span>
-              <span class="value"><%= user.city %></span>
-            </div>
-            <div class="info-cell col3">
+            <div class="info-cell">
               <span class="label">Celular:</span>
               <span class="value"><%= user.telephone %></span>
-            </div>
-          </div>
-          <div class="info-row">
-            <div class="info-cell col1">
-              <span class="label">Bairro:</span>
-              <span class="value"><%= user.district %></span>
-            </div>
-            <div class="info-cell col2">
-              <span class="label">CEP:</span>
-              <span class="value"><%= user.postalCode %></span>
-            </div>
-            <div class="info-cell col3">
-              <span class="label">UF:</span>
-              <span class="value"><%= user.UF %></span>
             </div>
           </div>
         </div>
