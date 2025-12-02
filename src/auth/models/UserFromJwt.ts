@@ -3,4 +3,5 @@ export interface UserFromJwt {
   email: string;
   name: string;
   role: string;
+  sub?: string;
 }

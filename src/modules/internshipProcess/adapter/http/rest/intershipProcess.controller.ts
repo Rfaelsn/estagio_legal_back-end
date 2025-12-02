@@ -6,7 +6,6 @@ import {
   Param,
   UseGuards,
   Patch,
-  Request,
   ParseIntPipe,
   Post,
   HttpException,
@@ -31,6 +30,8 @@ import {
   configFileInterceptor,
   filePipe,
 } from '@/modules/file/adapter/interceptors/config-file-interceptor';
+import { UseFilters } from '@nestjs/common';
+import { FileValidationExceptionFilter } from '@/shared/filters/file-validation-exception.filter';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('processo/estagio')
@@ -62,6 +63,7 @@ export class InternshipProcessController
 
   @Roles(Role.STUDENT, Role.ADMINISTRATOR, Role.EMPLOYEE)
   @UseInterceptors(FilesInterceptor('file', 3, configFileInterceptor))
+  @UseFilters(FileValidationExceptionFilter)
   @Post('assign-end-internship-process')
   async assignEndInternshipProcess(
     @Body()
@@ -112,11 +114,19 @@ export class InternshipProcessController
   @Roles(Role.STUDENT)
   @Get('elegible-for-completation')
   async findEligibleProcessesForCompletion(
-    @Request() req,
+    @User() user: UserFromJwt,
     @Query('page', new ParseIntPipe()) page: number,
     @Query('pageSize', new ParseIntPipe()) pageSize: number,
   ) {
-    const userId = req.user.id;
+    const userId = user.sub;
+
+    if (!userId) {
+      throw new HttpException(
+        'User ID not found in token',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
     return await this.internshipProcessService.findEligibleProcessesForCompletion(
       userId,
       page,
