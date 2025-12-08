@@ -71,6 +71,10 @@ export class CreateTermCommitmentDTO {
     each: true,
     message: 'Each activity in internshipActivityPlan must be a string',
   })
+  @IsNotEmpty({
+    each: true,
+    message: 'Each activity in internshipActivityPlan must not be empty',
+  })
   @MaxLength(200, {
     each: true,
     message:

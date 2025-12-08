@@ -347,20 +347,23 @@
               <span class="value"><%= grantingCompanyName %></span>
             </div>
             <div class="info-cell col2"></div>
-            <div class="info-cell col3"></div>
-          </div>
-          <div class="info-row">
-            <div class="info-cell col1">
+            <div class="info-cell col3">
               <span class="label">CNPJ:</span>
               <span class="value"><%= grantingCompanyCNPJ %></span>
             </div>
-            <div class="info-cell col2">
+          </div>
+          <div class="info-row">
+            <div class="info-cell col1">
               <span class="label">Cidade:</span>
               <span class="value"><%= grantingCompanyCity %></span>
             </div>
-            <div class="info-cell col3">
+            <div class="info-cell col2">
               <span class="label">UF:</span>
               <span class="value"><%= grantingCompanyState %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Bairro:</span>
+              <span class="value"><%= grantingCompanyDistrict %></span>
             </div>
           </div>
           <div class="info-row">
@@ -369,12 +372,12 @@
               <span class="value"><%= grantingCompanyAddress %></span>
             </div>
             <div class="info-cell col2">
-              <span class="label">Bairro:</span>
-              <span class="value"><%= grantingCompanyDistrict %></span>
-            </div>
-            <div class="info-cell col3">
               <span class="label">Email:</span>
               <span class="value"><%= grantingCompanyEmail %></span>
+            </div>
+            <div class="info-cell col3">
+              <span class="label">Cep:</span>
+              <span class="value"><%= grantingCompanyPostalCode %></span>
             </div>
           </div>
           <div class="info-row">
@@ -384,13 +387,9 @@
                 ><%= grantingCompanyLegalRepresentative %></span
               >
             </div>
-            <div class="info-cell col2">
-              <span class="label">Cargo:</span>
+            <div class="info-cell col2" colspan="2" style="width: 40%">
+              <span class="label">Cargo (Representante Legal):</span>
               <span class="value"><%= legalRepresentativeRole %></span>
-            </div>
-            <div class="info-cell col3">
-              <span class="label">Cep:</span>
-              <span class="value"><%= grantingCompanyPostalCode %></span>
             </div>
           </div>
           <div class="info-row">
@@ -399,7 +398,7 @@
               <span class="value"><%= supervisor %></span>
             </div>
             <div class="info-cell col2">
-              <span class="label">Cargo:</span>
+              <span class="label">Cargo (Supervisor):</span>
               <span class="value"><%= supervisorPosition %></span>
             </div>
             <div class="info-cell col3"></div>
